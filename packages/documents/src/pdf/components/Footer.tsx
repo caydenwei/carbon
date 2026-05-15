@@ -16,11 +16,17 @@ interface FooterProps {
 
 const Footer = ({ label, documentId }: FooterProps) => {
   return (
-    <View style={tw("absolute bottom-0 left-0 right-0 px-10 pb-5")} fixed>
-      <View style={tw("border-t border-gray-200 pt-2")}>
+    <View
+      style={[
+        tw("absolute bottom-0 left-0 right-0 pb-5"),
+        { paddingLeft: 16, paddingRight: 16 }
+      ]}
+      fixed
+    >
+      <View style={tw("border-t border-gray-200 pt-3")}>
         <View
           style={tw(
-            "flex flex-row justify-between items-center text-xs text-gray-500"
+            "flex flex-row justify-between items-center text-xs text-gray-500 px-1"
           )}
         >
           <Text>{label ?? ""}</Text>

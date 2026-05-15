@@ -1,13 +1,13 @@
 import type { Database } from "@carbon/database";
 import type { JSONContent } from "@carbon/react";
-import { formatDate, pluralize } from "@carbon/utils";
+import { formatDate, isEoriCountry, pluralize } from "@carbon/utils";
 import { getLocalTimeZone, today } from "@internationalized/date";
 import { Image, Text, View } from "@react-pdf/renderer";
 import { createTw } from "react-pdf-tailwind";
 import type { AccountsReceivableBillingAddress, PDF } from "../types";
+import { composeRegistrationLine } from "../utils/footer";
 import { getLineDescription, getLineDescriptionDetails } from "../utils/quote";
-import { getCurrencyFormatter } from "../utils/shared";
-import { Header, Note, PartyDetails, Template } from "./components";
+import { AddressBlock, Header, Note, Template } from "./components";
 
 type QuoteCustomerDetails =
   Database["public"]["Views"]["quoteCustomerDetails"]["Row"] & {
@@ -88,7 +88,18 @@ const QuotePDF = ({
   const currencyCode = quote.currencyCode ?? company.baseCurrencyCode;
   const shouldConvertCurrency =
     !!currencyCode && currencyCode !== company.baseCurrencyCode;
-  const formatter = getCurrencyFormatter(currencyCode ?? "USD", locale);
+  const numberFormatter = new Intl.NumberFormat(locale, {
+    style: "decimal",
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2
+  });
+
+  const registrationLine = composeRegistrationLine({
+    companyName: company.name,
+    country: company.countryCode,
+    eori: company.eori,
+    accountsReceivableEmail: companySettings?.accountsReceivableEmail
+  });
 
   const pricesByLine = quoteLinePrices.reduce<
     Record<string, Database["public"]["Tables"]["quoteLinePrice"]["Row"][]>
@@ -230,6 +241,7 @@ const QuotePDF = ({
         subject: meta?.subject ?? "Quote"
       }}
       footerDocumentId={quote?.quoteId}
+      footerLabel={registrationLine ?? undefined}
     >
       {watermarkSrc && (
         <View
@@ -256,50 +268,44 @@ const QuotePDF = ({
         locale={locale}
       />
 
-      <PartyDetails
-        company={company}
-        companyAddressOverride={
-          accountsReceivableBillingAddress
-            ? {
-                name: accountsReceivableBillingAddress.name,
-                addressLine1: accountsReceivableBillingAddress.addressLine1,
-                addressLine2: accountsReceivableBillingAddress.addressLine2,
-                city: accountsReceivableBillingAddress.city,
-                stateProvince: accountsReceivableBillingAddress.state,
-                postalCode: accountsReceivableBillingAddress.postalCode,
-                countryCode: accountsReceivableBillingAddress.countryCode
-              }
-            : undefined
-        }
-        companyLabel="Seller"
-        counterParty={{
-          name: customerName,
-          addressLine1: customerAddressLine1,
-          addressLine2: customerAddressLine2,
-          city: customerCity,
-          stateProvince: customerStateProvince,
-          postalCode: customerPostalCode,
-          countryCode: customerCountryCode,
-          taxId: customerTaxId,
-          vatNumber: customerVatNumber,
-          eori: customerEori,
-          contactName: contactName,
-          contactEmail: contactEmail
-        }}
-        counterPartyLabel="Buyer"
-        accountsReceivableEmail={companySettings?.accountsReceivableEmail}
-      />
-
-      {/* Quote Details & Notes */}
+      {/* Body row — TO (customer left) | QUOTE DETAILS (right) */}
       <View style={tw("border border-gray-200 mb-4")}>
         <View style={tw("flex flex-row")}>
+          {/* LEFT — Customer block (addressee) */}
           <View style={tw("w-1/2 p-3 border-r border-gray-200")}>
+            <Text
+              style={tw("text-[9px] font-bold text-gray-600 mb-1 uppercase")}
+            >
+              To
+            </Text>
+            <View style={tw("text-[9px] text-gray-800")}>
+              <AddressBlock
+                name={customerName}
+                addressLine1={customerAddressLine1}
+                addressLine2={customerAddressLine2}
+                city={customerCity}
+                stateProvince={customerStateProvince}
+                postalCode={customerPostalCode}
+                countryCode={customerCountryCode}
+              />
+              {customerTaxId && !isEoriCountry(customerCountryCode) && (
+                <Text>Tax ID: {customerTaxId}</Text>
+              )}
+              {customerVatNumber && <Text>VAT: {customerVatNumber}</Text>}
+              {customerEori && <Text>EORI: {customerEori}</Text>}
+              {contactName && <Text>Contact: {contactName}</Text>}
+              {contactEmail && <Text>Email: {contactEmail}</Text>}
+            </View>
+          </View>
+
+          {/* RIGHT — Quote Details */}
+          <View style={tw("w-1/2 p-3")}>
             <Text
               style={tw("text-[9px] font-bold text-gray-600 mb-1 uppercase")}
             >
               Quote Details
             </Text>
-            <View style={tw("text-[10px] text-gray-800")}>
+            <View style={tw("text-[9px] text-gray-800")}>
               <Text>
                 Date:{" "}
                 {formatDate(
@@ -309,7 +315,7 @@ const QuotePDF = ({
                 )}
               </Text>
               {quote.expirationDate && (
-                <Text>
+                <Text style={tw("font-bold")}>
                   Expires: {formatDate(quote.expirationDate, undefined, locale)}
                 </Text>
               )}
@@ -326,60 +332,78 @@ const QuotePDF = ({
                 <Text>
                   Incoterm: {shipment.incoterm}
                   {shipment.incotermLocation
-                    ? ` - ${shipment.incotermLocation}`
+                    ? ` — ${shipment.incotermLocation}`
                     : ""}
                 </Text>
-              )}
-            </View>
-          </View>
-          <View style={tw("w-1/2 p-3")}>
-            <Text
-              style={tw("text-[9px] font-bold text-gray-600 mb-1 uppercase")}
-            >
-              Notes
-            </Text>
-            <View style={tw("text-[10px] text-gray-800")}>
-              {Object.keys(quote?.externalNotes ?? {}).length > 0 ? (
-                <Note content={(quote.externalNotes ?? {}) as JSONContent} />
-              ) : (
-                <Text style={tw("text-gray-400")}>None</Text>
               )}
             </View>
           </View>
         </View>
       </View>
 
+      {/* Notes (full width) */}
+      <View style={tw("border border-gray-200 mb-4")}>
+        <View style={tw("p-3")}>
+          <Text style={tw("text-[9px] font-bold text-gray-600 mb-1 uppercase")}>
+            Notes
+          </Text>
+          <View style={tw("text-[9px] text-gray-800")}>
+            {Object.keys(quote?.externalNotes ?? {}).length > 0 ? (
+              <Note content={(quote.externalNotes ?? {}) as JSONContent} />
+            ) : (
+              <Text style={tw("text-gray-400")}>None</Text>
+            )}
+          </View>
+        </View>
+      </View>
+
       {/* Line Items Table */}
       <View style={tw("mb-4")}>
-        {/* Header */}
+        {/* Header — fixed so it repeats on every page the table spans */}
         <View
+          fixed
           style={tw(
-            "flex flex-row bg-gray-800 py-2 px-3 text-white text-[9px] font-bold"
+            "flex flex-row bg-gray-800 py-2 px-3 text-white text-[9px] font-bold items-center"
           )}
         >
           <View style={tw("w-1/3")}>
             <Text>Description</Text>
           </View>
-          <View style={tw("w-2/3 flex flex-row")}>
-            <Text style={tw(`${colWidth} text-right pr-3`)}>Qty</Text>
-            <Text style={tw(`${colWidth} text-right pr-3`)}>Unit Price</Text>
+          <View style={tw("w-2/3 flex flex-row items-center")}>
+            <Text style={tw(`${colWidth} text-center pr-3`)}>Qty</Text>
+            <View style={tw(`${colWidth} items-center pr-3`)}>
+              <Text>Unit Price</Text>
+              <Text style={[tw("text-[7px] font-normal"), { opacity: 0.7 }]}>
+                {currencyCode}
+              </Text>
+            </View>
             {!hasSinglePricePerLine && (
-              <Text style={tw(`${colWidth} text-right pr-3`)}>Tax & Fees</Text>
+              <View style={tw(`${colWidth} items-center pr-3`)}>
+                <Text>Tax & Fees</Text>
+                <Text style={[tw("text-[7px] font-normal"), { opacity: 0.7 }]}>
+                  {currencyCode}
+                </Text>
+              </View>
             )}
             {hasAnyLeadTime && (
-              <Text style={tw(`${colWidth} text-right pr-3`)}>Lead Time</Text>
+              <Text style={tw(`${colWidth} text-center pr-3`)}>Lead Time</Text>
             )}
-            <Text style={tw(`${colWidth} text-right`)}>Total</Text>
+            <View style={tw(`${colWidth} items-center`)}>
+              <Text>Total</Text>
+              <Text style={[tw("text-[7px] font-normal"), { opacity: 0.7 }]}>
+                {currencyCode}
+              </Text>
+            </View>
           </View>
         </View>
 
         {/* Rows */}
         {quoteLines.map((line) => {
-          const unitPriceFormatter = getCurrencyFormatter(
-            currencyCode ?? "USD",
-            locale,
-            line.unitPricePrecision ?? 2
-          );
+          const unitPriceNumberFormatter = new Intl.NumberFormat(locale, {
+            style: "decimal",
+            minimumFractionDigits: line.unitPricePrecision ?? 2,
+            maximumFractionDigits: line.unitPricePrecision ?? 2
+          });
 
           const additionalCharges = line.additionalCharges ?? {};
 
@@ -434,11 +458,16 @@ const QuotePDF = ({
                   return (
                     <View
                       key={`${line.id}-${quantity}`}
-                      style={tw(
-                        `flex flex-row py-2 px-3 border-b border-gray-200 text-[10px] ${
-                          isEven ? "bg-white" : "bg-gray-50"
-                        }`
-                      )}
+                      style={[
+                        tw(
+                          "flex flex-row py-2 px-3 border-b border-gray-200 text-[10px]"
+                        ),
+                        {
+                          backgroundColor: isEven
+                            ? "transparent"
+                            : "rgba(249, 250, 251, 0.6)"
+                        }
+                      ]}
                     >
                       <View style={tw("w-1/3 pr-2")}>
                         {index === 0 && (
@@ -512,35 +541,35 @@ const QuotePDF = ({
                       <View style={tw("w-2/3 flex flex-row")}>
                         <Text
                           style={tw(
-                            `${colWidth} text-right text-gray-600 pr-3`
+                            `${colWidth} text-center text-gray-600 pr-3`
                           )}
                         >
                           {quantity} EA
                         </Text>
                         <Text
                           style={tw(
-                            `${colWidth} text-right text-gray-600 pr-3`
+                            `${colWidth} text-center text-gray-600 pr-3`
                           )}
                         >
                           {unitPrice
-                            ? unitPriceFormatter.format(unitPrice)
+                            ? unitPriceNumberFormatter.format(unitPrice)
                             : "-"}
                         </Text>
                         {!hasSinglePricePerLine && (
                           <Text
                             style={tw(
-                              `${colWidth} text-right text-gray-600 pr-3`
+                              `${colWidth} text-center text-gray-600 pr-3`
                             )}
                           >
                             {totalTaxAndFees > 0
-                              ? formatter.format(totalTaxAndFees)
+                              ? numberFormatter.format(totalTaxAndFees)
                               : "-"}
                           </Text>
                         )}
                         {hasAnyLeadTime && (
                           <Text
                             style={tw(
-                              `${colWidth} text-right text-gray-600 pr-3`
+                              `${colWidth} text-center text-gray-600 pr-3`
                             )}
                           >
                             {leadTime > 0
@@ -550,15 +579,15 @@ const QuotePDF = ({
                         )}
                         <Text
                           style={tw(
-                            `${colWidth} text-right text-gray-800 font-medium`
+                            `${colWidth} text-center text-gray-800 font-medium`
                           )}
                         >
                           {hasSinglePricePerLine
                             ? netExtendedPrice > 0
-                              ? formatter.format(netExtendedPrice)
+                              ? numberFormatter.format(netExtendedPrice)
                               : "-"
                             : totalPrice > 0
-                              ? formatter.format(totalPrice)
+                              ? numberFormatter.format(totalPrice)
                               : "-"}
                         </Text>
                       </View>
@@ -567,11 +596,17 @@ const QuotePDF = ({
                 })
               ) : (
                 <View
-                  style={tw(
-                    `flex flex-row py-2 px-3 border-b border-gray-200 text-[10px] ${
-                      rowIndex++ % 2 === 0 ? "bg-white" : "bg-gray-50"
-                    }`
-                  )}
+                  style={[
+                    tw(
+                      "flex flex-row py-2 px-3 border-b border-gray-200 text-[10px]"
+                    ),
+                    {
+                      backgroundColor:
+                        rowIndex++ % 2 === 0
+                          ? "transparent"
+                          : "rgba(249, 250, 251, 0.6)"
+                    }
+                  ]}
                 >
                   <View style={tw("w-1/3 pr-2")}>
                     <Text style={tw("text-gray-800")}>
@@ -605,51 +640,68 @@ const QuotePDF = ({
         {hasSinglePricePerLine && (
           <View>
             <View
-              style={tw("flex flex-row py-1.5 px-3 bg-gray-50 text-[10px]")}
+              style={[
+                tw("flex flex-row py-1.5 px-3 text-[9px]"),
+                { backgroundColor: "rgba(249, 250, 251, 0.6)" }
+              ]}
             >
-              <View style={tw("w-4/6")} />
-              <Text style={tw("w-1/6 text-right text-gray-600")}>Subtotal</Text>
-              <Text style={tw("w-1/6 text-right text-gray-800")}>
-                {formatter.format(getTotalSubtotal())}
+              <Text style={tw("w-[80%] text-right pr-3 text-gray-600")}>
+                Subtotal ({currencyCode})
+              </Text>
+              <Text style={tw("w-[20%] text-right text-gray-800")}>
+                {numberFormatter.format(getTotalSubtotal())}
               </Text>
             </View>
             <View
-              style={tw("flex flex-row py-1.5 px-3 bg-gray-50 text-[10px]")}
+              style={[
+                tw("flex flex-row py-1.5 px-3 text-[9px]"),
+                { backgroundColor: "rgba(249, 250, 251, 0.6)" }
+              ]}
             >
-              <View style={tw("w-4/6")} />
-              <Text style={tw("w-1/6 text-right text-gray-600")}>Shipping</Text>
-              <Text style={tw("w-1/6 text-right text-gray-800")}>
-                {formatter.format(getTotalShipping())}
+              <Text style={tw("w-[80%] text-right pr-3 text-gray-600")}>
+                Shipping ({currencyCode})
+              </Text>
+              <Text style={tw("w-[20%] text-right text-gray-800")}>
+                {numberFormatter.format(getTotalShipping())}
               </Text>
             </View>
             {getTotalFees() > 0 && (
               <View
-                style={tw("flex flex-row py-1.5 px-3 bg-gray-50 text-[10px]")}
+                style={[
+                  tw("flex flex-row py-1.5 px-3 text-[9px]"),
+                  { backgroundColor: "rgba(249, 250, 251, 0.6)" }
+                ]}
               >
-                <View style={tw("w-4/6")} />
-                <Text style={tw("w-1/6 text-right text-gray-600")}>Fees</Text>
-                <Text style={tw("w-1/6 text-right text-gray-800")}>
-                  {formatter.format(getTotalFees())}
+                <Text style={tw("w-[80%] text-right pr-3 text-gray-600")}>
+                  Fees ({currencyCode})
+                </Text>
+                <Text style={tw("w-[20%] text-right text-gray-800")}>
+                  {numberFormatter.format(getTotalFees())}
                 </Text>
               </View>
             )}
             <View
-              style={tw("flex flex-row py-1.5 px-3 bg-gray-50 text-[10px]")}
+              style={[
+                tw("flex flex-row py-1.5 px-3 text-[9px]"),
+                { backgroundColor: "rgba(249, 250, 251, 0.6)" }
+              ]}
             >
-              <View style={tw("w-4/6")} />
-              <Text style={tw("w-1/6 text-right text-gray-600")}>Taxes</Text>
-              <Text style={tw("w-1/6 text-right text-gray-800")}>
-                {formatter.format(getTotalTaxes())}
+              <Text style={tw("w-[80%] text-right pr-3 text-gray-600")}>
+                Taxes ({currencyCode})
+              </Text>
+              <Text style={tw("w-[20%] text-right text-gray-800")}>
+                {numberFormatter.format(getTotalTaxes())}
               </Text>
             </View>
             <View style={tw("h-[1px] bg-gray-200")} />
-            <View style={tw("flex flex-row py-2 px-3 text-[11px]")}>
-              <View style={tw("w-4/6")} />
-              <Text style={tw("w-1/6 text-right text-gray-800 font-bold")}>
+            <View style={tw("flex flex-row py-2 px-3 text-[9px]")}>
+              <Text
+                style={tw("w-[80%] text-right pr-3 text-gray-800 font-bold")}
+              >
                 Total
               </Text>
-              <Text style={tw("w-1/6 text-right text-gray-800 font-bold")}>
-                {formatter.format(getTotal())}
+              <Text style={tw("w-[20%] text-right text-gray-800 font-bold")}>
+                {currencyCode} {numberFormatter.format(getTotal())}
               </Text>
             </View>
           </View>
@@ -658,7 +710,16 @@ const QuotePDF = ({
 
       {terms?.content && terms.content.length > 0 && (
         <View break>
-          <Note title="Standard Terms & Conditions" content={terms} />
+          <View style={tw("border-b border-gray-400 mb-3 pb-2 mt-2")}>
+            <Text
+              style={tw(
+                "text-[14px] font-bold text-gray-800 uppercase tracking-wide"
+              )}
+            >
+              Terms & Conditions
+            </Text>
+          </View>
+          <Note content={terms} />
         </View>
       )}
     </Template>

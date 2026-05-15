@@ -1,9 +1,10 @@
 import type { Database } from "@carbon/database";
 import type { JSONContent } from "@carbon/react";
-import { formatDate } from "@carbon/utils";
+import { formatDate, isEoriCountry } from "@carbon/utils";
 import { Image, Text, View } from "@react-pdf/renderer";
 import { createTw } from "react-pdf-tailwind";
 import type { AccountsReceivableBillingAddress, PDF } from "../types";
+import { composeRegistrationLine } from "../utils/footer";
 import {
   getLineDescription,
   getLineDescriptionDetails,
@@ -11,14 +12,7 @@ import {
   getLineTotal,
   getTotal
 } from "../utils/sales-invoice";
-import { getCurrencyFormatter } from "../utils/shared";
-import {
-  Header,
-  Note,
-  PartyDetails,
-  ShipBillDetails,
-  Template
-} from "./components";
+import { AddressBlock, Header, Note, Template } from "./components";
 
 type SalesInvoiceLocations =
   Database["public"]["Views"]["salesInvoiceLocations"]["Row"] & {
@@ -104,7 +98,18 @@ const SalesInvoicePDF = ({
   } = salesInvoiceLocations;
 
   const currencyCode = salesInvoice.currencyCode ?? company.baseCurrencyCode;
-  const formatter = getCurrencyFormatter(currencyCode ?? "USD", locale);
+  const numberFormatter = new Intl.NumberFormat(locale, {
+    style: "decimal",
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2
+  });
+
+  const registrationLine = composeRegistrationLine({
+    companyName: company.name,
+    country: company.countryCode,
+    eori: company.eori,
+    accountsReceivableEmail: companySettings?.accountsReceivableEmail
+  });
 
   const paymentTerm = paymentTerms?.find(
     (term) => term.id === salesInvoice?.paymentTermId
@@ -127,6 +132,7 @@ const SalesInvoicePDF = ({
         subject: meta?.subject ?? "Invoice"
       }}
       footerDocumentId={salesInvoice?.invoiceId}
+      footerLabel={registrationLine ?? undefined}
     >
       {watermarkSrc && (
         <View
@@ -149,121 +155,127 @@ const SalesInvoicePDF = ({
         company={company}
         title="Invoice"
         documentId={salesInvoice?.invoiceId}
-        date={salesInvoice?.dateIssued}
         currencyCode={salesInvoice?.currencyCode}
         locale={locale}
       />
 
-      <PartyDetails
-        company={company}
-        companyAddressOverride={
-          accountsReceivableBillingAddress
-            ? {
-                name: accountsReceivableBillingAddress.name,
-                addressLine1: accountsReceivableBillingAddress.addressLine1,
-                addressLine2: accountsReceivableBillingAddress.addressLine2,
-                city: accountsReceivableBillingAddress.city,
-                stateProvince: accountsReceivableBillingAddress.state,
-                postalCode: accountsReceivableBillingAddress.postalCode,
-                countryCode: accountsReceivableBillingAddress.countryCode
-              }
-            : undefined
-        }
-        companyLabel="Seller"
-        counterParty={{
-          name: customerName,
-          addressLine1: customerAddressLine1,
-          addressLine2: customerAddressLine2,
-          city: customerCity,
-          stateProvince: customerStateProvince,
-          postalCode: customerPostalCode,
-          countryCode: customerCountryName,
-          taxId: customerTaxId,
-          vatNumber: customerVatNumber,
-          eori: customerEori
-        }}
-        counterPartyLabel="Buyer"
-        accountsReceivableEmail={companySettings?.accountsReceivableEmail}
-      />
-
-      <ShipBillDetails
-        shipTo={{
-          name: shipmentCustomerName,
-          addressLine1: shipmentAddressLine1,
-          addressLine2: shipmentAddressLine2,
-          city: shipmentCity,
-          stateProvince: shipmentStateProvince,
-          postalCode: shipmentPostalCode,
-          countryCode: shipmentCountryName
-        }}
-        billTo={{
-          name: invoiceCustomerName,
-          addressLine1: invoiceAddressLine1,
-          addressLine2: invoiceAddressLine2,
-          city: invoiceCity,
-          stateProvince: invoiceStateProvince,
-          postalCode: invoicePostalCode,
-          countryCode: invoiceCountryName
-        }}
-      />
-
-      {/* Invoice Details & Notes */}
+      {/* Body row — Bill To (left) | Invoice Details + Ship To stacked (right) */}
       <View style={tw("border border-gray-200 mb-4")}>
         <View style={tw("flex flex-row")}>
+          {/* LEFT — Bill To (the customer being invoiced) */}
           <View style={tw("w-1/2 p-3 border-r border-gray-200")}>
             <Text
               style={tw("text-[9px] font-bold text-gray-600 mb-1 uppercase")}
             >
-              Invoice Details
+              Bill To
             </Text>
-            <View style={tw("text-[10px] text-gray-800")}>
-              {salesInvoice?.dateIssued && (
-                <Text>
-                  Date Issued:{" "}
-                  {formatDate(salesInvoice.dateIssued, undefined, locale)}
-                </Text>
-              )}
-              {salesInvoice?.dateDue && (
-                <Text>
-                  Due Date:{" "}
-                  {formatDate(salesInvoice.dateDue, undefined, locale)}
-                </Text>
-              )}
-              {salesInvoice?.customerReference && (
-                <Text>Customer Ref: {salesInvoice.customerReference}</Text>
-              )}
-              {paymentTerm && <Text>Payment Terms: {paymentTerm.name}</Text>}
-              {shippingMethod && <Text>Shipping: {shippingMethod.name}</Text>}
-              {salesInvoiceShipment?.shippingTermId && (
-                <Text>
-                  Shipping Terms: {salesInvoiceShipment.shippingTermId}
-                </Text>
-              )}
-              {salesInvoiceShipment?.incoterm && (
-                <Text>
-                  Incoterm: {salesInvoiceShipment.incoterm}
-                  {salesInvoiceShipment.incotermLocation
-                    ? ` - ${salesInvoiceShipment.incotermLocation}`
-                    : ""}
-                </Text>
-              )}
+            <View style={tw("text-[9px] text-gray-800")}>
+              <AddressBlock
+                name={invoiceCustomerName ?? customerName}
+                addressLine1={invoiceAddressLine1 ?? customerAddressLine1}
+                addressLine2={invoiceAddressLine2 ?? customerAddressLine2}
+                city={invoiceCity ?? customerCity}
+                stateProvince={invoiceStateProvince ?? customerStateProvince}
+                postalCode={invoicePostalCode ?? customerPostalCode}
+                countryCode={invoiceCountryName ?? customerCountryName}
+              />
+              {customerTaxId &&
+                !isEoriCountry(invoiceCountryName ?? customerCountryName) && (
+                  <Text>Tax ID: {customerTaxId}</Text>
+                )}
+              {customerVatNumber && <Text>VAT: {customerVatNumber}</Text>}
+              {customerEori && <Text>EORI: {customerEori}</Text>}
             </View>
           </View>
-          <View style={tw("w-1/2 p-3")}>
-            <Text
-              style={tw("text-[9px] font-bold text-gray-600 mb-1 uppercase")}
-            >
-              Notes
-            </Text>
-            <View style={tw("text-[10px] text-gray-800")}>
-              {Object.keys(salesInvoice?.externalNotes ?? {}).length > 0 ? (
-                <Note
-                  content={(salesInvoice.externalNotes ?? {}) as JSONContent}
-                />
-              ) : (
-                <Text style={tw("text-gray-400")}>None</Text>
+
+          {/* RIGHT — Invoice Details + Ship To stacked */}
+          <View style={tw("w-1/2 flex flex-col")}>
+            {/* Invoice Details — Due Date prominent */}
+            <View
+              style={tw(
+                shipmentCustomerName ? "p-3 border-b border-gray-200" : "p-3"
               )}
+            >
+              <Text
+                style={tw("text-[9px] font-bold text-gray-600 mb-1 uppercase")}
+              >
+                Invoice Details
+              </Text>
+              <View style={tw("text-[9px] text-gray-800")}>
+                {salesInvoice?.dateIssued && (
+                  <Text>
+                    Date Issued:{" "}
+                    {formatDate(salesInvoice.dateIssued, undefined, locale)}
+                  </Text>
+                )}
+                {salesInvoice?.dateDue && (
+                  <Text style={tw("font-bold")}>
+                    Due Date:{" "}
+                    {formatDate(salesInvoice.dateDue, undefined, locale)}
+                  </Text>
+                )}
+                {salesInvoice?.customerReference && (
+                  <Text>Customer Ref: {salesInvoice.customerReference}</Text>
+                )}
+                {paymentTerm && <Text>Payment Terms: {paymentTerm.name}</Text>}
+                {shippingMethod && <Text>Shipping: {shippingMethod.name}</Text>}
+                {salesInvoiceShipment?.shippingTermId && (
+                  <Text>
+                    Shipping Terms: {salesInvoiceShipment.shippingTermId}
+                  </Text>
+                )}
+                {salesInvoiceShipment?.incoterm && (
+                  <Text>
+                    Incoterm: {salesInvoiceShipment.incoterm}
+                    {salesInvoiceShipment.incotermLocation
+                      ? ` — ${salesInvoiceShipment.incotermLocation}`
+                      : ""}
+                  </Text>
+                )}
+              </View>
             </View>
+
+            {/* Ship To — only when shipment has a distinct address (not falling back to customer's main address) */}
+            {shipmentCustomerName && (
+              <View style={tw("p-3")}>
+                <Text
+                  style={tw(
+                    "text-[9px] font-bold text-gray-600 mb-1 uppercase"
+                  )}
+                >
+                  Ship To
+                </Text>
+                <View style={tw("text-[9px] text-gray-800")}>
+                  <AddressBlock
+                    name={shipmentCustomerName}
+                    addressLine1={shipmentAddressLine1}
+                    addressLine2={shipmentAddressLine2}
+                    city={shipmentCity}
+                    stateProvince={shipmentStateProvince}
+                    postalCode={shipmentPostalCode}
+                    countryCode={shipmentCountryName}
+                  />
+                </View>
+              </View>
+            )}
+          </View>
+        </View>
+      </View>
+
+      {/* Notes (full width) */}
+      <View style={tw("border border-gray-200 mb-4")}>
+        <View style={tw("p-3")}>
+          <Text style={tw("text-[9px] font-bold text-gray-600 mb-1 uppercase")}>
+            Notes
+          </Text>
+          <View style={tw("text-[9px] text-gray-800")}>
+            {Object.keys(salesInvoice?.externalNotes ?? {}).length > 0 ? (
+              <Note
+                content={(salesInvoice.externalNotes ?? {}) as JSONContent}
+              />
+            ) : (
+              <Text style={tw("text-gray-400")}>None</Text>
+            )}
           </View>
         </View>
       </View>
@@ -272,14 +284,25 @@ const SalesInvoicePDF = ({
       <View style={tw("mb-4")}>
         {/* Header */}
         <View
+          fixed
           style={tw(
-            "flex flex-row bg-gray-800 py-2 px-3 text-white text-[9px] font-bold"
+            "flex flex-row bg-gray-800 py-2 px-3 text-white text-[9px] font-bold items-center"
           )}
         >
           <Text style={tw("w-1/2")}>Description</Text>
-          <Text style={tw("w-1/6 text-right")}>Qty</Text>
-          <Text style={tw("w-1/6 text-right")}>Unit Price</Text>
-          <Text style={tw("w-1/6 text-right")}>Total</Text>
+          <Text style={tw("w-1/6 text-center")}>Qty</Text>
+          <View style={tw("w-1/6 items-center")}>
+            <Text>Unit Price</Text>
+            <Text style={[tw("text-[7px] font-normal"), { opacity: 0.7 }]}>
+              {currencyCode}
+            </Text>
+          </View>
+          <View style={tw("w-1/6 items-center")}>
+            <Text>Total</Text>
+            <Text style={[tw("text-[7px] font-normal"), { opacity: 0.7 }]}>
+              {currencyCode}
+            </Text>
+          </View>
         </View>
 
         {/* Rows */}
@@ -302,11 +325,16 @@ const SalesInvoicePDF = ({
           return (
             <View
               key={line.id}
-              style={tw(
-                `flex flex-row py-2 px-3 border-b border-gray-200 text-[10px] ${
-                  isEven ? "bg-white" : "bg-gray-50"
-                }`
-              )}
+              style={[
+                tw(
+                  "flex flex-row py-2 px-3 border-b border-gray-200 text-[10px]"
+                ),
+                {
+                  backgroundColor: isEven
+                    ? "transparent"
+                    : "rgba(249, 250, 251, 0.6)"
+                }
+              ]}
               wrap={false}
             >
               <View style={tw("w-1/2 pr-2")}>
@@ -363,20 +391,20 @@ const SalesInvoicePDF = ({
                   </View>
                 )}
               </View>
-              <Text style={tw("w-1/6 text-right text-gray-600")}>
+              <Text style={tw("w-1/6 text-center text-gray-600")}>
                 {line.invoiceLineType === "Comment"
                   ? ""
                   : `${line.quantity} ${line.unitOfMeasureCode ?? "EA"}`}
               </Text>
-              <Text style={tw("w-1/6 text-right text-gray-600")}>
+              <Text style={tw("w-1/6 text-center text-gray-600")}>
                 {line.invoiceLineType === "Comment"
                   ? ""
-                  : formatter.format(line.convertedUnitPrice ?? 0)}
+                  : numberFormatter.format(line.convertedUnitPrice ?? 0)}
               </Text>
-              <Text style={tw("w-1/6 text-right text-gray-800 font-medium")}>
+              <Text style={tw("w-1/6 text-center text-gray-800 font-medium")}>
                 {line.invoiceLineType === "Comment"
                   ? ""
-                  : formatter.format(getLineTotal(line))}
+                  : numberFormatter.format(getLineTotal(line))}
               </Text>
             </View>
           );
@@ -385,11 +413,17 @@ const SalesInvoicePDF = ({
         {/* Summary */}
         <View>
           {/* Subtotal - extended price only */}
-          <View style={tw("flex flex-row py-1.5 px-3 bg-gray-50 text-[10px]")}>
-            <View style={tw("w-4/6")} />
-            <Text style={tw("w-1/6 text-right text-gray-600")}>Subtotal</Text>
-            <Text style={tw("w-1/6 text-right text-gray-800")}>
-              {formatter.format(
+          <View
+            style={[
+              tw("flex flex-row py-1.5 px-3 text-[9px]"),
+              { backgroundColor: "rgba(249, 250, 251, 0.6)" }
+            ]}
+          >
+            <Text style={tw("w-[80%] text-right pr-3 text-gray-600")}>
+              Subtotal ({currencyCode})
+            </Text>
+            <Text style={tw("w-[20%] text-right text-gray-800")}>
+              {numberFormatter.format(
                 salesInvoiceLines.reduce(
                   (sum, line) =>
                     sum + (line.quantity ?? 0) * (line.convertedUnitPrice ?? 0),
@@ -406,12 +440,16 @@ const SalesInvoicePDF = ({
               (line.convertedNonTaxableAddOnCost ?? 0) > 0
           ) && (
             <View
-              style={tw("flex flex-row py-1.5 px-3 bg-gray-50 text-[10px]")}
+              style={[
+                tw("flex flex-row py-1.5 px-3 text-[9px]"),
+                { backgroundColor: "rgba(249, 250, 251, 0.6)" }
+              ]}
             >
-              <View style={tw("w-4/6")} />
-              <Text style={tw("w-1/6 text-right text-gray-600")}>Add-Ons</Text>
-              <Text style={tw("w-1/6 text-right text-gray-800")}>
-                {formatter.format(
+              <Text style={tw("w-[80%] text-right pr-3 text-gray-600")}>
+                Add-Ons ({currencyCode})
+              </Text>
+              <Text style={tw("w-[20%] text-right text-gray-800")}>
+                {numberFormatter.format(
                   salesInvoiceLines.reduce(
                     (sum, line) =>
                       sum +
@@ -436,14 +474,16 @@ const SalesInvoicePDF = ({
             const totalShipping = lineShipping + invoiceShipping;
             return totalShipping > 0 ? (
               <View
-                style={tw("flex flex-row py-1.5 px-3 bg-gray-50 text-[10px]")}
+                style={[
+                  tw("flex flex-row py-1.5 px-3 text-[9px]"),
+                  { backgroundColor: "rgba(249, 250, 251, 0.6)" }
+                ]}
               >
-                <View style={tw("w-4/6")} />
-                <Text style={tw("w-1/6 text-right text-gray-600")}>
-                  Shipping
+                <Text style={tw("w-[80%] text-right pr-3 text-gray-600")}>
+                  Shipping ({currencyCode})
                 </Text>
-                <Text style={tw("w-1/6 text-right text-gray-800")}>
-                  {formatter.format(totalShipping)}
+                <Text style={tw("w-[20%] text-right text-gray-800")}>
+                  {numberFormatter.format(totalShipping)}
                 </Text>
               </View>
             ) : null;
@@ -452,12 +492,16 @@ const SalesInvoicePDF = ({
           {/* Taxes */}
           {salesInvoiceLines.some((line) => (line.taxPercent ?? 0) > 0) && (
             <View
-              style={tw("flex flex-row py-1.5 px-3 bg-gray-50 text-[10px]")}
+              style={[
+                tw("flex flex-row py-1.5 px-3 text-[9px]"),
+                { backgroundColor: "rgba(249, 250, 251, 0.6)" }
+              ]}
             >
-              <View style={tw("w-4/6")} />
-              <Text style={tw("w-1/6 text-right text-gray-600")}>Taxes</Text>
-              <Text style={tw("w-1/6 text-right text-gray-800")}>
-                {formatter.format(
+              <Text style={tw("w-[80%] text-right pr-3 text-gray-600")}>
+                Taxes ({currencyCode})
+              </Text>
+              <Text style={tw("w-[20%] text-right text-gray-800")}>
+                {numberFormatter.format(
                   salesInvoiceLines.reduce((sum, line) => {
                     const taxPercent = line.taxPercent ?? 0;
                     return sum + getLineTaxableSubtotal(line) * taxPercent;
@@ -468,13 +512,13 @@ const SalesInvoicePDF = ({
           )}
 
           <View style={tw("h-[1px] bg-gray-200")} />
-          <View style={tw("flex flex-row py-2 px-3 text-[11px]")}>
-            <View style={tw("w-4/6")} />
-            <Text style={tw("w-1/6 text-right text-gray-800 font-bold")}>
+          <View style={tw("flex flex-row py-2 px-3 text-[9px]")}>
+            <Text style={tw("w-[80%] text-right pr-3 text-gray-800 font-bold")}>
               Total
             </Text>
-            <Text style={tw("w-1/6 text-right text-gray-800 font-bold")}>
-              {formatter.format(
+            <Text style={tw("w-[20%] text-right text-gray-800 font-bold")}>
+              {currencyCode}{" "}
+              {numberFormatter.format(
                 getTotal(salesInvoiceLines, salesInvoice, salesInvoiceShipment)
               )}
             </Text>
@@ -484,7 +528,16 @@ const SalesInvoicePDF = ({
 
       {terms?.content && terms.content.length > 0 && (
         <View break>
-          <Note title="Standard Terms & Conditions" content={terms} />
+          <View style={tw("border-b border-gray-400 mb-3 pb-2 mt-2")}>
+            <Text
+              style={tw(
+                "text-[14px] font-bold text-gray-800 uppercase tracking-wide"
+              )}
+            >
+              Terms & Conditions
+            </Text>
+          </View>
+          <Note content={terms} />
         </View>
       )}
     </Template>

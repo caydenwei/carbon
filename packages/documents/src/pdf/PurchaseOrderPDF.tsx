@@ -1,17 +1,27 @@
 import type { Database } from "@carbon/database";
 import type { JSONContent } from "@carbon/react";
-import { formatCityStatePostalCode, formatDate } from "@carbon/utils";
+import { formatDate, isEoriCountry } from "@carbon/utils";
 import { Image, Text, View } from "@react-pdf/renderer";
 import { createTw } from "react-pdf-tailwind";
 import type { AccountsPayableBillingAddress, PDF } from "../types";
+import { composeRegistrationLine } from "../utils/footer";
 import {
   getLineDescription,
   getLineDescriptionDetails,
   getLineTotal,
   getTotal
 } from "../utils/purchase-order";
-import { formatTaxPercent, getCurrencyFormatter } from "../utils/shared";
-import { Header, Note, PartyDetails, Template } from "./components";
+import { formatTaxPercent } from "../utils/shared";
+import { AddressBlock, Header, Note, Template } from "./components";
+
+const INDIRECT_TYPES = new Set([
+  "Service",
+  "G/L Account",
+  "Fixed Asset",
+  "Comment"
+]);
+const isIndirect = (t: string | null | undefined) =>
+  !!t && INDIRECT_TYPES.has(t);
 
 interface PurchaseOrderPDFProps extends PDF {
   purchaseOrder: Database["public"]["Views"]["purchaseOrders"]["Row"];
@@ -86,7 +96,6 @@ const PurchaseOrderPDF = ({
 
   const currencyCode =
     purchaseOrder.currencyCode ?? company.baseCurrencyCode ?? "USD";
-  const formatter = getCurrencyFormatter(currencyCode, locale);
   const numberFormatter = new Intl.NumberFormat(locale, {
     style: "decimal",
     minimumFractionDigits: 2,
@@ -128,6 +137,12 @@ const PurchaseOrderPDF = ({
     ? `${title}: ${purchaseOrder.purchaseOrderId}`
     : title;
 
+  const registrationLine = composeRegistrationLine({
+    companyName: company.name,
+    country: purchaseOrderLocations.companyCountryName ?? company.countryCode,
+    eori: company.eori
+  });
+
   let rowIndex = 0;
 
   return (
@@ -139,6 +154,7 @@ const PurchaseOrderPDF = ({
         subject: meta?.subject ?? "Purchase Order"
       }}
       footerDocumentId={purchaseOrder?.purchaseOrderId}
+      footerLabel={registrationLine ?? undefined}
     >
       {watermarkSrc && (
         <View
@@ -162,123 +178,137 @@ const PurchaseOrderPDF = ({
         title={title}
         documentId={purchaseOrder?.purchaseOrderId}
         locale={locale}
+        fixed
       />
 
-      {/* Order to (supplier) — top-left | Buyer (us) — top-right */}
-      <PartyDetails
-        company={company}
-        companyLabel="Buyer"
-        counterParty={{
-          name: supplierName,
-          addressLine1: supplierAddressLine1,
-          addressLine2: supplierAddressLine2,
-          city: supplierCity,
-          stateProvince: supplierStateProvince,
-          postalCode: supplierPostalCode,
-          countryCode: supplierCountryCode,
-          taxId: purchaseOrderLocations.supplierTaxId,
-          vatNumber: purchaseOrderLocations.supplierVatNumber,
-          eori: purchaseOrderLocations.supplierEori,
-          contactName: purchaseOrderLocations.supplierContactName,
-          contactEmail: purchaseOrderLocations.supplierContactEmail
-        }}
-        counterPartyLabel="Order to:"
-        createdByFullName={purchaseOrder.createdByFullName}
-        createdByEmail={purchaseOrder.createdByEmail}
-        createdByPhone={purchaseOrder.createdByPhone ?? null}
-        accountsPayableEmail={accountsPayableBillingAddress?.email}
-        hideCompanyTaxLines
-      />
-
-      {/* Order Details | Deliver To */}
+      {/* Body row — Supplier (left) | Right-column stack */}
       <View style={tw("border border-gray-200 mb-4")}>
         <View style={tw("flex flex-row")}>
+          {/* LEFT — Supplier block (full content with address) */}
           <View style={tw("w-1/2 p-3 border-r border-gray-200")}>
             <Text
               style={tw("text-[9px] font-bold text-gray-600 mb-1 uppercase")}
             >
-              Order Details
+              Supplier
             </Text>
             <View style={tw("text-[9px] text-gray-800")}>
-              {purchaseOrder?.purchaseOrderId && (
-                <Text>PO Number: {purchaseOrder.purchaseOrderId}</Text>
+              <AddressBlock
+                name={supplierName}
+                addressLine1={supplierAddressLine1}
+                addressLine2={supplierAddressLine2}
+                city={supplierCity}
+                stateProvince={supplierStateProvince}
+                postalCode={supplierPostalCode}
+                countryCode={supplierCountryCode}
+              />
+              {purchaseOrderLocations.supplierTaxId &&
+                !isEoriCountry(supplierCountryCode) && (
+                  <Text>Tax ID: {purchaseOrderLocations.supplierTaxId}</Text>
+                )}
+              {purchaseOrderLocations.supplierVatNumber && (
+                <Text>VAT: {purchaseOrderLocations.supplierVatNumber}</Text>
               )}
-              {purchaseOrder?.orderDate && (
+              {purchaseOrderLocations.supplierEori && (
+                <Text>EORI: {purchaseOrderLocations.supplierEori}</Text>
+              )}
+              {purchaseOrderLocations.supplierContactName && (
                 <Text>
-                  Date: {formatDate(purchaseOrder.orderDate, undefined, locale)}
+                  Contact: {purchaseOrderLocations.supplierContactName}
                 </Text>
               )}
-              <Text>Currency: {currencyCode}</Text>
-              {purchaseOrder?.supplierReference && (
-                <Text>Reference: {purchaseOrder.supplierReference}</Text>
-              )}
-              {purchaseOrder?.receiptRequestedDate && (
+              {purchaseOrderLocations.supplierContactEmail && (
                 <Text>
-                  Requested Date:{" "}
-                  {formatDate(
-                    purchaseOrder.receiptRequestedDate,
-                    undefined,
-                    locale
-                  )}
+                  Email: {purchaseOrderLocations.supplierContactEmail}
                 </Text>
               )}
-              {purchaseOrder?.receiptPromisedDate && (
-                <Text>
-                  Promised Date:{" "}
-                  {formatDate(
-                    purchaseOrder.receiptPromisedDate,
-                    undefined,
-                    locale
-                  )}
-                </Text>
-              )}
-              {paymentTerm && <Text>Payment Terms: {paymentTerm.name}</Text>}
-              {purchaseOrder?.incoterm && (
-                <Text>
-                  Incoterm: {purchaseOrder.incoterm}
-                  {purchaseOrder.incotermLocation
-                    ? ` - ${purchaseOrder.incotermLocation}`
-                    : ""}
-                </Text>
-              )}
-              {company.taxId && <Text>Buyer Tax ID: {company.taxId}</Text>}
-              {company.vatNumber && <Text>Buyer VAT: {company.vatNumber}</Text>}
-              {company.eori && <Text>Buyer EORI: {company.eori}</Text>}
             </View>
           </View>
-          <View style={tw("w-1/2 p-3")}>
-            <Text
-              style={tw("text-[9px] font-bold text-gray-600 mb-1 uppercase")}
-            >
-              Deliver To
-            </Text>
-            <View style={tw("text-[9px] text-gray-800")}>
-              {shipAddress.name && (
-                <Text style={tw("font-bold")}>{shipAddress.name}</Text>
-              )}
-              {shipAddress.addressLine1 && (
-                <Text>{shipAddress.addressLine1}</Text>
-              )}
-              {shipAddress.addressLine2 && (
-                <Text>{shipAddress.addressLine2}</Text>
-              )}
-              {(shipAddress.city ||
-                shipAddress.stateProvince ||
-                shipAddress.postalCode ||
-                shipAddress.countryCode) && (
-                <Text>
-                  {[
-                    formatCityStatePostalCode(
-                      shipAddress.city,
-                      shipAddress.stateProvince,
-                      shipAddress.postalCode
-                    ),
-                    shipAddress.countryCode
-                  ]
-                    .filter(Boolean)
-                    .join(" ")}
-                </Text>
-              )}
+
+          {/* RIGHT — three stacked sub-blocks */}
+          <View style={tw("w-1/2 flex flex-col")}>
+            {/* Order Info — merges Order Details + Buyer Contact */}
+            <View style={tw("p-3 border-b border-gray-200")}>
+              <Text
+                style={tw("text-[9px] font-bold text-gray-600 mb-1 uppercase")}
+              >
+                Order Info
+              </Text>
+              <View style={tw("text-[9px] text-gray-800")}>
+                {purchaseOrder?.purchaseOrderId && (
+                  <Text>PO Number: {purchaseOrder.purchaseOrderId}</Text>
+                )}
+                {purchaseOrder?.orderDate && (
+                  <Text>
+                    Date:{" "}
+                    {formatDate(purchaseOrder.orderDate, undefined, locale)}
+                  </Text>
+                )}
+                <Text>Currency: {currencyCode}</Text>
+                {purchaseOrder?.supplierReference && (
+                  <Text>Reference: {purchaseOrder.supplierReference}</Text>
+                )}
+                {purchaseOrder?.receiptRequestedDate && (
+                  <Text>
+                    Requested:{" "}
+                    {formatDate(
+                      purchaseOrder.receiptRequestedDate,
+                      undefined,
+                      locale
+                    )}
+                  </Text>
+                )}
+                {purchaseOrder?.receiptPromisedDate && (
+                  <Text>
+                    Promised:{" "}
+                    {formatDate(
+                      purchaseOrder.receiptPromisedDate,
+                      undefined,
+                      locale
+                    )}
+                  </Text>
+                )}
+                {paymentTerm && <Text>Payment Terms: {paymentTerm.name}</Text>}
+                {purchaseOrder?.incoterm && (
+                  <Text>
+                    Incoterm: {purchaseOrder.incoterm}
+                    {purchaseOrder.incotermLocation
+                      ? ` — ${purchaseOrder.incotermLocation}`
+                      : ""}
+                  </Text>
+                )}
+              </View>
+              {/* Thin divider between Order Details and Buyer Contact halves */}
+              <View style={tw("h-[1px] bg-gray-200 my-2")} />
+              <View style={tw("text-[9px] text-gray-800")}>
+                {company.vatNumber && <Text>VAT: {company.vatNumber}</Text>}
+                {purchaseOrder.createdByFullName && (
+                  <Text>Contact: {purchaseOrder.createdByFullName}</Text>
+                )}
+                {purchaseOrder.createdByEmail && (
+                  <Text>Email: {purchaseOrder.createdByEmail}</Text>
+                )}
+                {purchaseOrder.createdByPhone && (
+                  <Text>Phone: {purchaseOrder.createdByPhone}</Text>
+                )}
+                {accountsPayableBillingAddress?.email && (
+                  <Text style={tw("font-bold")}>
+                    Billing documents and enquiries to:{" "}
+                    {accountsPayableBillingAddress.email}
+                  </Text>
+                )}
+              </View>
+            </View>
+
+            {/* Deliver To */}
+            <View style={tw("p-3")}>
+              <Text
+                style={tw("text-[9px] font-bold text-gray-600 mb-1 uppercase")}
+              >
+                Deliver To
+              </Text>
+              <View style={tw("text-[9px] text-gray-800")}>
+                <AddressBlock {...shipAddress} />
+              </View>
             </View>
           </View>
         </View>
@@ -304,8 +334,9 @@ const PurchaseOrderPDF = ({
 
       {/* Line Items Table */}
       <View style={tw("mb-4")}>
-        {/* Header */}
+        {/* Header — fixed so it repeats on every page the table spans */}
         <View
+          fixed
           style={tw(
             "flex flex-row bg-gray-800 py-3 px-3 text-white text-[9px] font-bold items-center"
           )}
@@ -370,12 +401,20 @@ const PurchaseOrderPDF = ({
                     {line.purchaseOrderLineType === "Comment" ? "" : rowIndex}
                   </Text>
                   <View style={tw("w-[22%] pr-2")}>
-                    <Text style={tw("text-gray-900")}>
-                      {getLineDescription(line)}
-                    </Text>
-                    <Text style={tw("text-[7px] text-gray-600 mt-0.5")}>
-                      {getLineDescriptionDetails(line)}
-                    </Text>
+                    {isIndirect(line.purchaseOrderLineType) ? (
+                      <Text style={tw("text-gray-900")}>
+                        {line.description ?? ""}
+                      </Text>
+                    ) : (
+                      <>
+                        <Text style={tw("text-gray-900")}>
+                          {getLineDescription(line)}
+                        </Text>
+                        <Text style={tw("text-[7px] text-gray-600 mt-0.5")}>
+                          {getLineDescriptionDetails(line)}
+                        </Text>
+                      </>
+                    )}
                     {purchaseOrder.purchaseOrderType === "Outside Processing" &&
                       line.jobOperationDescription && (
                         <Text style={tw("text-[7px] text-gray-600 mt-0.5")}>
@@ -464,11 +503,11 @@ const PurchaseOrderPDF = ({
               { backgroundColor: "rgba(249, 250, 251, 0.6)" }
             ]}
           >
-            <Text style={tw("w-[87%] text-right pr-3 text-gray-600")}>
-              Subtotal
+            <Text style={tw("w-[80%] text-right pr-3 text-gray-600")}>
+              Subtotal ({currencyCode})
             </Text>
-            <Text style={tw("w-[13%] text-right text-gray-800")}>
-              {formatter.format(
+            <Text style={tw("w-[20%] text-right text-gray-800")}>
+              {numberFormatter.format(
                 purchaseOrderLines.reduce((sum, line) => {
                   if (line?.purchaseQuantity && line?.supplierUnitPrice) {
                     return sum + line.purchaseQuantity * line.supplierUnitPrice;
@@ -487,16 +526,16 @@ const PurchaseOrderPDF = ({
                 { backgroundColor: "rgba(249, 250, 251, 0.6)" }
               ]}
             >
-              <Text style={tw("w-[87%] text-right pr-3 text-gray-600")}>
-                Shipping
+              <Text style={tw("w-[80%] text-right pr-3 text-gray-600")}>
+                Shipping ({currencyCode})
               </Text>
-              <Text style={tw("w-[13%] text-right text-gray-800")}>
-                {formatter.format(shippingCost)}
+              <Text style={tw("w-[20%] text-right text-gray-800")}>
+                {numberFormatter.format(shippingCost)}
               </Text>
             </View>
           )}
 
-          {/* Tax */}
+          {/* Tax — amount only, no percentage subtext */}
           {taxAmount > 0 && (
             <View
               style={[
@@ -504,36 +543,25 @@ const PurchaseOrderPDF = ({
                 { backgroundColor: "rgba(249, 250, 251, 0.6)" }
               ]}
             >
-              <Text style={tw("w-[87%] text-right pr-3 text-gray-600")}>
-                Tax
+              <Text style={tw("w-[80%] text-right pr-3 text-gray-600")}>
+                Tax ({currencyCode})
               </Text>
-              <View style={tw("w-[13%] flex flex-col items-end")}>
-                <Text style={tw("text-gray-800")}>
-                  {formatter.format(taxAmount)}
-                </Text>
-                {formatTaxPercent(
-                  purchaseOrderLines.find((line) => (line.taxPercent ?? 0) > 0)
-                    ?.taxPercent
-                ) && (
-                  <Text style={tw("text-[6px] text-gray-400")}>
-                    {formatTaxPercent(
-                      purchaseOrderLines.find(
-                        (line) => (line.taxPercent ?? 0) > 0
-                      )?.taxPercent
-                    )}
-                  </Text>
-                )}
-              </View>
+              <Text style={tw("w-[20%] text-right text-gray-800")}>
+                {numberFormatter.format(taxAmount)}
+              </Text>
             </View>
           )}
 
           <View style={tw("h-[1px] bg-gray-200")} />
           <View style={tw("flex flex-row py-2 px-3 text-[9px]")}>
-            <Text style={tw("w-[87%] text-right pr-3 text-gray-800 font-bold")}>
+            <Text style={tw("w-[80%] text-right pr-3 text-gray-800 font-bold")}>
               Total
             </Text>
-            <Text style={tw("w-[13%] text-right text-gray-800 font-bold")}>
-              {formatter.format(getTotal(purchaseOrderLines) + shippingCost)}
+            <Text style={tw("w-[20%] text-right text-gray-800 font-bold")}>
+              {currencyCode}{" "}
+              {numberFormatter.format(
+                getTotal(purchaseOrderLines) + shippingCost
+              )}
             </Text>
           </View>
         </View>
@@ -542,7 +570,16 @@ const PurchaseOrderPDF = ({
       {/* Terms */}
       {terms?.content && terms.content.length > 0 && (
         <View break>
-          <Note title="Standard Terms & Conditions" content={terms} />
+          <View style={tw("border-b border-gray-400 mb-3 pb-2 mt-2")}>
+            <Text
+              style={tw(
+                "text-[14px] font-bold text-gray-800 uppercase tracking-wide"
+              )}
+            >
+              Terms & Conditions
+            </Text>
+          </View>
+          <Note content={terms} />
         </View>
       )}
     </Template>

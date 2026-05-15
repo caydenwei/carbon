@@ -1,17 +1,8 @@
+import { AddressBlock } from "./AddressBlock";
 import Footer from "./Footer";
 import { Header } from "./Header";
 import Note from "./Note";
-import { PartyDetails } from "./PartyDetails";
-import { ShipBillDetails } from "./ShipBillDetails";
 import Summary from "./Summary";
 import Template from "./Template";
 
-export {
-  Footer,
-  Header,
-  Note,
-  PartyDetails,
-  ShipBillDetails,
-  Summary,
-  Template
-};
+export { AddressBlock, Footer, Header, Note, Summary, Template };

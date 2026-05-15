@@ -1,9 +1,10 @@
 import type { Database } from "@carbon/database";
 import type { JSONContent } from "@carbon/react";
-import { formatDate } from "@carbon/utils";
+import { formatDate, isEoriCountry } from "@carbon/utils";
 import { Image, Text, View } from "@react-pdf/renderer";
 import { createTw } from "react-pdf-tailwind";
 import type { AccountsReceivableBillingAddress, PDF } from "../types";
+import { composeRegistrationLine } from "../utils/footer";
 import {
   getLineDescription,
   getLineDescriptionDetails,
@@ -11,14 +12,7 @@ import {
   getLineTotal,
   getTotal
 } from "../utils/sales-order";
-import { getCurrencyFormatter } from "../utils/shared";
-import {
-  Header,
-  Note,
-  PartyDetails,
-  ShipBillDetails,
-  Template
-} from "./components";
+import { AddressBlock, Header, Note, Template } from "./components";
 
 type SalesOrderLocations =
   Database["public"]["Views"]["salesOrderLocations"]["Row"] & {
@@ -95,7 +89,18 @@ const SalesOrderPDF = ({
   } = salesOrderLocations;
 
   const currencyCode = salesOrder.currencyCode ?? company.baseCurrencyCode;
-  const formatter = getCurrencyFormatter(currencyCode ?? "USD", locale);
+  const numberFormatter = new Intl.NumberFormat(locale, {
+    style: "decimal",
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2
+  });
+
+  const registrationLine = composeRegistrationLine({
+    companyName: company.name,
+    country: company.countryCode,
+    eori: company.eori,
+    accountsReceivableEmail: companySettings?.accountsReceivableEmail
+  });
 
   const paymentTerm = paymentTerms?.find(
     (term) => term.id === salesOrder?.paymentTermId
@@ -118,6 +123,7 @@ const SalesOrderPDF = ({
         subject: meta?.subject ?? "Sales Order"
       }}
       footerDocumentId={salesOrder?.salesOrderId}
+      footerLabel={registrationLine ?? undefined}
     >
       {watermarkSrc && (
         <View
@@ -140,132 +146,135 @@ const SalesOrderPDF = ({
         company={company}
         title="Sales Order"
         documentId={salesOrder?.salesOrderId}
-        date={salesOrder?.orderDate}
         currencyCode={salesOrder?.currencyCode}
         locale={locale}
       />
 
-      <PartyDetails
-        company={company}
-        companyAddressOverride={
-          accountsReceivableBillingAddress
-            ? {
-                name: accountsReceivableBillingAddress.name,
-                addressLine1: accountsReceivableBillingAddress.addressLine1,
-                addressLine2: accountsReceivableBillingAddress.addressLine2,
-                city: accountsReceivableBillingAddress.city,
-                stateProvince: accountsReceivableBillingAddress.state,
-                postalCode: accountsReceivableBillingAddress.postalCode,
-                countryCode: accountsReceivableBillingAddress.countryCode
-              }
-            : undefined
-        }
-        companyLabel="Seller"
-        counterParty={{
-          name: customerName,
-          addressLine1: customerAddressLine1,
-          addressLine2: customerAddressLine2,
-          city: customerCity,
-          stateProvince: customerStateProvince,
-          postalCode: customerPostalCode,
-          countryCode: customerCountryName,
-          taxId: customerTaxId,
-          vatNumber: customerVatNumber,
-          eori: customerEori
-        }}
-        counterPartyLabel="Buyer"
-        accountsReceivableEmail={companySettings?.accountsReceivableEmail}
-      />
-
-      <ShipBillDetails
-        shipTo={{
-          name: customerName,
-          addressLine1: customerAddressLine1,
-          addressLine2: customerAddressLine2,
-          city: customerCity,
-          stateProvince: customerStateProvince,
-          postalCode: customerPostalCode,
-          countryCode: customerCountryName
-        }}
-        billTo={{
-          name: paymentCustomerName,
-          addressLine1: paymentAddressLine1,
-          addressLine2: paymentAddressLine2,
-          city: paymentCity,
-          stateProvince: paymentStateProvince,
-          postalCode: paymentPostalCode,
-          countryCode: paymentCountryName
-        }}
-      />
-
-      {/* Order Details & Notes */}
+      {/* Body row — Customer (left) | Order Details + Ship To + Bill To stacked (right) */}
       <View style={tw("border border-gray-200 mb-4")}>
         <View style={tw("flex flex-row")}>
+          {/* LEFT — Customer block */}
           <View style={tw("w-1/2 p-3 border-r border-gray-200")}>
             <Text
               style={tw("text-[9px] font-bold text-gray-600 mb-1 uppercase")}
             >
-              Order Details
+              Customer
             </Text>
-            <View style={tw("text-[10px] text-gray-800")}>
-              {salesOrder?.orderDate && (
-                <Text>
-                  Date: {formatDate(salesOrder.orderDate, undefined, locale)}
-                </Text>
+            <View style={tw("text-[9px] text-gray-800")}>
+              <AddressBlock
+                name={customerName}
+                addressLine1={customerAddressLine1}
+                addressLine2={customerAddressLine2}
+                city={customerCity}
+                stateProvince={customerStateProvince}
+                postalCode={customerPostalCode}
+                countryCode={customerCountryName}
+              />
+              {customerTaxId && !isEoriCountry(customerCountryName) && (
+                <Text>Tax ID: {customerTaxId}</Text>
               )}
-              {salesOrder?.customerReference && (
-                <Text>Customer PO #: {salesOrder.customerReference}</Text>
-              )}
-              {salesOrder?.receiptRequestedDate && (
-                <Text>
-                  Requested:{" "}
-                  {formatDate(
-                    salesOrder.receiptRequestedDate,
-                    undefined,
-                    locale
-                  )}
-                </Text>
-              )}
-              {salesOrder?.receiptPromisedDate && (
-                <Text>
-                  Promised:{" "}
-                  {formatDate(
-                    salesOrder.receiptPromisedDate,
-                    undefined,
-                    locale
-                  )}
-                </Text>
-              )}
-              {shippingMethod && <Text>Shipping: {shippingMethod.name}</Text>}
-              {salesOrder?.shippingTermName && (
-                <Text>Shipping Terms: {salesOrder.shippingTermName}</Text>
-              )}
-              {salesOrder?.incoterm && (
-                <Text>
-                  Incoterm: {salesOrder.incoterm}
-                  {salesOrder.incotermLocation
-                    ? ` - ${salesOrder.incotermLocation}`
-                    : ""}
-                </Text>
-              )}
-              {paymentTerm && <Text>Payment Terms: {paymentTerm.name}</Text>}
+              {customerVatNumber && <Text>VAT: {customerVatNumber}</Text>}
+              {customerEori && <Text>EORI: {customerEori}</Text>}
             </View>
           </View>
-          <View style={tw("w-1/2 p-3")}>
-            <Text
-              style={tw("text-[9px] font-bold text-gray-600 mb-1 uppercase")}
-            >
-              Notes
-            </Text>
-            <View style={tw("text-[10px] text-gray-800")}>
-              {Object.keys(salesOrder?.externalNotes ?? {}).length > 0 ? (
-                <Note
-                  content={(salesOrder.externalNotes ?? {}) as JSONContent}
-                />
-              ) : (
-                <Text style={tw("text-gray-400")}>None</Text>
+
+          {/* RIGHT — Order Details + Ship To + Bill To stacked */}
+          <View style={tw("w-1/2 flex flex-col")}>
+            {/* Order Details */}
+            <View
+              style={tw(
+                paymentCustomerName ? "p-3 border-b border-gray-200" : "p-3"
               )}
+            >
+              <Text
+                style={tw("text-[9px] font-bold text-gray-600 mb-1 uppercase")}
+              >
+                Order Details
+              </Text>
+              <View style={tw("text-[9px] text-gray-800")}>
+                {salesOrder?.orderDate && (
+                  <Text>
+                    Date: {formatDate(salesOrder.orderDate, undefined, locale)}
+                  </Text>
+                )}
+                {salesOrder?.customerReference && (
+                  <Text>Customer Ref: {salesOrder.customerReference}</Text>
+                )}
+                {salesOrder?.receiptRequestedDate && (
+                  <Text>
+                    Requested:{" "}
+                    {formatDate(
+                      salesOrder.receiptRequestedDate,
+                      undefined,
+                      locale
+                    )}
+                  </Text>
+                )}
+                {salesOrder?.receiptPromisedDate && (
+                  <Text>
+                    Promised:{" "}
+                    {formatDate(
+                      salesOrder.receiptPromisedDate,
+                      undefined,
+                      locale
+                    )}
+                  </Text>
+                )}
+                {paymentTerm && <Text>Payment Terms: {paymentTerm.name}</Text>}
+                {shippingMethod && <Text>Shipping: {shippingMethod.name}</Text>}
+                {salesOrder?.shippingTermName && (
+                  <Text>Shipping Terms: {salesOrder.shippingTermName}</Text>
+                )}
+                {salesOrder?.incoterm && (
+                  <Text>
+                    Incoterm: {salesOrder.incoterm}
+                    {salesOrder.incotermLocation
+                      ? ` — ${salesOrder.incotermLocation}`
+                      : ""}
+                  </Text>
+                )}
+              </View>
             </View>
+
+            {/* Bill To (only if a separate billing customer is set) */}
+            {paymentCustomerName && (
+              <View style={tw("p-3")}>
+                <Text
+                  style={tw(
+                    "text-[9px] font-bold text-gray-600 mb-1 uppercase"
+                  )}
+                >
+                  Bill To
+                </Text>
+                <View style={tw("text-[9px] text-gray-800")}>
+                  <AddressBlock
+                    name={paymentCustomerName}
+                    addressLine1={paymentAddressLine1}
+                    addressLine2={paymentAddressLine2}
+                    city={paymentCity}
+                    stateProvince={paymentStateProvince}
+                    postalCode={paymentPostalCode}
+                    countryCode={paymentCountryName}
+                  />
+                </View>
+              </View>
+            )}
+          </View>
+        </View>
+      </View>
+
+      {/* Notes (full width) */}
+      <View style={tw("border border-gray-200 mb-4")}>
+        <View style={tw("p-3")}>
+          <Text style={tw("text-[9px] font-bold text-gray-600 mb-1 uppercase")}>
+            Notes
+          </Text>
+          <View style={tw("text-[9px] text-gray-800")}>
+            {Object.keys(salesOrder?.externalNotes ?? {}).length > 0 ? (
+              <Note content={(salesOrder.externalNotes ?? {}) as JSONContent} />
+            ) : (
+              <Text style={tw("text-gray-400")}>None</Text>
+            )}
           </View>
         </View>
       </View>
@@ -274,14 +283,25 @@ const SalesOrderPDF = ({
       <View style={tw("mb-4")}>
         {/* Header */}
         <View
+          fixed
           style={tw(
-            "flex flex-row bg-gray-800 py-2 px-3 text-white text-[9px] font-bold"
+            "flex flex-row bg-gray-800 py-2 px-3 text-white text-[9px] font-bold items-center"
           )}
         >
           <Text style={tw("w-1/2")}>Description</Text>
-          <Text style={tw("w-1/6 text-right")}>Qty</Text>
-          <Text style={tw("w-1/6 text-right")}>Unit Price</Text>
-          <Text style={tw("w-1/6 text-right")}>Total</Text>
+          <Text style={tw("w-1/6 text-center")}>Qty</Text>
+          <View style={tw("w-1/6 items-center")}>
+            <Text>Unit Price</Text>
+            <Text style={[tw("text-[7px] font-normal"), { opacity: 0.7 }]}>
+              {currencyCode}
+            </Text>
+          </View>
+          <View style={tw("w-1/6 items-center")}>
+            <Text>Total</Text>
+            <Text style={[tw("text-[7px] font-normal"), { opacity: 0.7 }]}>
+              {currencyCode}
+            </Text>
+          </View>
         </View>
 
         {/* Rows */}
@@ -304,11 +324,16 @@ const SalesOrderPDF = ({
           return (
             <View
               key={line.id}
-              style={tw(
-                `flex flex-row py-2 px-3 border-b border-gray-200 text-[10px] ${
-                  isEven ? "bg-white" : "bg-gray-50"
-                }`
-              )}
+              style={[
+                tw(
+                  "flex flex-row py-2 px-3 border-b border-gray-200 text-[10px]"
+                ),
+                {
+                  backgroundColor: isEven
+                    ? "transparent"
+                    : "rgba(249, 250, 251, 0.6)"
+                }
+              ]}
               wrap={false}
             >
               <View style={tw("w-1/2 pr-2")}>
@@ -366,20 +391,20 @@ const SalesOrderPDF = ({
                     </View>
                   )}
               </View>
-              <Text style={tw("w-1/6 text-right text-gray-600")}>
+              <Text style={tw("w-1/6 text-center text-gray-600")}>
                 {line.salesOrderLineType === "Comment"
                   ? ""
                   : `${line.saleQuantity} ${line.unitOfMeasureCode ?? "EA"}`}
               </Text>
-              <Text style={tw("w-1/6 text-right text-gray-600")}>
+              <Text style={tw("w-1/6 text-center text-gray-600")}>
                 {line.salesOrderLineType === "Comment"
                   ? ""
-                  : formatter.format(line.convertedUnitPrice ?? 0)}
+                  : numberFormatter.format(line.convertedUnitPrice ?? 0)}
               </Text>
-              <Text style={tw("w-1/6 text-right text-gray-800 font-medium")}>
+              <Text style={tw("w-1/6 text-center text-gray-800 font-medium")}>
                 {line.salesOrderLineType === "Comment"
                   ? ""
-                  : formatter.format(getLineTotal(line))}
+                  : numberFormatter.format(getLineTotal(line))}
               </Text>
             </View>
           );
@@ -388,11 +413,17 @@ const SalesOrderPDF = ({
         {/* Summary */}
         <View>
           {/* Subtotal - extended price only */}
-          <View style={tw("flex flex-row py-1.5 px-3 bg-gray-50 text-[10px]")}>
-            <View style={tw("w-4/6")} />
-            <Text style={tw("w-1/6 text-right text-gray-600")}>Subtotal</Text>
-            <Text style={tw("w-1/6 text-right text-gray-800")}>
-              {formatter.format(
+          <View
+            style={[
+              tw("flex flex-row py-1.5 px-3 text-[9px]"),
+              { backgroundColor: "rgba(249, 250, 251, 0.6)" }
+            ]}
+          >
+            <Text style={tw("w-[80%] text-right pr-3 text-gray-600")}>
+              Subtotal ({currencyCode})
+            </Text>
+            <Text style={tw("w-[20%] text-right text-gray-800")}>
+              {numberFormatter.format(
                 salesOrderLines.reduce(
                   (sum, line) =>
                     sum +
@@ -410,12 +441,16 @@ const SalesOrderPDF = ({
               (line.convertedNonTaxableAddOnCost ?? 0) > 0
           ) && (
             <View
-              style={tw("flex flex-row py-1.5 px-3 bg-gray-50 text-[10px]")}
+              style={[
+                tw("flex flex-row py-1.5 px-3 text-[9px]"),
+                { backgroundColor: "rgba(249, 250, 251, 0.6)" }
+              ]}
             >
-              <View style={tw("w-4/6")} />
-              <Text style={tw("w-1/6 text-right text-gray-600")}>Add-Ons</Text>
-              <Text style={tw("w-1/6 text-right text-gray-800")}>
-                {formatter.format(
+              <Text style={tw("w-[80%] text-right pr-3 text-gray-600")}>
+                Add-Ons ({currencyCode})
+              </Text>
+              <Text style={tw("w-[20%] text-right text-gray-800")}>
+                {numberFormatter.format(
                   salesOrderLines.reduce(
                     (sum, line) =>
                       sum +
@@ -439,14 +474,16 @@ const SalesOrderPDF = ({
             const totalShipping = lineShipping + orderShipping;
             return totalShipping > 0 ? (
               <View
-                style={tw("flex flex-row py-1.5 px-3 bg-gray-50 text-[10px]")}
+                style={[
+                  tw("flex flex-row py-1.5 px-3 text-[9px]"),
+                  { backgroundColor: "rgba(249, 250, 251, 0.6)" }
+                ]}
               >
-                <View style={tw("w-4/6")} />
-                <Text style={tw("w-1/6 text-right text-gray-600")}>
-                  Shipping
+                <Text style={tw("w-[80%] text-right pr-3 text-gray-600")}>
+                  Shipping ({currencyCode})
                 </Text>
-                <Text style={tw("w-1/6 text-right text-gray-800")}>
-                  {formatter.format(totalShipping)}
+                <Text style={tw("w-[20%] text-right text-gray-800")}>
+                  {numberFormatter.format(totalShipping)}
                 </Text>
               </View>
             ) : null;
@@ -455,12 +492,16 @@ const SalesOrderPDF = ({
           {/* Taxes */}
           {salesOrderLines.some((line) => (line.taxPercent ?? 0) > 0) && (
             <View
-              style={tw("flex flex-row py-1.5 px-3 bg-gray-50 text-[10px]")}
+              style={[
+                tw("flex flex-row py-1.5 px-3 text-[9px]"),
+                { backgroundColor: "rgba(249, 250, 251, 0.6)" }
+              ]}
             >
-              <View style={tw("w-4/6")} />
-              <Text style={tw("w-1/6 text-right text-gray-600")}>Taxes</Text>
-              <Text style={tw("w-1/6 text-right text-gray-800")}>
-                {formatter.format(
+              <Text style={tw("w-[80%] text-right pr-3 text-gray-600")}>
+                Taxes ({currencyCode})
+              </Text>
+              <Text style={tw("w-[20%] text-right text-gray-800")}>
+                {numberFormatter.format(
                   salesOrderLines.reduce((sum, line) => {
                     const taxPercent = line.taxPercent ?? 0;
                     return sum + getLineTaxableSubtotal(line) * taxPercent;
@@ -471,13 +512,13 @@ const SalesOrderPDF = ({
           )}
 
           <View style={tw("h-[1px] bg-gray-200")} />
-          <View style={tw("flex flex-row py-2 px-3 text-[11px]")}>
-            <View style={tw("w-4/6")} />
-            <Text style={tw("w-1/6 text-right text-gray-800 font-bold")}>
+          <View style={tw("flex flex-row py-2 px-3 text-[9px]")}>
+            <Text style={tw("w-[80%] text-right pr-3 text-gray-800 font-bold")}>
               Total
             </Text>
-            <Text style={tw("w-1/6 text-right text-gray-800 font-bold")}>
-              {formatter.format(getTotal(salesOrderLines, salesOrder))}
+            <Text style={tw("w-[20%] text-right text-gray-800 font-bold")}>
+              {currencyCode}{" "}
+              {numberFormatter.format(getTotal(salesOrderLines, salesOrder))}
             </Text>
           </View>
         </View>
@@ -486,7 +527,16 @@ const SalesOrderPDF = ({
       {/* Terms */}
       {terms?.content && terms.content.length > 0 && (
         <View break>
-          <Note title="Standard Terms & Conditions" content={terms} />
+          <View style={tw("border-b border-gray-400 mb-3 pb-2 mt-2")}>
+            <Text
+              style={tw(
+                "text-[14px] font-bold text-gray-800 uppercase tracking-wide"
+              )}
+            >
+              Terms & Conditions
+            </Text>
+          </View>
+          <Note content={terms} />
         </View>
       )}
     </Template>

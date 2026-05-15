@@ -410,7 +410,7 @@ export interface Quote {
   private_notes?: string | null;
   quote_items?: QuoteItem[];
   quote_notes?: string | null;
-  request_for_quote?: boolean | null;
+  request_for_quote?: boolean | string | null;
   /** A unique revision number for a Quote. May be null. */
   revision_number?: RevisionNumber;
   salesperson?: SalesPerson;

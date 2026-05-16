@@ -79,7 +79,7 @@ export async function removeWorktreeCmd() {
             title: "Unregister portless aliases",
             task: async () => {
               await unregisterAliases(targetPath, branchPrefix);
-              pruneStaleRoutes(branchPrefix);
+              pruneStaleRoutes();
               return "network stopped";
             }
           }

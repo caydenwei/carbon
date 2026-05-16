@@ -74,8 +74,9 @@ delegate_ts() {
   wt_root="$(git rev-parse --show-toplevel 2>/dev/null)"
   main_root="$(repo_root)"
 
-  # Pick source: worktree first, main fallback.
-  if [[ -n "$wt_root" && -f "$wt_root/packages/dev/src/main.ts" ]]; then
+  # Pick source: worktree first, but only if deps are installed (otherwise
+  # imports like `citty` fail). Falls back to main checkout.
+  if [[ -n "$wt_root" && -f "$wt_root/packages/dev/src/main.ts" && -d "$wt_root/node_modules" ]]; then
     src="$wt_root/packages/dev/src/main.ts"
   else
     src="$main_root/packages/dev/src/main.ts"

@@ -148,6 +148,19 @@ crbn() {
     local out
     out="\$(command crbn "\$@")" || return \$?
     [[ -n "\$out" ]] && eval "\$out"
+  elif [[ "\${1:-}" == "new" ]]; then
+    # \`new\` uses interactive prompts (clack) on stdout, so we can't capture
+    # stdout for eval. Instead, the TS code writes the target path to a temp
+    # file and we cd after it exits.
+    local tmpf="\${TMPDIR:-/tmp}/crbn-new-\$\$"
+    CRBN_NEW_TARGET="\$tmpf" command crbn "\$@"
+    local rc=\$?
+    if [[ \$rc -eq 0 && -f "\$tmpf" ]]; then
+      cd "\$(cat "\$tmpf")" && rm -f "\$tmpf"
+    else
+      rm -f "\$tmpf" 2>/dev/null
+    fi
+    return \$rc
   else
     command crbn "\$@"
   fi

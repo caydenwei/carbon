@@ -1,4 +1,4 @@
-import { copyFileSync, existsSync } from "node:fs";
+import { copyFileSync, existsSync, writeFileSync } from "node:fs";
 import { intro, outro, tasks } from "@clack/prompts";
 import { basename, dirname, join, relative, resolve } from "pathe";
 import pc from "picocolors";
@@ -53,7 +53,11 @@ export async function newWorktree() {
       : [])
   ]);
 
-  outro(
-    `worktree ready — ${pc.cyan(`crbn checkout ${branch} --up`)} to boot it`
-  );
+  // Write target path so the shell wrapper can cd into the new worktree.
+  const targetFile = process.env.CRBN_NEW_TARGET;
+  if (targetFile) {
+    writeFileSync(targetFile, targetPath);
+  }
+
+  outro(`worktree ready — ${pc.cyan("crbn up")} to boot it`);
 }

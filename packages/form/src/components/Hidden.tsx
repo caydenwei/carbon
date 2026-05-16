@@ -15,16 +15,17 @@ type HiddenProps = InputProps & {
 const Hidden = forwardRef<HTMLInputElement, HiddenProps>(
   ({ name, value, ...rest }, ref) => {
     const { getInputProps, error } = useField(name);
+    const { defaultValue, ...inputProps } = getInputProps({
+      id: name,
+      ...rest
+    });
 
     return (
       <FormControl isInvalid={!!error}>
         <InputBase
           ref={ref}
-          {...getInputProps({
-            id: name,
-            ...rest
-          })}
-          value={value}
+          {...inputProps}
+          {...(value !== undefined ? { value } : { defaultValue })}
           type="hidden"
         />
         {error && <FormErrorMessage>{error}</FormErrorMessage>}

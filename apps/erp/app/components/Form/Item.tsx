@@ -103,7 +103,6 @@ const Item = ({
   const translateItemType = useTranslatedItemType();
   const [items] = useItems();
 
-  // biome-ignore lint/correctness/useExhaustiveDependencies: suppressed due to migration
   const options = useMemo(() => {
     let results = items
       .filter((item) => {
@@ -160,7 +159,8 @@ const Item = ({
     props.locationId,
     props.replenishmentSystem,
     props.whitelist,
-    type
+    type,
+    validItemTypes
   ]);
 
   const selectTypeModal = useDisclosure();

@@ -7,14 +7,13 @@ import {
 } from "react-router";
 import { docsQuery } from "~/utils/react-query";
 
-const ratelimit = new Ratelimit({
-  redis,
-  limiter: Ratelimit.slidingWindow(20, "1 h"),
-  analytics: true
-});
-
 export async function loader({ request }: LoaderFunctionArgs) {
   const ip = request.headers.get("x-forwarded-for") ?? "127.0.0.1";
+  const ratelimit = new Ratelimit({
+    redis,
+    limiter: Ratelimit.slidingWindow(20, "1 h"),
+    analytics: true
+  });
   const { success } = await ratelimit.limit(`docs:${ip}`);
 
   if (!success) {

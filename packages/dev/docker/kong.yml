@@ -7,6 +7,16 @@ _transform: true
 ###
 
 services:
+  - name: auth-verify
+    url: http://gotrue:9999/verify
+    routes:
+      - name: auth-verify
+        strip_path: true
+        paths:
+          - /verify
+    plugins:
+      - name: cors
+
   - name: auth-v1-open
     url: http://gotrue:9999/verify
     routes:
@@ -58,7 +68,7 @@ services:
       - name: cors
 
   - name: realtime-v1-ws
-    url: http://realtime:4000/socket
+    url: http://realtime-dev:4000/socket
     protocol: ws
     routes:
       - name: realtime-v1-ws

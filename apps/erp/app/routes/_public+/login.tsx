@@ -10,11 +10,16 @@ import {
   magicLinkValidator,
   RATE_LIMIT
 } from "@carbon/auth";
-import { sendMagicLink, verifyAuthSession } from "@carbon/auth/auth.server";
+import {
+  sendMagicLink,
+  signInWithBypassEmail,
+  verifyAuthSession
+} from "@carbon/auth/auth.server";
 import {
   clearAuthCookies,
   flash,
-  getAuthSession
+  getAuthSession,
+  setAuthSession
 } from "@carbon/auth/session.server";
 import { getUserByEmail } from "@carbon/auth/users.server";
 import { sendVerificationCode } from "@carbon/auth/verification.server";
@@ -72,15 +77,14 @@ export async function loader({ request }: LoaderFunctionArgs) {
   return { providers: AUTH_PROVIDERS.split(",") };
 }
 
-const ratelimit = new Ratelimit({
-  redis,
-  limiter: Ratelimit.slidingWindow(RATE_LIMIT, "1 h"),
-  analytics: true
-});
-
 export async function action({ request }: ActionFunctionArgs) {
   assertIsPost(request);
   const ip = request.headers.get("x-forwarded-for") ?? "127.0.0.1";
+  const ratelimit = new Ratelimit({
+    redis,
+    limiter: Ratelimit.slidingWindow(RATE_LIMIT, "1 h"),
+    analytics: true
+  });
   const { success } = await ratelimit.limit(ip);
 
   if (!success) {
@@ -132,6 +136,21 @@ export async function action({ request }: ActionFunctionArgs) {
   }
 
   const user = await getUserByEmail(email);
+
+  const devBypassEmail = process.env.DEV_BYPASS_EMAIL;
+  if (
+    devBypassEmail &&
+    email.toLowerCase() === devBypassEmail.toLowerCase() &&
+    user.data?.active
+  ) {
+    const authSession = await signInWithBypassEmail(email);
+    if (authSession) {
+      const sessionCookie = await setAuthSession(request, { authSession });
+      return redirect(path.to.authenticatedRoot, {
+        headers: [["Set-Cookie", sessionCookie]]
+      });
+    }
+  }
 
   if (user.data && user.data.active) {
     const magicLink = await sendMagicLink(email);

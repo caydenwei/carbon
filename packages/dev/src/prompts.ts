@@ -13,10 +13,35 @@ import { join } from "pathe";
 import pc from "picocolors";
 import { APP_CHOICES, type AppId } from "./constants.js";
 import { branchExists, deleteBranch, listWorktrees } from "./git.js";
+import { listSlugs } from "./worktree.js";
 
 // git-check-ref-format(1) rules.
 const INVALID_BRANCH_RE =
   /(^[/-])|([/-]$)|(\.\.)|(@\{)|([\s~^:?*[\\])|(\/{2,})/;
+
+export async function pickBorrowSlug(currentSlug: string): Promise<string> {
+  const registry = listSlugs();
+  const others = Object.entries(registry).filter(([s]) => s !== currentSlug);
+  if (others.length === 0) {
+    throw new Error(
+      `No other worktree stacks in ~/.carbon/dev-ports.json.\nRun \`crbn up\` in another worktree first.`
+    );
+  }
+  if (others.length === 1) {
+    log.info(`auto-selecting only available worktree: ${others[0]![0]}`);
+    return others[0]![0];
+  }
+  const picked = await select({
+    message: "Borrow containers from which worktree?",
+    options: others.map(([s, entry]) => ({
+      value: s,
+      label: s,
+      hint: entry.worktreeRoot
+    }))
+  });
+  if (isCancel(picked)) abort();
+  return picked as string;
+}
 
 export async function pickApps(): Promise<AppId[]> {
   const fromEnv = process.env.CARBON_DEV_APPS;

@@ -40,6 +40,12 @@ const main = defineCommand({
           default: false,
           description:
             "Always docker compose pull (default: skip when all images exist locally)"
+        },
+        borrow: {
+          type: "boolean",
+          default: false,
+          description:
+            "Pick another worktree's running containers to use instead of booting a new stack"
         }
       },
       run: ({ args }) =>
@@ -47,7 +53,8 @@ const main = defineCommand({
           migrate: args.migrate !== false,
           regen: args.regen !== false,
           apps: args.apps !== false,
-          pull: args.pull === true
+          pull: args.pull === true,
+          borrow: args.borrow === true
         })
     }),
     down: defineCommand({

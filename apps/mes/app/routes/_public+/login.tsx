@@ -66,15 +66,14 @@ export async function loader({ request }: LoaderFunctionArgs) {
   return { providers: AUTH_PROVIDERS.split(",") };
 }
 
-const ratelimit = new Ratelimit({
-  redis,
-  limiter: Ratelimit.slidingWindow(RATE_LIMIT, "1 h"),
-  analytics: true
-});
-
 export async function action({ request }: ActionFunctionArgs) {
   assertIsPost(request);
   const ip = request.headers.get("x-forwarded-for") ?? "127.0.0.1";
+  const ratelimit = new Ratelimit({
+    redis,
+    limiter: Ratelimit.slidingWindow(RATE_LIMIT, "1 h"),
+    analytics: true
+  });
   const { success } = await ratelimit.limit(ip);
 
   if (!success) {

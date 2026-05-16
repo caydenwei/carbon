@@ -35,12 +35,6 @@ const supportedFileTypes: Record<string, string> = {
   step: "application/step"
 };
 
-const ratelimit = new Ratelimit({
-  redis,
-  limiter: Ratelimit.slidingWindow(10, "1 m"), // 10 downloads per minute
-  analytics: true
-});
-
 export let loader = async ({ params, request }: LoaderFunctionArgs) => {
   const { id } = params;
   if (!id) {
@@ -48,7 +42,11 @@ export let loader = async ({ params, request }: LoaderFunctionArgs) => {
   }
 
   const ip = request.headers.get("x-forwarded-for") ?? "127.0.0.1";
-
+  const ratelimit = new Ratelimit({
+    redis,
+    limiter: Ratelimit.slidingWindow(10, "1 m"), // 10 downloads per minute
+    analytics: true
+  });
   const { success } = await ratelimit.limit(ip);
 
   if (!success) {

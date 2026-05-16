@@ -23,6 +23,11 @@ const RealtimeDataProvider = ({ children }: { children: React.ReactNode }) => {
     hydratedFromServer = false;
   }, [companyId]);
 
+  // Reset on logout so the next login triggers a fresh server hydrate.
+  useEffect(() => {
+    if (!accessToken) hydratedFromServer = false;
+  }, [accessToken]);
+
   const [, setItems] = useItems();
   const [, setSuppliers] = useSuppliers();
   const [, setCustomers] = useCustomers();
@@ -154,24 +159,27 @@ const RealtimeDataProvider = ({ children }: { children: React.ReactNode }) => {
     setItems(items.data ?? []);
     setSuppliers(suppliers.data ?? []);
     setCustomers(customers.data ?? []);
-    setPeople(
-      // @ts-ignore
-      people.data ?? []
-    );
+    // @ts-ignore
+    setPeople(people.data ?? []);
 
-    idb.setItem("items", items.data);
-    idb.setItem("suppliers", suppliers.data);
-    idb.setItem("customers", customers.data);
-    idb.setItem("people", people.data);
+    await Promise.all([
+      idb.setItem("items", items.data),
+      idb.setItem("suppliers", suppliers.data),
+      idb.setItem("customers", customers.data),
+      idb.setItem("people", people.data)
+    ]);
 
     fetchQuantities();
   };
 
-  // biome-ignore lint/correctness/useExhaustiveDependencies: suppressed due to migration
+  // Re-run when auth becomes ready: `hydrate()` bails if `carbon` / `accessToken` are missing,
+  // and with only `[companyId]` that first run could be the only attempt — leaving `items` empty
+  // (e.g. New Job item combobox shows no options).
+  // biome-ignore lint/correctness/useExhaustiveDependencies: hydrate closes over setters + idb
   useEffect(() => {
     if (!companyId) return;
-    hydrate();
-  }, [companyId]);
+    hydrate().catch((err) => console.error("hydrate failed:", err));
+  }, [companyId, carbon, accessToken]);
 
   useInterval(fetchQuantities, companyId ? 10 * 60 * 1000 : null);
 
@@ -217,7 +225,6 @@ const RealtimeDataProvider = ({ children }: { children: React.ReactNode }) => {
                     )
                   )
                 );
-
                 break;
               case "UPDATE":
                 const { new: updated } = payload;

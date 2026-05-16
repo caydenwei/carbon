@@ -1,6 +1,6 @@
 import Table from "cli-table3";
 import pc from "picocolors";
-import { type AppId, TLD } from "./constants.js";
+import type { AppId } from "./constants.js";
 import type { Container } from "./services/compose.js";
 import { PORT_NAMES, type PortMap, SHARED_REDIS_PORT } from "./worktree.js";
 
@@ -124,19 +124,44 @@ function formatPorts(c: Container): string {
 /** Boxed list of URLs + DB DSN for the up-summary. */
 export function summaryLines(
   ports: PortMap,
-  branchPrefix: string,
-  apps: readonly AppId[]
+  apps: readonly AppId[],
+  /** When provided, show portless hostnames; otherwise show localhost URLs. */
+  branchPrefix?: string
 ): string[] {
-  const host = (sub: string) => `https://${sub}.${branchPrefix}.${TLD}`;
+  const url = branchPrefix
+    ? (sub: string) => `https://${sub}.${branchPrefix}.${TLD}`;
+    : (sub: string, port: number) => `http://localhost:${port}`;
   const dbUrl = `postgresql://postgres:postgres@localhost:${ports.PORT_DB}/postgres`;
   const lines: string[] = [];
-  if (apps.includes("erp")) lines.push(row(pc.cyan, "ERP", host("erp")));
-  if (apps.includes("mes")) lines.push(row(pc.magenta, "MES", host("mes")));
+  if (apps.includes("erp"))
+    lines.push(row(pc.cyan, "ERP", url("erp", ports.PORT_ERP)));
+  if (apps.includes("mes"))
+    lines.push(row(pc.magenta, "MES", url("mes", ports.PORT_MES)));
   lines.push(
-    row(pc.green, "API", host("api"), ports.PORT_API),
-    row(pc.green, "Studio", host("studio"), ports.PORT_STUDIO),
-    row(pc.yellow, "Mail", host("mail"), ports.PORT_INBUCKET),
-    row(pc.blue, "Inngest", host("inngest"), ports.PORT_INNGEST),
+    row(
+      pc.green,
+      "API",
+      url("api", ports.PORT_API),
+      branchPrefix ? ports.PORT_API : undefined
+    ),
+    row(
+      pc.green,
+      "Studio",
+      url("studio", ports.PORT_STUDIO),
+      branchPrefix ? ports.PORT_STUDIO : undefined
+    ),
+    row(
+      pc.yellow,
+      "Mail",
+      url("mail", ports.PORT_INBUCKET),
+      branchPrefix ? ports.PORT_INBUCKET : undefined
+    ),
+    row(
+      pc.blue,
+      "Inngest",
+      url("inngest", ports.PORT_INNGEST),
+      branchPrefix ? ports.PORT_INNGEST : undefined
+    ),
     `${pc.gray(pc.bold("Postgres".padEnd(8)))}  ${pc.gray(dbUrl)}`
   );
   return lines;

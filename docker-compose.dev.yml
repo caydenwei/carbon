@@ -60,9 +60,11 @@ services:
       GOTRUE_JWT_AUD: authenticated
       GOTRUE_EXTERNAL_EMAIL_ENABLED: "true"
       GOTRUE_MAILER_AUTOCONFIRM: "true"
-      GOTRUE_SMTP_HOST: inbucket
-      GOTRUE_SMTP_PORT: 2500
-      GOTRUE_SMTP_ADMIN_EMAIL: admin@carbon.local
+      GOTRUE_SMTP_HOST: ${GOTRUE_SMTP_HOST:-inbucket}
+      GOTRUE_SMTP_PORT: ${GOTRUE_SMTP_PORT:-2500}
+      GOTRUE_SMTP_USER: ${GOTRUE_SMTP_USER:-}
+      GOTRUE_SMTP_PASS: ${GOTRUE_SMTP_PASS:-}
+      GOTRUE_SMTP_ADMIN_EMAIL: ${GOTRUE_SMTP_ADMIN_EMAIL:-admin@carbon.local}
       GOTRUE_SMTP_SENDER_NAME: Carbon
       GOTRUE_EXTERNAL_GOOGLE_ENABLED: "true"
       GOTRUE_EXTERNAL_GOOGLE_CLIENT_ID: ${SUPABASE_AUTH_EXTERNAL_GOOGLE_CLIENT_ID:-}
@@ -105,6 +107,10 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
+    networks:
+      default:
+        aliases:
+          - realtime-dev
     environment:
       PORT: 4000
       DB_HOST: postgres

@@ -6,7 +6,7 @@ import type { AppId } from "../constants.js";
 import { renderEnv, syncAppPortlessConfigs, writeEnv } from "../env.js";
 import { currentBranch, isLinkedWorktree } from "../git.js";
 import { onShutdown } from "../helpers.js";
-import { pickApps } from "../prompts.js";
+import { pickApps, pickBorrowSlug } from "../prompts.js";
 import {
   installDeps,
   spawnApps,
@@ -48,6 +48,7 @@ import {
 import { summaryLines } from "../ui.js";
 import {
   ensureSlugAvailable,
+  getSlot,
   getWorktreeRoot,
   type JwtCreds,
   type PortMap,
@@ -66,6 +67,8 @@ type UpOpts = {
   apps?: boolean;
   /** When true, always `docker compose pull` even if images exist locally. */
   pull?: boolean;
+  /** When true, show a picker to borrow another worktree's running containers. */
+  borrow?: boolean;
 };
 
 type Ctx = {
@@ -82,34 +85,71 @@ export async function up(opts: UpOpts = {}) {
   // Type/swagger regen depends on a freshly-migrated schema. If migrations
   // were skipped, schema is unchanged — skip regen too.
   const shouldRegen = shouldMigrate && (opts.regen ?? true);
+  const shouldBorrow = opts.borrow === true;
   // Services-only mode: boot compose stack + portless aliases (api/studio/
   // mail/inngest URLs still useful), skip spawnApps + auto-`down` on Ctrl+C.
   // Triggered by --no-apps OR by deselecting everything in the picker.
   const appsRequested = opts.apps ?? true;
 
+  // Load .env early so CARBON_PORTLESS (and other flags) can be set there
+  // rather than requiring a shell export. .env.local takes precedence.
+  const root = await getWorktreeRoot();
+  loadDotenv({ path: join(root, ".env.local"), override: false });
+  loadDotenv({ path: join(root, ".env"), override: false });
+
+  // Set CARBON_PORTLESS=0 to use http://localhost:PORT URLs and skip the
+  // portless proxy setup (useful when the .dev TLD cert is not trusted).
+  const portless = process.env.CARBON_PORTLESS !== "0";
+
   intro("Carbon · dev up");
 
-  await ensurePortlessInstalled();
-  await ensureProxyPrivileges();
+  if (portless) {
+    await ensurePortlessInstalled();
+    await ensureProxyPrivileges();
+  } else {
+    log.info("portless disabled (CARBON_PORTLESS=0) — using localhost URLs");
+  }
 
   const selectedApps = appsRequested ? await pickApps() : [];
-
-  const root = await getWorktreeRoot();
   const slug = resolveSlug(root);
-  await ensureSlugAvailable(slug, root);
+
+  // Resolve borrowed slot before ensureSlugAvailable (borrowing doesn't start
+  // own containers so the slug conflict check is irrelevant).
+  let borrowedEntry:
+    | { ports: PortMap; redisDb: number; jwt: JwtCreds }
+    | undefined;
+  if (shouldBorrow) {
+    const borrowSlug = await pickBorrowSlug(slug);
+    const entry = getSlot(borrowSlug);
+    if (!entry)
+      throw new Error(
+        `No slot found for worktree "${borrowSlug}" in ~/.carbon/dev-ports.json`
+      );
+    borrowedEntry = entry;
+    log.info(`borrowing containers from: ${borrowSlug}`);
+  } else {
+    await ensureSlugAvailable(slug, root);
+  }
+
   persistSlug(root, slug);
   log.info(`worktree: ${slug}  (project ${projectName(slug)})`);
 
   await refreshStaleCopyFiles(root);
   await ensureDepsInstalled(root);
 
-  const ctx = await provisionSlot(root, slug);
-  await pullImages(ctx, { force: opts.pull === true });
-  await bootDockerStack(ctx);
-  await waitForServices(ctx);
+  const ctx = await provisionSlot(root, slug, portless, borrowedEntry);
+  if (borrowedEntry) {
+    await waitForServices(ctx);
+  } else {
+    await pullImages(ctx, { force: opts.pull === true });
+    await bootDockerStack(ctx);
+    await waitForServices(ctx);
+  }
   await runDatabaseMigrations(ctx, { shouldMigrate, shouldRegen });
-  await setupPortless(ctx, selectedApps);
-  await ensureHostsFile();
+  if (portless) {
+    await setupPortless(ctx, selectedApps);
+    await ensureHostsFile();
+  }
 
   if (process.env.CARBON_EDITION === "cloud") {
     spawnStripeListener(root);
@@ -117,7 +157,11 @@ export async function up(opts: UpOpts = {}) {
   }
 
   box(
-    summaryLines(ctx.ports, ctx.branchPrefix, selectedApps).join("\n"),
+    summaryLines(
+      ctx.ports,
+      selectedApps,
+      portless ? ctx.branchPrefix : undefined
+    ).join("\n"),
     `Carbon dev — ${slug}`
   );
 
@@ -126,7 +170,7 @@ export async function up(opts: UpOpts = {}) {
     return;
   }
   outro("apps starting (Ctrl+C to stop)");
-  await runAppsThenTeardown(root, selectedApps);
+  await runAppsThenTeardown(root, selectedApps, ctx.ports, portless);
 }
 
 // ---------------------------------------------------------------------------
@@ -154,13 +198,35 @@ async function ensureDepsInstalled(root: string) {
   else log.info("pnpm install skipped (lockfile in sync)");
 }
 
-async function provisionSlot(root: string, slug: string): Promise<Ctx> {
+async function provisionSlot(
+  root: string,
+  slug: string,
+  portless: boolean,
+  borrowedEntry?: { ports: PortMap; redisDb: number; jwt: JwtCreds }
+): Promise<Ctx> {
   let ctx!: Ctx;
   await tasks([
     {
-      title: "Configure portless",
+      title: borrowedEntry ? "Configure (borrowed slot)" : "Configure portless",
       task: async () => {
-        const slot = await resolveSlot(slug, root);
+        // Always resolve own slot so PORT_ERP/PORT_MES are claimed for this
+        // worktree and won't collide with the borrowed stack's running dev servers.
+        const ownSlot = await resolveSlot(slug, root);
+        const slot = borrowedEntry
+          ? {
+              // Backend ports (DB, API, Studio, Inbucket, Inngest) come from the
+              // borrowed stack — apps talk to those running containers.
+              // App ports (ERP, MES) come from our own slot — dev servers bind here,
+              // so they don't conflict with the borrowed stack's dev servers.
+              ports: {
+                ...borrowedEntry.ports,
+                PORT_ERP: ownSlot.ports.PORT_ERP,
+                PORT_MES: ownSlot.ports.PORT_MES
+              } as PortMap,
+              redisDb: borrowedEntry.redisDb,
+              jwt: borrowedEntry.jwt
+            }
+          : ownSlot;
         // Prefix every non-default branch. Portless auto-prefixes only in
         // linked worktrees; main checkout gets the same shape via per-app
         // portless.json stamped below.
@@ -170,15 +236,21 @@ async function provisionSlot(root: string, slug: string): Promise<Ctx> {
 
         ctx = { root, slug, branchPrefix, ...slot };
 
-        writeEnv(root, renderEnv({ slug, branchPrefix, ...slot }));
+        writeEnv(root, renderEnv({ slug, portless, branchPrefix, ...slot }));
         syncAppPortlessConfigs({
           worktreeRoot: root,
-          branchPrefix,
+          branchPrefix: portless ? branchPrefix : null,
           linked
         });
-        loadDotenv({ path: join(root, ".env.local"), override: false });
+        // Use override: true so freshly written .env.local values replace any
+        // stale values already in process.env from the initial load at startup.
+        loadDotenv({ path: join(root, ".env.local"), override: true });
         loadDotenv({ path: join(root, ".env"), override: false });
-        return `prefix "${branchPrefix}", redis db ${slot.redisDb}`;
+        return borrowedEntry
+          ? `borrowed backend ports, own app ports (ERP :${slot.ports.PORT_ERP} MES :${slot.ports.PORT_MES}), redis db ${slot.redisDb}`
+          : portless
+            ? `prefix "${branchPrefix}", redis db ${slot.redisDb}`
+            : `localhost mode, redis db ${slot.redisDb}`;
       }
     },
     {
@@ -368,8 +440,13 @@ async function ensureHostsFile() {
   await syncHostsFile();
 }
 
-async function runAppsThenTeardown(root: string, selectedApps: AppId[]) {
-  await spawnApps({ root, apps: selectedApps });
+async function runAppsThenTeardown(
+  root: string,
+  selectedApps: AppId[],
+  ports: PortMap,
+  portless: boolean
+) {
+  await spawnApps({ root, apps: selectedApps, ports, portless });
 
   // Apps exit on Ctrl+C; auto-`down` so compose stack isn't orphaned.
   // Swallow further signals so a second Ctrl+C during teardown doesn't

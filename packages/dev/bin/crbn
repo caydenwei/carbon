@@ -238,6 +238,18 @@ cmd_checkout() {
     return 0
   fi
 
+  # Never create a separate worktree for the main checkout's branch — just cd
+  # into the repo root. `git worktree add main` would detach and confuse.
+  local main_branch
+  main_branch="$(git -C "$root" symbolic-ref --short refs/remotes/origin/HEAD 2>/dev/null || echo "origin/main")"
+  main_branch="${main_branch#origin/}"
+  if [[ "$name" == "$main_branch" ]]; then
+    info "main checkout at ${C_DIM}${root}${C_RESET}"
+    printf "cd %q\n" "$root"
+    maybe_up "$root" "$do_up"
+    return 0
+  fi
+
   # Need to materialize a worktree. Resolve the ref locally or via origin.
   local resolved=""
   if (( local_exists )); then
@@ -330,13 +342,13 @@ _checkout_pr() {
   maybe_up "$target" "$do_up"
 }
 
-# crbn copy inside the new worktree (so it reads package.json#crbn.copy from
-# the main checkout via --git-common-dir). All output goes to stderr to keep
-# stdout reserved for the eval'd `cd` line.
+# crbn env sync inside the new worktree (so it reads package.json#crbn.copy
+# from the main checkout via --git-common-dir). All output goes to stderr to
+# keep stdout reserved for the eval'd `cd` line.
 do_post_create() {
   local target="$1"
-  if ! ( cd "$target" && delegate_ts copy >&2 ); then
-    warn "copy step failed (worktree was still created)"
+  if ! ( cd "$target" && delegate_ts env sync >&2 ); then
+    warn "env sync step failed (worktree was still created)"
   fi
 }
 
@@ -368,11 +380,13 @@ crbn — Carbon dev CLI
     crbn checkout <pr-number>       Fetch the PR head from GitHub into a
                                     new `pr-<num>` branch + worktree.
     crbn new                        Interactive: pick branch + base ref,
-                                    create worktree, optionally copy .env.
+                                    create worktree, sync env from main.
     crbn list                       Show all worktrees with stack status.
     crbn remove                     Pick a worktree to delete (with stack
                                     teardown).
-    crbn copy                       Sync files (package.json#crbn.copy)
+    crbn copy <file...>             Copy file(s) from main checkout into
+                                    current worktree.
+    crbn env sync                   Sync files listed in package.json#crbn.copy
                                     from main checkout into cwd.
 
   Stack:
@@ -400,7 +414,7 @@ case "$cmd" in
   checkout)
     cmd_checkout "$@"
     ;;
-  copy|up|down|reset|status|migrate|new|list|remove|complete)
+  copy|env|up|down|reset|status|migrate|new|list|remove|complete)
     delegate_ts "$cmd" "$@"
     ;;
   *)

@@ -217,6 +217,13 @@ async function provisionSlot(
         // Always resolve own slot so PORT_ERP/PORT_MES are claimed for this
         // worktree and won't collide with the borrowed stack's running dev servers.
         const ownSlot = await resolveSlot(slug, root);
+        // Pin well-known ports in localhost mode so URLs are predictable and
+        // OAuth redirect URIs can be registered once in Google/Azure console.
+        if (!portless && !borrowedEntry) {
+          ownSlot.ports.PORT_API = 54321;
+          ownSlot.ports.PORT_ERP = 3000;
+          ownSlot.ports.PORT_MES = 3001;
+        }
         const slot = borrowedEntry
           ? {
               // Backend ports (DB, API, Studio, Inbucket, Inngest) come from the

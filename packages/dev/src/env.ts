@@ -59,13 +59,17 @@ export function renderEnv(opts: {
   lines.push(`SUPABASE_JWT_SECRET=${jwt.secret}`);
   lines.push(`SUPABASE_ANON_KEY=${jwt.anonKey}`);
   lines.push(`SUPABASE_SERVICE_ROLE_KEY=${jwt.serviceKey}`);
-  const apiBase = portless ? `https://${host("api")}` : local(ports.PORT_API);
-  // OAuth callback must match the URL scheme apps actually use.
+  // OAuth callback: portless uses the shared api.carbon.dev alias; localhost
+  // mode uses the well-known Supabase default port so the redirect URI is
+  // predictable and can be registered in Google/Azure console once.
+  const oauthBase = portless
+    ? "https://api.carbon.dev"
+    : "http://localhost:54321";
   lines.push(
-    `SUPABASE_AUTH_EXTERNAL_GOOGLE_REDIRECT_URI=${portless ? "https://api.carbon.dev" : apiBase}/auth/v1/callback`
+    `SUPABASE_AUTH_EXTERNAL_GOOGLE_REDIRECT_URI=${oauthBase}/auth/v1/callback`
   );
   lines.push(
-    `SUPABASE_AUTH_EXTERNAL_AZURE_REDIRECT_URI=${portless ? "https://api.carbon.dev" : apiBase}/auth/v1/callback`
+    `SUPABASE_AUTH_EXTERNAL_AZURE_REDIRECT_URI=${oauthBase}/auth/v1/callback`
   );
   lines.push("");
   lines.push("# Aux services");

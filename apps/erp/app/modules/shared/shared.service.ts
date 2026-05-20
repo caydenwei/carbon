@@ -464,6 +464,44 @@ export async function getApproverUserIdsForRule(
   return combined;
 }
 
+/**
+ * "Notified of spend" cascade resolver. When a tiered approval lands at
+ * a high tier, approvers of every enabled rule with a strictly lower
+ * `lowerBoundAmount` get pinged — visibility into spend that bypassed
+ * their tier. Returns deduped user IDs.
+ */
+export async function getLowerTierApproverUserIds(
+  client: SupabaseClient<Database>,
+  documentType: (typeof approvalDocumentType)[number],
+  companyId: string,
+  amount: number | null | undefined
+): Promise<string[]> {
+  if (amount == null) return [];
+
+  const matched = await getApprovalRuleByAmount(
+    client,
+    documentType,
+    companyId,
+    amount
+  );
+  if (!matched.data) return [];
+
+  const lowerRules = await client
+    .from("approvalRule")
+    .select("approverGroupIds, defaultApproverId")
+    .eq("documentType", documentType)
+    .eq("companyId", companyId)
+    .eq("enabled", true)
+    .lt("lowerBoundAmount", matched.data.lowerBoundAmount ?? 0);
+
+  if (lowerRules.error || !lowerRules.data?.length) return [];
+
+  const expanded = await Promise.all(
+    lowerRules.data.map((rule) => getApproverUserIdsForRule(client, rule))
+  );
+  return [...new Set(expanded.flat())];
+}
+
 export async function getApprovalRuleById(
   client: SupabaseClient<Database>,
   id: string,

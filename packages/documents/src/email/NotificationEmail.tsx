@@ -3,7 +3,6 @@ import {
   Button,
   Container,
   Heading,
-  Hr,
   Link,
   Preview,
   Section,
@@ -305,7 +304,7 @@ export const NotificationEmail = ({
             </>
           )}
 
-          <Hr className={`my-[32px] nf-divider ${themeClasses.border}`} />
+          {/* <Hr className={`my-[32px] nf-divider ${themeClasses.border}`} />
 
           <Text
             className={`text-[12px] leading-[18px] m-0 nf-fallback ${themeClasses.mutedText}`}
@@ -313,7 +312,7 @@ export const NotificationEmail = ({
             You're receiving this email because you have email notifications
             enabled on your Carbon account. You can manage your preferences from
             your account settings.
-          </Text>
+          </Text> */}
         </Container>
       </Body>
     </EmailThemeProvider>

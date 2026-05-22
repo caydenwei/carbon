@@ -38,7 +38,7 @@ export type Notification = {
   seen: boolean;
   createdAt: string;
   payload: {
-    recordId?: string;
+    documentId?: string;
     description?: string;
     event?: string;
     from?: string;

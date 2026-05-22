@@ -469,7 +469,7 @@ function DigestNotification({
               {children.map((child) => (
                 <GenericNotification
                   key={child._id}
-                  id={child.payload.recordId as string}
+                  id={child.payload.documentId as string}
                   createdAt={child.createdAt}
                   description={child.payload.description as string}
                   event={child.payload.event as NotificationEvent}
@@ -627,7 +627,7 @@ const Notifications = () => {
                     return (
                       <GenericNotification
                         key={notification._id}
-                        id={notification.payload.recordId as string}
+                        id={notification.payload.documentId as string}
                         createdAt={notification.createdAt}
                         description={notification.payload.description as string}
                         event={event}
@@ -715,7 +715,7 @@ const Notifications = () => {
                     return (
                       <GenericNotification
                         key={notification._id}
-                        id={notification.payload.recordId as string}
+                        id={notification.payload.documentId as string}
                         createdAt={notification.createdAt}
                         description={notification.payload.description as string}
                         event={event}

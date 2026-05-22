@@ -6,6 +6,7 @@ import {
   notifyTaskAssigned
 } from "@carbon/ee/notifications";
 import { companyHasPlan } from "@carbon/ee/plan.server";
+import { getSlackUserIdByCarbonId } from "@carbon/ee/slack.server";
 import { ERP_URL } from "@carbon/env";
 import type { Events } from "@carbon/lib/events";
 import {
@@ -70,6 +71,19 @@ async function getDescription(
         throw quote.error;
       }
       return `Quote ${quote?.data?.quoteId} assigned to you`;
+    }
+
+    case NotificationEvent.QuoteExpired: {
+      const expiredQuote = await client
+        .from("quote")
+        .select("*")
+        .eq("id", documentId)
+        .single();
+      if (expiredQuote.error) {
+        console.error("Failed to get quote", expiredQuote.error);
+        throw expiredQuote.error;
+      }
+      return `Quote ${expiredQuote?.data?.quoteId} has expired`;
     }
 
     case NotificationEvent.SalesOrderAssignment: {
@@ -280,6 +294,36 @@ async function getDescription(
       return `Training "${trainingAssignment?.data?.training?.name}" assigned to you`;
     }
 
+    case NotificationEvent.PurchaseOrderAssignment: {
+      const purchaseOrder = await client
+        .from("purchaseOrder")
+        .select("*")
+        .eq("id", documentId)
+        .single();
+
+      if (purchaseOrder.error) {
+        console.error("Failed to get purchaseOrder", purchaseOrder.error);
+        throw purchaseOrder.error;
+      }
+
+      return `Purchase Order ${purchaseOrder?.data?.purchaseOrderId} assigned to you`;
+    }
+
+    case NotificationEvent.PurchaseInvoiceAssignment: {
+      const purchaseInvoice = await client
+        .from("purchaseInvoice")
+        .select("*")
+        .eq("id", documentId)
+        .single();
+
+      if (purchaseInvoice.error) {
+        console.error("Failed to get purchaseInvoice", purchaseInvoice.error);
+        throw purchaseInvoice.error;
+      }
+
+      return `Purchase Invoice ${purchaseInvoice?.data?.invoiceId} assigned to you`;
+    }
+
     case NotificationEvent.SuggestionResponse: {
       const suggestion = await client
         .from("suggestion")
@@ -309,6 +353,24 @@ async function getDescription(
       }
 
       return `Risk "${risk?.data?.title}" assigned to you`;
+    }
+
+    case NotificationEvent.SupplierQuoteAssignment: {
+      const supplierQuoteAssignment = await client
+        .from("supplierQuote")
+        .select("*")
+        .eq("id", documentId)
+        .single();
+
+      if (supplierQuoteAssignment.error) {
+        console.error(
+          "Failed to get supplier quote",
+          supplierQuoteAssignment.error
+        );
+        throw supplierQuoteAssignment.error;
+      }
+
+      return `Supplier Quote ${supplierQuoteAssignment?.data?.supplierQuoteId} assigned to you`;
     }
 
     case NotificationEvent.SupplierQuoteResponse: {
@@ -436,38 +498,110 @@ async function getDescription(
 const defaultDestinations: Partial<
   Record<NotificationEvent, NotificationDestination[]>
 > = {
-  [NotificationEvent.ApprovalApproved]: [NotificationDestination.Email],
-  [NotificationEvent.ApprovalRejected]: [NotificationDestination.Email],
-  [NotificationEvent.ApprovalRequested]: [NotificationDestination.Email],
-  [NotificationEvent.DigitalQuoteResponse]: [NotificationDestination.Email],
-  [NotificationEvent.GaugeCalibrationExpired]: [NotificationDestination.Email],
-  [NotificationEvent.JobAssignment]: [NotificationDestination.Email],
-  [NotificationEvent.JobCompleted]: [NotificationDestination.Email],
-  [NotificationEvent.JobOperationAssignment]: [NotificationDestination.Email],
-  [NotificationEvent.JobOperationMessage]: [NotificationDestination.Email],
+  [NotificationEvent.ApprovalApproved]: [
+    NotificationDestination.Email,
+    NotificationDestination.Slack
+  ],
+  [NotificationEvent.ApprovalRejected]: [
+    NotificationDestination.Email,
+    NotificationDestination.Slack
+  ],
+  [NotificationEvent.ApprovalRequested]: [
+    NotificationDestination.Email,
+    NotificationDestination.Slack
+  ],
+  [NotificationEvent.DigitalQuoteResponse]: [
+    NotificationDestination.Email,
+    NotificationDestination.Slack
+  ],
+  [NotificationEvent.GaugeCalibrationExpired]: [
+    NotificationDestination.Email,
+    NotificationDestination.Slack
+  ],
+  [NotificationEvent.JobAssignment]: [
+    NotificationDestination.Email,
+    NotificationDestination.Slack
+  ],
+  [NotificationEvent.JobCompleted]: [
+    NotificationDestination.Email,
+    NotificationDestination.Slack
+  ],
+  [NotificationEvent.JobOperationAssignment]: [
+    NotificationDestination.Email,
+    NotificationDestination.Slack
+  ],
+  [NotificationEvent.JobOperationMessage]: [
+    NotificationDestination.Email,
+    NotificationDestination.Slack
+  ],
   [NotificationEvent.MaintenanceDispatchAssignment]: [
-    NotificationDestination.Email
+    NotificationDestination.Email,
+    NotificationDestination.Slack
   ],
   [NotificationEvent.MaintenanceDispatchCreated]: [
-    NotificationDestination.Email
+    NotificationDestination.Email,
+    NotificationDestination.Slack
   ],
-  [NotificationEvent.NonConformanceAssignment]: [NotificationDestination.Email],
-  [NotificationEvent.ProcedureAssignment]: [NotificationDestination.Email],
+  [NotificationEvent.NonConformanceAssignment]: [
+    NotificationDestination.Email,
+    NotificationDestination.Slack
+  ],
+  [NotificationEvent.ProcedureAssignment]: [
+    NotificationDestination.Email,
+    NotificationDestination.Slack
+  ],
   [NotificationEvent.PurchaseInvoiceAssignment]: [
-    NotificationDestination.Email
+    NotificationDestination.Email,
+    NotificationDestination.Slack
   ],
-  [NotificationEvent.PurchaseOrderAssignment]: [NotificationDestination.Email],
-  [NotificationEvent.QuoteAssignment]: [NotificationDestination.Email],
-  [NotificationEvent.QuoteExpired]: [NotificationDestination.Email],
-  [NotificationEvent.RiskAssignment]: [NotificationDestination.Email],
-  [NotificationEvent.SalesOrderAssignment]: [NotificationDestination.Email],
-  [NotificationEvent.SalesRfqAssignment]: [NotificationDestination.Email],
-  [NotificationEvent.SalesRfqReady]: [NotificationDestination.Email],
-  [NotificationEvent.StockTransferAssignment]: [NotificationDestination.Email],
-  [NotificationEvent.SuggestionResponse]: [NotificationDestination.Email],
-  [NotificationEvent.SupplierQuoteAssignment]: [NotificationDestination.Email],
-  [NotificationEvent.SupplierQuoteResponse]: [NotificationDestination.Email],
-  [NotificationEvent.TrainingAssignment]: [NotificationDestination.Email]
+  [NotificationEvent.PurchaseOrderAssignment]: [
+    NotificationDestination.Email,
+    NotificationDestination.Slack
+  ],
+  [NotificationEvent.QuoteAssignment]: [
+    NotificationDestination.Email,
+    NotificationDestination.Slack
+  ],
+  [NotificationEvent.QuoteExpired]: [
+    NotificationDestination.Email,
+    NotificationDestination.Slack
+  ],
+  [NotificationEvent.RiskAssignment]: [
+    NotificationDestination.Email,
+    NotificationDestination.Slack
+  ],
+  [NotificationEvent.SalesOrderAssignment]: [
+    NotificationDestination.Email,
+    NotificationDestination.Slack
+  ],
+  [NotificationEvent.SalesRfqAssignment]: [
+    NotificationDestination.Email,
+    NotificationDestination.Slack
+  ],
+  [NotificationEvent.SalesRfqReady]: [
+    NotificationDestination.Email,
+    NotificationDestination.Slack
+  ],
+  [NotificationEvent.StockTransferAssignment]: [
+    NotificationDestination.Email,
+    NotificationDestination.Slack
+  ],
+  [NotificationEvent.SuggestionResponse]: [
+    NotificationDestination.Email,
+    NotificationDestination.Slack
+  ],
+  [NotificationEvent.SupplierQuoteAssignment]: [
+    NotificationDestination.Email,
+    NotificationDestination.Slack
+  ],
+  [NotificationEvent.SupplierQuoteResponse]: [
+    NotificationDestination.Email,
+    NotificationDestination.Slack
+  ],
+  [NotificationEvent.TrainingAssignment]: [
+    NotificationDestination.Email,
+    NotificationDestination.Slack
+  ]
 };
 
 export const notifyFunction = inngest.createFunction(
@@ -588,10 +722,10 @@ export const notifyFunction = inngest.createFunction(
             description,
             event: payload.event,
             from: payload.from,
-            recordId: payload.documentId,
+            documentId: payload.documentId,
             ...(payload.documentType && { documentType: payload.documentType })
           },
-          recordId: payload.documentId,
+          documentId: payload.documentId,
           title: description,
           topic,
           userId
@@ -699,6 +833,64 @@ export const notifyFunction = inngest.createFunction(
       );
       if (emailEvents.length > 0) {
         await step.sendEvent("fan-out-emails", emailEvents);
+      }
+    }
+
+    // ---- Slack DM fan-out ----
+    // Per-user DMs via the company's linked Slack workspace. Users without a
+    // matching Slack account in that workspace are silently skipped.
+    if (destinations.includes(NotificationDestination.Slack)) {
+      const slackEvents = await step.run(
+        "resolve-slack-recipients",
+        async () => {
+          const { data: integration, error } = await client
+            .from("companyIntegration")
+            .select("active, metadata")
+            .eq("companyId", payload.companyId)
+            .eq("id", "slack")
+            .maybeSingle();
+
+          if (error) {
+            console.error("Failed to resolve Slack integration", error);
+            return [];
+          }
+          if (!integration?.active) return [];
+
+          const metadata = integration.metadata as {
+            access_token?: string;
+          } | null;
+          const accessToken = metadata?.access_token;
+          if (!accessToken) return [];
+
+          const link = getNotificationLink(payload.event, payload.documentId, {
+            documentType: payload.documentType
+          });
+          const ctaUrl = link ? `${ERP_URL}${link}` : undefined;
+          const text = ctaUrl
+            ? `${description}\n<${ctaUrl}|View in Carbon>`
+            : description;
+
+          const slackUserIds = await Promise.all(
+            userIds.map((userId) =>
+              getSlackUserIdByCarbonId(client, accessToken, userId)
+            )
+          );
+
+          return slackUserIds
+            .filter((id): id is string => !!id)
+            .map((slackUserId) => ({
+              data: {
+                channel: slackUserId,
+                companyId: payload.companyId,
+                text
+              },
+              name: "carbon/send-slack" as const
+            }));
+        }
+      );
+
+      if (slackEvents.length > 0) {
+        await step.sendEvent("fan-out-slack", slackEvents);
       }
     }
   }

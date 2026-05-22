@@ -168,14 +168,13 @@ export default function ItemRuleAssignments({
             <HStack className="gap-2">
               {availableOptions.length > 0 && (
                 <Combobox
-                  size="sm"
                   value=""
                   options={availableOptions}
                   onChange={handleAssign}
                   placeholder={t`Add from library…`}
                 />
               )}
-              <Button asChild variant="secondary" size="sm">
+              <Button asChild>
                 <Link to={path.to.newItemRule}>
                   <Trans>Add rule</Trans>
                 </Link>
@@ -315,18 +314,12 @@ function EmptyState({
           {availableOptions.length > 0 ? (
             <>
               <Combobox
-                size="sm"
                 value=""
                 options={availableOptions}
                 onChange={onAssign}
                 placeholder={t`Add from library…`}
               />
-              <Button
-                asChild
-                variant="secondary"
-                size="sm"
-                leftIcon={<LuPlus />}
-              >
+              <Button asChild variant="secondary" leftIcon={<LuPlus />}>
                 <Link to={path.to.newItemRule}>
                   <Trans>Create new rule</Trans>
                 </Link>
@@ -334,17 +327,12 @@ function EmptyState({
             </>
           ) : (
             <>
-              <Button
-                asChild
-                variant="secondary"
-                size="sm"
-                leftIcon={<LuLibrary />}
-              >
+              <Button asChild variant="secondary" leftIcon={<LuLibrary />}>
                 <Link to={path.to.itemRules}>
                   <Trans>Browse library</Trans>
                 </Link>
               </Button>
-              <Button asChild size="sm" leftIcon={<LuPlus />}>
+              <Button asChild leftIcon={<LuPlus />}>
                 <Link to={path.to.newItemRule}>
                   <Trans>Create new rule</Trans>
                 </Link>

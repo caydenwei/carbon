@@ -305,7 +305,7 @@ const BoMExplorer = ({
             parentClassName="h-full"
             renderNode={({ node, state }) => {
               return (
-                <HoverCard openDelay={500} closeDelay={0}>
+                <HoverCard openDelay={500} closeDelay={150}>
                   <HoverCardTrigger asChild>
                     <div
                       key={node.id}
@@ -400,10 +400,7 @@ const BoMExplorer = ({
                       </div>
                     </div>
                   </HoverCardTrigger>
-                  <HoverCardContent
-                    side="right"
-                    className="pointer-events-none"
-                  >
+                  <HoverCardContent side="right">
                     <NodePreview node={node} />
                   </HoverCardContent>
                 </HoverCard>

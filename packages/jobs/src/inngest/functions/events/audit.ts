@@ -1,8 +1,10 @@
 import { getCarbonServiceRole } from "@carbon/auth/client.server";
+import type { TableConfig } from "@carbon/database/audit.config";
 import {
   auditConfig,
   getCreateFields,
   getEntityConfigsForTable,
+  getSnapshotFields,
   isAuditableTable,
   isChildTable,
   isExtensionTable,
@@ -362,6 +364,11 @@ export const auditFunction = inngest.createFunction(
           }
         }
 
+        // Snapshot FK target display values into each diff before insert.
+        // Frozen at write time — renames/deletes of the FK target do not
+        // rewrite history.
+        await applyFkSnapshots(client, companyId, entries);
+
         // Batch insert entries using RPC
         if (entries.length > 0) {
           const { data: insertedCount, error } = await (
@@ -392,3 +399,132 @@ export const auditFunction = inngest.createFunction(
     return results;
   }
 );
+
+/**
+ * For every entry whose tableConfig declares `snapshotFields`, look up the
+ * FK target's display columns and freeze them onto the diff entry under
+ * `snapshot.old` / `snapshot.new`. One batched query per target table —
+ * proportional to distinct FK targets, not to entries.
+ */
+async function applyFkSnapshots(
+  client: ReturnType<typeof getCarbonServiceRole>,
+  companyId: string,
+  entries: CreateAuditLogEntry[]
+): Promise<void> {
+  type Ref = {
+    diffEntry: {
+      old?: unknown;
+      new?: unknown;
+      snapshot?: {
+        old?: Record<string, unknown>;
+        new?: Record<string, unknown>;
+      };
+    };
+    table: string;
+    displayColumns: readonly string[];
+  };
+
+  const refs: Ref[] = [];
+  const idsByTable = new Map<string, Set<string>>();
+  const colsByTable = new Map<string, Set<string>>();
+
+  for (const entry of entries) {
+    if (!entry.diff) continue;
+    const configs = getEntityConfigsForTable(entry.tableName).filter(
+      (c) => c.entityType === entry.entityType
+    );
+    for (const { tableConfig } of configs) {
+      const snapshots = getSnapshotFields(tableConfig as TableConfig);
+      for (const snap of snapshots) {
+        const change = entry.diff[snap.column];
+        if (!change) continue;
+        refs.push({
+          diffEntry: change,
+          table: snap.table,
+          displayColumns: snap.displayColumns
+        });
+
+        const ids = idsByTable.get(snap.table) ?? new Set<string>();
+        if (typeof change.old === "string") ids.add(change.old);
+        if (typeof change.new === "string") ids.add(change.new);
+        idsByTable.set(snap.table, ids);
+
+        const cols = colsByTable.get(snap.table) ?? new Set<string>();
+        for (const c of snap.displayColumns) cols.add(c);
+        colsByTable.set(snap.table, cols);
+      }
+    }
+  }
+
+  if (refs.length === 0) return;
+
+  // (table, id) → { col: value, ... } — full snapshot row per id
+  const lookup = new Map<string, Record<string, unknown>>();
+
+  for (const [table, ids] of idsByTable) {
+    if (ids.size === 0) continue;
+    const cols = colsByTable.get(table);
+    if (!cols || cols.size === 0) continue;
+    const selectClause = ["id", ...cols].join(", ");
+
+    try {
+      const { data, error } = await (client as any)
+        .from(table)
+        .select(selectClause)
+        .eq("companyId", companyId)
+        .in("id", Array.from(ids));
+
+      if (error || !data) continue;
+
+      for (const row of data as Array<Record<string, unknown>>) {
+        const rowId = row?.id;
+        if (typeof rowId !== "string") continue;
+        const snapshot: Record<string, unknown> = {};
+        for (const col of cols) snapshot[col] = row[col];
+        lookup.set(`${table}::${rowId}`, snapshot);
+      }
+    } catch (err) {
+      console.error(`FK snapshot lookup failed for table "${table}":`, err);
+    }
+  }
+
+  // Pick only the columns this ref asked for. Multiple refs can share a
+  // target table but request different subsets; per-ref filtering keeps
+  // each diff entry's snapshot scoped to what the config declared.
+  const pickSnapshot = (
+    fullSnapshot: Record<string, unknown> | undefined,
+    displayColumns: readonly string[]
+  ): Record<string, unknown> | undefined => {
+    if (!fullSnapshot) return undefined;
+    const picked: Record<string, unknown> = {};
+    for (const col of displayColumns) {
+      if (col in fullSnapshot) picked[col] = fullSnapshot[col];
+    }
+    return Object.keys(picked).length > 0 ? picked : undefined;
+  };
+
+  for (const ref of refs) {
+    const oldVal = ref.diffEntry.old;
+    const newVal = ref.diffEntry.new;
+    const oldSnap =
+      typeof oldVal === "string"
+        ? pickSnapshot(
+            lookup.get(`${ref.table}::${oldVal}`),
+            ref.displayColumns
+          )
+        : undefined;
+    const newSnap =
+      typeof newVal === "string"
+        ? pickSnapshot(
+            lookup.get(`${ref.table}::${newVal}`),
+            ref.displayColumns
+          )
+        : undefined;
+    if (oldSnap || newSnap) {
+      ref.diffEntry.snapshot = {
+        ...(oldSnap && { old: oldSnap }),
+        ...(newSnap && { new: newSnap })
+      };
+    }
+  }
+}

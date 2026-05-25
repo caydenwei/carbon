@@ -2269,18 +2269,9 @@ export async function getResolvedPoAttachments(
     supplierId: string | null;
     supplierInteractionId: string | null;
     itemIds: string[];
-    /** Filename of the freshly-generated PO PDF — excluded from ad-hoc listing
-     *  since the action attaches it separately. */
-    excludePoPdfFileName?: string;
   }
 ): Promise<ResolvedAttachment[]> {
-  const {
-    companyId,
-    supplierId,
-    supplierInteractionId,
-    itemIds,
-    excludePoPdfFileName
-  } = args;
+  const { companyId, supplierId, supplierInteractionId, itemIds } = args;
 
   const companyPrefix = `${companyId}/default-attachments/company`;
   const supplierPrefix = supplierId
@@ -2345,8 +2336,6 @@ export async function getResolvedPoAttachments(
 
   if (poPrefix) {
     for (const f of poFiles) {
-      // Skip the PO PDF we just generated — the action attaches it separately.
-      if (excludePoPdfFileName && f.name === excludePoPdfFileName) continue;
       const path = `${poPrefix}/${f.name}`;
       if (!byPath.has(path))
         byPath.set(path, {

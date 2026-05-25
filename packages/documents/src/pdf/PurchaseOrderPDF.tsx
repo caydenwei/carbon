@@ -77,6 +77,7 @@ const PurchaseOrderPDF = ({
     supplierStateProvince,
     supplierPostalCode,
     supplierCountryCode,
+    supplierCountryName,
     deliveryName,
     deliveryAddressLine1,
     deliveryAddressLine2,
@@ -84,6 +85,7 @@ const PurchaseOrderPDF = ({
     deliveryStateProvince,
     deliveryPostalCode,
     deliveryCountryCode,
+    deliveryCountryName,
     dropShipment,
     customerName,
     customerAddressLine1,
@@ -91,7 +93,8 @@ const PurchaseOrderPDF = ({
     customerCity,
     customerStateProvince,
     customerPostalCode,
-    customerCountryCode
+    customerCountryCode,
+    customerCountryName
   } = purchaseOrderLocations;
 
   const currencyCode =
@@ -121,7 +124,7 @@ const PurchaseOrderPDF = ({
         city: customerCity,
         stateProvince: customerStateProvince,
         postalCode: customerPostalCode,
-        countryCode: customerCountryCode
+        country: customerCountryName ?? customerCountryCode
       }
     : {
         name: deliveryName,
@@ -130,7 +133,7 @@ const PurchaseOrderPDF = ({
         city: deliveryCity,
         stateProvince: deliveryStateProvince,
         postalCode: deliveryPostalCode,
-        countryCode: deliveryCountryCode
+        country: deliveryCountryName ?? deliveryCountryCode
       };
 
   const headerTitle = purchaseOrder?.purchaseOrderId
@@ -199,7 +202,7 @@ const PurchaseOrderPDF = ({
                 city={supplierCity}
                 stateProvince={supplierStateProvince}
                 postalCode={supplierPostalCode}
-                countryCode={supplierCountryCode}
+                country={supplierCountryName ?? supplierCountryCode}
               />
               {purchaseOrderLocations.supplierTaxId &&
                 !isEoriCountry(supplierCountryCode) && (
@@ -281,20 +284,36 @@ const PurchaseOrderPDF = ({
               <View style={tw("h-[1px] bg-gray-200 my-2")} />
               <View style={tw("text-[9px] text-gray-800")}>
                 {company.vatNumber && <Text>VAT: {company.vatNumber}</Text>}
-                {purchaseOrder.createdByFullName && (
-                  <Text>Contact: {purchaseOrder.createdByFullName}</Text>
-                )}
-                {purchaseOrder.createdByEmail && (
-                  <Text>Email: {purchaseOrder.createdByEmail}</Text>
-                )}
-                {purchaseOrder.createdByPhone && (
-                  <Text>Phone: {purchaseOrder.createdByPhone}</Text>
-                )}
+                {(() => {
+                  const name =
+                    purchaseOrder.assigneeFullName ??
+                    purchaseOrder.accountManagerFullName ??
+                    purchaseOrder.createdByFullName;
+                  const email =
+                    purchaseOrder.assigneeEmail ??
+                    purchaseOrder.accountManagerEmail ??
+                    purchaseOrder.createdByEmail;
+                  const phone =
+                    purchaseOrder.assigneePhone ??
+                    purchaseOrder.accountManagerPhone ??
+                    purchaseOrder.createdByPhone;
+                  return (
+                    <>
+                      {name && <Text>Contact: {name}</Text>}
+                      {email && <Text>Email: {email}</Text>}
+                      {phone && <Text>Phone: {phone}</Text>}
+                    </>
+                  );
+                })()}
                 {accountsPayableBillingAddress?.email && (
-                  <Text style={tw("font-bold")}>
-                    Billing documents and enquiries to:{" "}
-                    {accountsPayableBillingAddress.email}
-                  </Text>
+                  <>
+                    <Text style={tw("font-bold mt-1")}>
+                      Billing documents and enquiries:
+                    </Text>
+                    <Text style={tw("font-bold")}>
+                      {accountsPayableBillingAddress.email}
+                    </Text>
+                  </>
                 )}
               </View>
             </View>

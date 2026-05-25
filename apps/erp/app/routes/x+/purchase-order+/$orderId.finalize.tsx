@@ -349,22 +349,9 @@ export async function action(args: ActionFunctionArgs) {
           const html = await renderAsync(emailTemplate);
           const text = await renderAsync(emailTemplate, { plainText: true });
 
-          const signedMainPdf = await serviceRole.storage
-            .from("private")
-            .createSignedUrl(documentFilePath, 3600);
-          if (signedMainPdf.error || !signedMainPdf.data?.signedUrl) {
-            console.error(`${logPrefix} failed to sign main PO PDF`, {
-              path: documentFilePath,
-              error: signedMainPdf.error
-            });
-          } else {
-            console.log(`${logPrefix} signed main PO PDF`, {
-              path: documentFilePath
-            });
-          }
-          const signedUrlData = signedMainPdf.data;
-
           // Resolve cascaded attachments (Company + Supplier + Item + PO ad-hoc).
+          // The freshly-uploaded PO PDF is in supplier-interaction/ and rides
+          // along naturally as a `po`-source file in the cascade.
           const itemIds = Array.from(
             new Set(
               (purchaseOrderLines.data ?? [])
@@ -377,8 +364,7 @@ export async function action(args: ActionFunctionArgs) {
             supplierId: purchaseOrder.data.supplierId ?? null,
             supplierInteractionId:
               purchaseOrder.data.supplierInteractionId ?? null,
-            itemIds,
-            excludePoPdfFileName: fileName
+            itemIds
           });
           console.log(`${logPrefix} resolved cascaded attachments`, {
             total: resolved.length,
@@ -434,14 +420,7 @@ export async function action(args: ActionFunctionArgs) {
             successful: cascadedAttachments.length
           });
 
-          const allAttachments: { path: string; filename: string }[] = [];
-          if (signedUrlData?.signedUrl) {
-            allAttachments.push({
-              path: signedUrlData.signedUrl,
-              filename: fileName
-            });
-          }
-          allAttachments.push(...cascadedAttachments);
+          const allAttachments = cascadedAttachments;
 
           const triggerPayload = {
             to: [buyer.data.email, supplier.data.contact.email],

@@ -74,9 +74,7 @@ export const locationValidator = z
     addressLine1: z.string().min(1, { message: "Address is required" }),
     addressLine2: z.string().optional(),
     city: z.string().min(1, { message: "City is required" }),
-    stateProvince: z
-      .string()
-      .min(1, { message: "State / Province is required" }),
+    stateProvince: zfd.text(z.string().optional()),
     postalCode: z.string().min(1, { message: "Postal Code is required" }),
     countryCode: z.string().min(1, { message: "Country is required" }),
     timezone: z.string().min(1, { message: "Timezone is required" }),

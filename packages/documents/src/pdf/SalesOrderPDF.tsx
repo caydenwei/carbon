@@ -98,8 +98,7 @@ const SalesOrderPDF = ({
   const registrationLine = composeRegistrationLine({
     companyName: company.name,
     country: company.countryCode,
-    eori: company.eori,
-    accountsReceivableEmail: companySettings?.accountsReceivableEmail
+    eori: company.eori
   });
 
   const paymentTerm = paymentTerms?.find(
@@ -168,7 +167,7 @@ const SalesOrderPDF = ({
                 city={customerCity}
                 stateProvince={customerStateProvince}
                 postalCode={customerPostalCode}
-                countryCode={customerCountryName}
+                country={customerCountryName}
               />
               {customerTaxId && !isEoriCountry(customerCountryName) && (
                 <Text>Tax ID: {customerTaxId}</Text>
@@ -254,7 +253,7 @@ const SalesOrderPDF = ({
                     city={paymentCity}
                     stateProvince={paymentStateProvince}
                     postalCode={paymentPostalCode}
-                    countryCode={paymentCountryName}
+                    country={paymentCountryName}
                   />
                 </View>
               </View>

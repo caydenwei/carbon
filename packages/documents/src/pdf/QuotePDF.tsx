@@ -78,6 +78,7 @@ const QuotePDF = ({
     customerStateProvince,
     customerPostalCode,
     customerCountryCode,
+    customerCountryName,
     customerTaxId,
     customerVatNumber,
     customerEori,
@@ -97,8 +98,7 @@ const QuotePDF = ({
   const registrationLine = composeRegistrationLine({
     companyName: company.name,
     country: company.countryCode,
-    eori: company.eori,
-    accountsReceivableEmail: companySettings?.accountsReceivableEmail
+    eori: company.eori
   });
 
   const pricesByLine = quoteLinePrices.reduce<
@@ -293,7 +293,7 @@ const QuotePDF = ({
                 city={customerCity}
                 stateProvince={customerStateProvince}
                 postalCode={customerPostalCode}
-                countryCode={customerCountryCode}
+                country={customerCountryName ?? customerCountryCode}
               />
               {customerTaxId && !isEoriCountry(customerCountryCode) && (
                 <Text>Tax ID: {customerTaxId}</Text>

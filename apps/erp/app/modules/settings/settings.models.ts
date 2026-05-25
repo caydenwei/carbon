@@ -63,7 +63,7 @@ const company = {
   addressLine1: z.string().min(1, { message: "Address is required" }),
   addressLine2: zfd.text(z.string().optional()),
   city: z.string().min(1, { message: "City is required" }),
-  stateProvince: z.string().min(1, { message: "State / Province is required" }),
+  stateProvince: zfd.text(z.string().optional()),
   postalCode: z.string().min(1, { message: "Postal Code is required" }),
   countryCode: z.string().min(1, { message: "Country is required" }),
   baseCurrencyCode: zfd.text(z.string()),

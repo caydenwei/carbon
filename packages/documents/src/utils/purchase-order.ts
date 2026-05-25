@@ -5,7 +5,7 @@ export function getLineDescription(
 ) {
   switch (line?.purchaseOrderLineType) {
     case "Fixed Asset":
-      return line?.assetId;
+      return line?.assetName ?? "Fixed Asset";
     case "G/L Account":
       return line?.description;
     case "Comment":

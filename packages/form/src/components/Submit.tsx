@@ -3,8 +3,8 @@ import type { ButtonProps } from "@carbon/react";
 import {
   Button,
   Modal,
-  ModalBody,
   ModalContent,
+  ModalDescription,
   ModalFooter,
   ModalHeader,
   ModalTitle
@@ -83,10 +83,10 @@ export const Submit = forwardRef<HTMLButtonElement, SubmitProps>(
             <ModalContent>
               <ModalHeader>
                 <ModalTitle>Unsaved changes</ModalTitle>
+                <ModalDescription>
+                  Are you sure you want to leave this page?
+                </ModalDescription>
               </ModalHeader>
-              <ModalBody>
-                <p>Are you sure you want to leave this page?</p>
-              </ModalBody>
               <ModalFooter>
                 <Button variant="secondary" onClick={() => blocker.reset()}>
                   Stay on this page

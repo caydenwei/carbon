@@ -56,7 +56,7 @@
   "scripts": {
     "build": "react-router build",
     "clean": "rimraf .cache .turbo node_modules dist build",
-    "dev": "react-router dev",
+    "dev": "NODE_EXTRA_CA_CERTS=$HOME/.portless/ca.pem react-router dev",
     "lint": "biome lint --write",
     "start": "react-router-serve ./build/server/index.js",
     "typecheck": "tsgo --noEmit",

@@ -778,7 +778,7 @@ serve(async (req: Request) => {
           companyId
         );
 
-        const [purchaseOrder, purchaseOrderLines, receipt] = await Promise.all([
+        const [purchaseOrder, purchaseOrderLines, fixedAssetPoLines, receipt] = await Promise.all([
           client
             .from("purchaseOrders")
             .select("*")
@@ -795,7 +795,11 @@ serve(async (req: Request) => {
               "Fixture",
               "Consumable",
             ]),
-
+          client
+            .from("purchaseOrderLine")
+            .select("id, purchaseOrderLineType, assetId, purchaseQuantity, quantityReceived, receivedComplete")
+            .eq("purchaseOrderId", purchaseOrderId)
+            .eq("purchaseOrderLineType", "Fixed Asset"),
           client
             .from("receipt")
             .select("*")
@@ -923,7 +927,10 @@ serve(async (req: Request) => {
           return acc;
         }, []);
 
-        if (receiptLineItems.length === 0) {
+        const hasUnreceivedFaLines = (fixedAssetPoLines.data ?? []).some(
+          (d) => d.assetId && d.purchaseQuantity && !d.receivedComplete
+        );
+        if (receiptLineItems.length === 0 && !hasUnreceivedFaLines) {
           throw new Error("No valid receipt line items found");
         }
 
@@ -984,6 +991,28 @@ serve(async (req: Request) => {
                   ...line,
                   receiptId: receiptId,
                   locationId,
+                }))
+              )
+              .execute();
+          }
+
+          const unreceivedFaLines = (fixedAssetPoLines.data ?? []).filter(
+            (d) => d.assetId && d.purchaseQuantity && !d.receivedComplete
+          );
+          if (unreceivedFaLines.length > 0) {
+            await trx
+              .deleteFrom("receiptFixedAssetLine")
+              .where("receiptId", "=", receiptId)
+              .execute();
+            await trx
+              .insertInto("receiptFixedAssetLine")
+              .values(
+                unreceivedFaLines.map((line) => ({
+                  receiptId: receiptId,
+                  purchaseOrderLineId: line.id,
+                  received: true,
+                  companyId,
+                  createdBy: userId,
                 }))
               )
               .execute();
@@ -1972,6 +2001,7 @@ serve(async (req: Request) => {
         const [
           salesOrder,
           salesOrderLines,
+          fixedAssetSoLines,
           salesOrderShipment,
           shipment,
           jobs,
@@ -1989,6 +2019,11 @@ serve(async (req: Request) => {
               "Consumable",
             ])
             .eq("locationId", locationId),
+          client
+            .from("salesOrderLine")
+            .select("id, salesOrderLineType, assetId, saleQuantity, quantitySent, sentComplete")
+            .eq("salesOrderId", salesOrderId)
+            .eq("salesOrderLineType", "Fixed Asset"),
           client
             .from("salesOrderShipment")
             .select("*")
@@ -2259,6 +2294,28 @@ serve(async (req: Request) => {
                   ...line,
                   shipmentId: shipmentId,
                   locationId,
+                }))
+              )
+              .execute();
+          }
+
+          const unshippedFaLines = (fixedAssetSoLines.data ?? []).filter(
+            (d) => d.assetId && d.saleQuantity && !d.sentComplete
+          );
+          if (unshippedFaLines.length > 0) {
+            await trx
+              .deleteFrom("shipmentFixedAssetLine")
+              .where("shipmentId", "=", shipmentId)
+              .execute();
+            await trx
+              .insertInto("shipmentFixedAssetLine")
+              .values(
+                unshippedFaLines.map((line) => ({
+                  shipmentId: shipmentId,
+                  salesOrderLineId: line.id,
+                  shipped: true,
+                  companyId,
+                  createdBy: userId,
                 }))
               )
               .execute();

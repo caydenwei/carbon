@@ -4,17 +4,9 @@ import {
   Card,
   CardContent,
   CardFooter,
-  CardHeader,
-  Copy,
-  DropdownMenu,
-  DropdownMenuContent,
   DropdownMenuIcon,
   DropdownMenuItem,
   DropdownMenuSeparator,
-  DropdownMenuTrigger,
-  Heading,
-  HStack,
-  IconButton,
   SplitButton,
   useDisclosure,
   VStack
@@ -24,7 +16,6 @@ import { Trans, useLingui } from "@lingui/react/macro";
 import {
   LuCheckCheck,
   LuCreditCard,
-  LuEllipsisVertical,
   LuQrCode,
   LuShoppingCart,
   LuTicketX,
@@ -33,6 +24,7 @@ import {
 } from "react-icons/lu";
 import { Link, useParams } from "react-router";
 import type { z } from "zod";
+import { DocumentHeader } from "~/components";
 import { useAuditLog } from "~/components/AuditLog";
 import {
   Combobox,
@@ -80,6 +72,7 @@ const ReceiptForm = ({
   const routeData = useRouteData<{
     receipt: Receipt;
     receiptLineTracking: ItemTracking[];
+    fixedAssetLines: { id: string; received: boolean }[];
   }>(path.to.receipt(receiptId));
 
   const { company } = useUser();
@@ -108,9 +101,13 @@ const ReceiptForm = ({
   const isInvoiced = routeData?.receipt?.invoiced === true;
   const isEditing = initialValues.id !== undefined;
 
+  const hasReceivableFaLines = (routeData?.fixedAssetLines ?? []).some(
+    (line) => line.received
+  );
   const canPost =
-    receiptLines.length > 0 &&
-    receiptLines.some((line) => (line.receivedQuantity ?? 0) !== 0);
+    (receiptLines.length > 0 &&
+      receiptLines.some((line) => (line.receivedQuantity ?? 0) !== 0)) ||
+    hasReceivableFaLines;
 
   const receiptLineTracking = routeData?.receiptLineTracking ?? [];
 
@@ -149,80 +146,70 @@ const ReceiptForm = ({
           defaultValues={initialValues}
           style={{ width: "100%" }}
         >
-          <CardHeader className="flex-row items-center justify-between">
-            <HStack>
-              <Heading as="h1" size="h3">
-                {routeData?.receipt?.receiptId}
-              </Heading>
-              <Copy text={routeData?.receipt?.receiptId ?? ""} />
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <IconButton
-                    aria-label="More options"
-                    icon={<LuEllipsisVertical />}
-                    variant="secondary"
-                    size="sm"
-                  />
-                </DropdownMenuTrigger>
-                <DropdownMenuContent>
-                  {auditLogTrigger}
-                  {isPosted && (
-                    <>
-                      <DropdownMenuSeparator />
-                      <DropdownMenuItem
-                        disabled={
-                          isVoided ||
-                          isInvoiced ||
-                          !permissions.can("update", "inventory")
-                        }
-                        destructive
-                        onClick={voidModal.onOpen}
-                      >
-                        <DropdownMenuIcon icon={<LuTicketX />} />
-                        <Trans>Void</Trans>
-                      </DropdownMenuItem>
-                    </>
-                  )}
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem
-                    disabled={
-                      !permissions.can("delete", "inventory") ||
-                      !permissions.is("employee")
-                    }
-                    destructive
-                    onClick={deleteDisclosure.onOpen}
-                  >
-                    <DropdownMenuIcon icon={<LuTrash />} />
-                    <Trans>Delete</Trans>
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-              <ReceiptStatus status={status} />
-            </HStack>
-            <HStack>
-              {receiptLineTracking.length > 0 && (
-                <SplitButton
-                  leftIcon={<LuQrCode />}
-                  dropdownItems={labelSizes.map((size) => ({
-                    label: size.name,
-                    onClick: () => navigateToTrackingLabels(!!size.zpl, size.id)
-                  }))}
-                  onClick={() => navigateToTrackingLabels(false)}
-                  variant={isPosted ? "primary" : "secondary"}
+          <DocumentHeader
+            title={routeData?.receipt?.receiptId ?? ""}
+            status={<ReceiptStatus status={status} />}
+            menuItems={
+              <>
+                {auditLogTrigger}
+                {isPosted && (
+                  <>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem
+                      disabled={
+                        isVoided ||
+                        isInvoiced ||
+                        !permissions.can("update", "inventory")
+                      }
+                      destructive
+                      onClick={voidModal.onOpen}
+                    >
+                      <DropdownMenuIcon icon={<LuTicketX />} />
+                      <Trans>Void</Trans>
+                    </DropdownMenuItem>
+                  </>
+                )}
+                <DropdownMenuSeparator />
+                <DropdownMenuItem
+                  disabled={
+                    !permissions.can("delete", "inventory") ||
+                    !permissions.is("employee")
+                  }
+                  destructive
+                  onClick={deleteDisclosure.onOpen}
                 >
-                  <Trans>Tracking Labels</Trans>
-                </SplitButton>
-              )}
-              <SourceDocumentLink
-                sourceDocument={routeData?.receipt?.sourceDocument ?? undefined}
-                sourceDocumentId={
-                  routeData?.receipt?.sourceDocumentId ?? undefined
-                }
-                sourceDocumentReadableId={
-                  routeData?.receipt?.sourceDocumentReadableId ?? undefined
-                }
-              />
-              {
+                  <DropdownMenuIcon icon={<LuTrash />} />
+                  <Trans>Delete</Trans>
+                </DropdownMenuItem>
+              </>
+            }
+            actions={
+              <>
+                {receiptLineTracking.length > 0 && (
+                  <SplitButton
+                    leftIcon={<LuQrCode />}
+                    dropdownItems={labelSizes.map((size) => ({
+                      label: size.name,
+                      onClick: () =>
+                        navigateToTrackingLabels(!!size.zpl, size.id)
+                    }))}
+                    onClick={() => navigateToTrackingLabels(false)}
+                    variant={isPosted ? "primary" : "secondary"}
+                  >
+                    <Trans>Tracking Labels</Trans>
+                  </SplitButton>
+                )}
+                <SourceDocumentLink
+                  sourceDocument={
+                    routeData?.receipt?.sourceDocument ?? undefined
+                  }
+                  sourceDocumentId={
+                    routeData?.receipt?.sourceDocumentId ?? undefined
+                  }
+                  sourceDocumentReadableId={
+                    routeData?.receipt?.sourceDocumentReadableId ?? undefined
+                  }
+                />
                 <Button
                   variant={canInvoice ? "primary" : "secondary"}
                   isDisabled={!canInvoice}
@@ -235,17 +222,19 @@ const ReceiptForm = ({
                     <Trans>Invoice</Trans>
                   </Link>
                 </Button>
-              }
-              <Button
-                variant={canPost && !isPosted ? "primary" : "secondary"}
-                onClick={postModal.onOpen}
-                isDisabled={!canPost || isPosted || !permissions.is("employee")}
-                leftIcon={<LuCheckCheck />}
-              >
-                <Trans>Post</Trans>
-              </Button>
-            </HStack>
-          </CardHeader>
+                <Button
+                  variant={canPost && !isPosted ? "primary" : "secondary"}
+                  onClick={postModal.onOpen}
+                  isDisabled={
+                    !canPost || isPosted || !permissions.is("employee")
+                  }
+                  leftIcon={<LuCheckCheck />}
+                >
+                  <Trans>Post</Trans>
+                </Button>
+              </>
+            }
+          />
 
           <CardContent>
             <Hidden name="id" />

@@ -443,6 +443,73 @@ export async function getCurrentAccountingPeriod(
     .single();
 }
 
+export async function getOrCreateAccountingPeriod(
+  client: SupabaseClient<Database>,
+  companyId: string,
+  date: string
+): Promise<{ data: string | null; error: { message: string } | null }> {
+  const existing = await getCurrentAccountingPeriod(client, companyId, date);
+
+  if (existing.data) {
+    if (existing.data.closedAt) {
+      return {
+        data: null,
+        error: {
+          message: "Accounting period is closed. Reopen it before posting."
+        }
+      };
+    }
+
+    if (existing.data.status === "Inactive") {
+      await client
+        .from("accountingPeriod")
+        .update({ status: "Inactive" as const })
+        .eq("companyId", companyId)
+        .eq("status", "Active");
+
+      await client
+        .from("accountingPeriod")
+        .update({ status: "Active" as const })
+        .eq("id", existing.data.id);
+    }
+    return { data: existing.data.id, error: null };
+  }
+
+  // Create a new period for the month of the given date
+  const d = new Date(date);
+  const year = d.getFullYear();
+  const month = d.getMonth(); // 0-indexed
+  const startDate = new Date(year, month, 1).toISOString().split("T")[0];
+  const endDate = new Date(year, month + 1, 0).toISOString().split("T")[0];
+
+  await client
+    .from("accountingPeriod")
+    .update({ status: "Inactive" as const })
+    .eq("companyId", companyId)
+    .eq("status", "Active");
+
+  const result = await client
+    .from("accountingPeriod")
+    .insert({
+      startDate,
+      endDate,
+      companyId,
+      status: "Active" as const,
+      createdBy: "system"
+    })
+    .select("id")
+    .single();
+
+  if (result.error) {
+    return {
+      data: null,
+      error: { message: "Failed to create accounting period" }
+    };
+  }
+
+  return { data: result.data.id, error: null };
+}
+
 export async function getDefaultAccounts(
   client: SupabaseClient<Database>,
   companyId: string
@@ -953,6 +1020,12 @@ function getEntityDimensionValues(
         .select("id, name")
         .eq("companyId", companyId)
         .order("name");
+    case "FixedAssetClass":
+      return client
+        .from("fixedAssetClass")
+        .select("id, name")
+        .eq("companyId", companyId)
+        .order("name");
     case "ItemPostingGroup":
       return client
         .from("itemPostingGroup")
@@ -1083,6 +1156,8 @@ function getEntityValuesByIds(
       return client.from("itemPostingGroup").select("id, name").in("id", ids);
     case "CostCenter":
       return client.from("costCenter").select("id, name").in("id", ids);
+    case "FixedAssetClass":
+      return client.from("fixedAssetClass").select("id, name").in("id", ids);
     default:
       return Promise.resolve({
         data: [] as { id: string; name: string }[],
@@ -1850,4 +1925,288 @@ export async function reverseJournalEntry(
   if (updateResult.error) return updateResult;
 
   return reversed;
+}
+
+// -- Asset Classes --
+
+export async function getFixedAssetClasses(
+  client: SupabaseClient<Database>,
+  companyId: string,
+  args: GenericQueryFilters & { search: string | null }
+) {
+  let query = client
+    .from("fixedAssetClass")
+    .select(
+      "id, name, description, depreciationMethod, usefulLifeMonths, residualValuePercent, taxDepreciationMethod, taxUsefulLifeMonths, macrsPropertyClass",
+      { count: "exact" }
+    )
+    .eq("companyId", companyId);
+
+  if (args.search) {
+    query = query.ilike("name", `%${args.search}%`);
+  }
+
+  query = setGenericQueryFilters(query, args, [
+    { column: "name", ascending: true }
+  ]);
+  return query;
+}
+
+export async function getFixedAssetClass(
+  client: SupabaseClient<Database>,
+  id: string
+) {
+  return client.from("fixedAssetClass").select("*").eq("id", id).single();
+}
+
+export async function getFixedAssetClassesList(
+  client: SupabaseClient<Database>,
+  companyId: string
+) {
+  return client
+    .from("fixedAssetClass")
+    .select(
+      "id, name, depreciationMethod, usefulLifeMonths, residualValuePercent, taxDepreciationMethod, taxUsefulLifeMonths, taxResidualValuePercent, macrsPropertyClass, macrsConvention, bonusDepreciationPercent"
+    )
+    .eq("companyId", companyId)
+    .order("name");
+}
+
+export async function upsertFixedAssetClass(
+  client: SupabaseClient<Database>,
+  data:
+    | (Record<string, any> & { companyId: string; createdBy: string })
+    | (Record<string, any> & { id: string; updatedBy: string })
+) {
+  if ("createdBy" in data) {
+    return client
+      .from("fixedAssetClass")
+      .insert([data as any])
+      .select("id")
+      .single();
+  }
+  const { id, ...rest } = data;
+  return client
+    .from("fixedAssetClass")
+    .update(sanitize(rest))
+    .eq("id", id)
+    .select("id")
+    .single();
+}
+
+export async function deleteFixedAssetClass(
+  client: SupabaseClient<Database>,
+  id: string
+) {
+  return client.from("fixedAssetClass").delete().eq("id", id);
+}
+
+// -- Fixed Assets --
+
+export async function getFixedAssets(
+  client: SupabaseClient<Database>,
+  companyId: string,
+  args: GenericQueryFilters & {
+    search: string | null;
+    status: Database["public"]["Enums"]["fixedAssetStatus"] | null;
+  }
+) {
+  let query = client
+    .from("fixedAsset")
+    .select(
+      "id, fixedAssetId, fixedAssetClassId, name, serialNumber, status, depreciationMethod, acquisitionCost, accumulatedDepreciation, fixedAssetClass:fixedAssetClassId(id, name), location:locationId(id, name)",
+      { count: "exact" }
+    )
+    .eq("companyId", companyId);
+
+  if (args.search) {
+    query = query.or(
+      `name.ilike.%${args.search}%,fixedAssetId.ilike.%${args.search}%,serialNumber.ilike.%${args.search}%`
+    );
+  }
+
+  if (args.status) {
+    query = query.eq("status", args.status);
+  }
+
+  query = setGenericQueryFilters(query, args, [
+    { column: "fixedAssetId", ascending: true }
+  ]);
+  return query;
+}
+
+export async function getFixedAsset(
+  client: SupabaseClient<Database>,
+  id: string
+) {
+  return client
+    .from("fixedAsset")
+    .select(
+      "*, fixedAssetClass:fixedAssetClassId(*), location:locationId(id, name)"
+    )
+    .eq("id", id)
+    .single();
+}
+
+export async function getFixedAssetsList(
+  client: SupabaseClient<Database>,
+  companyId: string
+) {
+  return client
+    .from("fixedAsset")
+    .select("id, fixedAssetId, name")
+    .eq("companyId", companyId)
+    .eq("status", "Draft")
+    .order("fixedAssetId");
+}
+
+export async function getFixedAssetsListForSale(
+  client: SupabaseClient<Database>,
+  companyId: string
+) {
+  return client
+    .from("fixedAsset")
+    .select("id, fixedAssetId, name")
+    .eq("companyId", companyId)
+    .in("status", ["Active", "Fully Depreciated"])
+    .order("fixedAssetId");
+}
+
+export async function upsertFixedAsset(
+  client: SupabaseClient<Database>,
+  data:
+    | (Record<string, any> & {
+        fixedAssetId: string;
+        companyId: string;
+        createdBy: string;
+      })
+    | (Record<string, any> & { id: string; updatedBy: string })
+) {
+  if ("createdBy" in data) {
+    return client
+      .from("fixedAsset")
+      .insert([data as any])
+      .select("id")
+      .single();
+  }
+  const { id, ...rest } = data;
+  return client
+    .from("fixedAsset")
+    .update(sanitize(rest))
+    .eq("id", id)
+    .select("id")
+    .single();
+}
+
+export async function deleteFixedAsset(
+  client: SupabaseClient<Database>,
+  id: string
+) {
+  return client.from("fixedAsset").delete().eq("id", id).eq("status", "Draft");
+}
+
+export async function deleteDepreciationRun(
+  client: SupabaseClient<Database>,
+  id: string
+) {
+  return client
+    .from("depreciationRun")
+    .delete()
+    .eq("id", id)
+    .eq("status", "Draft");
+}
+
+// -- Depreciation --
+
+export async function getDepreciationRuns(
+  client: SupabaseClient<Database>,
+  companyId: string,
+  args: GenericQueryFilters & { search: string | null }
+) {
+  let query = client
+    .from("depreciationRun")
+    .select("id, depreciationRunId, periodEnd, status, postedAt", {
+      count: "exact"
+    })
+    .eq("companyId", companyId);
+
+  if (args.search) {
+    query = query.ilike("depreciationRunId", `%${args.search}%`);
+  }
+
+  query = setGenericQueryFilters(query, args, [
+    { column: "createdAt", ascending: false }
+  ]);
+  return query;
+}
+
+export async function getDepreciationRun(
+  client: SupabaseClient<Database>,
+  id: string
+) {
+  return client.from("depreciationRun").select("*").eq("id", id).single();
+}
+
+export async function getDepreciationRunLines(
+  client: SupabaseClient<Database>,
+  depreciationRunId: string
+) {
+  return client
+    .from("depreciationRunLine")
+    .select(
+      "id, amount, taxAmount, journalId, fixedAsset:fixedAssetId(id, fixedAssetId, name, acquisitionCost, accumulatedDepreciation, accumulatedTaxDepreciation, residualValuePercent)"
+    )
+    .eq("depreciationRunId", depreciationRunId);
+}
+
+// -- Depreciation History for a single asset --
+
+export async function getAssetDepreciationHistory(
+  client: SupabaseClient<Database>,
+  fixedAssetId: string
+) {
+  return client
+    .from("depreciationRunLine")
+    .select(
+      "id, amount, taxAmount, journalId, depreciationRun:depreciationRunId(id, depreciationRunId, periodEnd, status)"
+    )
+    .eq("fixedAssetId", fixedAssetId)
+    .order("depreciationRun(periodEnd)", { ascending: false });
+}
+
+// -- Disposals --
+
+export async function getFixedAssetDisposal(
+  client: SupabaseClient<Database>,
+  fixedAssetId: string
+) {
+  return client
+    .from("fixedAssetDisposal")
+    .select("*")
+    .eq("fixedAssetId", fixedAssetId)
+    .maybeSingle();
+}
+
+// -- Usage Logs --
+
+export async function getFixedAssetUsageLogs(
+  client: SupabaseClient<Database>,
+  fixedAssetId: string
+) {
+  return client
+    .from("fixedAssetUsageLog")
+    .select("*")
+    .eq("fixedAssetId", fixedAssetId)
+    .order("periodEnd", { ascending: false });
+}
+
+export async function upsertFixedAssetUsageLog(
+  client: SupabaseClient<Database>,
+  data: Record<string, any> & { companyId: string; createdBy: string }
+) {
+  return client
+    .from("fixedAssetUsageLog")
+    .insert([data as any])
+    .select("id")
+    .single();
 }

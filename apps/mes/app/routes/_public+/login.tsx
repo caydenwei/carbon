@@ -271,11 +271,16 @@ export default function LoginRoute() {
 
   return (
     <>
-      <div className="flex justify-center mb-4">
+      <div className="flex justify-center mb-8">
         <img
-          src={CONTROLLED_ENVIRONMENT ? "/flag.png" : "/carbon-logo-mark.svg"}
+          src={CONTROLLED_ENVIRONMENT ? "/flag.png" : "/carbon-mark-light.svg"}
           alt={t`Carbon Logo`}
-          className="w-36"
+          className="w-24 dark:hidden"
+        />
+        <img
+          src={CONTROLLED_ENVIRONMENT ? "/flag.png" : "/carbon-mark-dark.svg"}
+          alt={t`Carbon Logo`}
+          className="w-24 hidden dark:block"
         />
       </div>
       <div className="rounded-lg md:bg-card md:border md:border-border md:shadow-lg p-8 w-[380px]">
@@ -338,11 +343,6 @@ export default function LoginRoute() {
                 </Button>
               )}
 
-              {(hasGoogleAuth || hasOutlookAuth) && (
-                <div className="py-3 w-full">
-                  <Separator />
-                </div>
-              )}
               {hasPasskeyAuth && passkeySupported && (
                 <Button
                   type="button"
@@ -354,9 +354,16 @@ export default function LoginRoute() {
                   variant="secondary"
                   leftIcon={<LuFingerprint className="size-4" />}
                 >
-                  Sign in with Passkey
+                  <Trans>Sign in with Passkey</Trans>
                 </Button>
               )}
+
+              {(hasGoogleAuth || hasOutlookAuth || hasPasskeyAuth) && (
+                <div className="py-3 w-full">
+                  <Separator />
+                </div>
+              )}
+
               <Input
                 name="email"
                 label=""

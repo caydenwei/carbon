@@ -424,6 +424,8 @@ serve(async (req: Request) => {
             "ItemPostingGroup",
             "Location",
             "CostCenter",
+            "Process",
+            "FixedAssetClass",
           ]),
       ]);
 
@@ -538,7 +540,25 @@ serve(async (req: Request) => {
       itemPostingGroupId: string | null;
       locationId: string | null;
       costCenterId: string | null;
+      processId: string | null;
+      fixedAssetClassId: string | null;
     }[] = [];
+
+    const processIdByJobOperationId = new Map<string, string>();
+    {
+      const jobOpIds = purchaseOrderLines.data
+        .map((pol) => pol.jobOperationId)
+        .filter((id): id is string => !!id);
+      if (jobOpIds.length > 0) {
+        const jobOps = await client
+          .from("jobOperation")
+          .select("id, processId")
+          .in("id", jobOpIds);
+        for (const op of jobOps.data ?? []) {
+          if (op.processId) processIdByJobOperationId.set(op.id, op.processId);
+        }
+      }
+    }
 
     const receiptLineInserts: Omit<
       Database["public"]["Tables"]["receiptLine"]["Insert"],
@@ -796,6 +816,8 @@ serve(async (req: Request) => {
                   itemPostingGroupId: lineItemPostingGroupId,
                   locationId: invoiceLine.locationId ?? null,
                   costCenterId: null,
+                  processId: null,
+                  fixedAssetClassId: null,
                 };
                 journalLineDimensionsMeta.push(itemDimMeta, itemDimMeta);
               }
@@ -976,11 +998,16 @@ serve(async (req: Request) => {
                   itemCosts.data.find(
                     (cost) => cost.itemId === invoiceLine.itemId
                   )?.itemPostingGroupId ?? null;
+                const lineProcessId = purchaseOrderLine?.jobOperationId
+                  ? processIdByJobOperationId.get(purchaseOrderLine.jobOperationId) ?? null
+                  : null;
                 const reverseDimMeta = {
                   supplierTypeId: supplier.data.supplierTypeId ?? null,
                   itemPostingGroupId: reverseLineItemPostingGroupId,
                   locationId: invoiceLine.locationId ?? null,
                   costCenterId: null,
+                  processId: lineProcessId,
+                  fixedAssetClassId: null,
                 };
                 const reverseJlCount =
                   journalLineInserts.length - jlStartIdxReverse;
@@ -1040,11 +1067,16 @@ serve(async (req: Request) => {
                   itemCosts.data.find(
                     (cost) => cost.itemId === invoiceLine.itemId
                   )?.itemPostingGroupId ?? null;
+                const accrualProcessId = purchaseOrderLine?.jobOperationId
+                  ? processIdByJobOperationId.get(purchaseOrderLine.jobOperationId) ?? null
+                  : null;
                 const accrualDimMeta = {
                   supplierTypeId: supplier.data.supplierTypeId ?? null,
                   itemPostingGroupId: accrualLineItemPostingGroupId,
                   locationId: invoiceLine.locationId ?? null,
                   costCenterId: null,
+                  processId: accrualProcessId,
+                  fixedAssetClassId: null,
                 };
                 journalLineDimensionsMeta.push(accrualDimMeta, accrualDimMeta);
               }
@@ -1052,9 +1084,221 @@ serve(async (req: Request) => {
           }
 
           break;
-        case "Fixed Asset":
-          // TODO: fixed assets
+        case "Fixed Asset": {
+          if (accountingEnabled && accountDefaults?.data && invoiceLine.assetId) {
+            const purchaseOrderLine = purchaseOrderLines.data.find(
+              (line) => line.id === invoiceLine.purchaseOrderLineId
+            );
+
+            const wasReceived =
+              purchaseOrderLine &&
+              (purchaseOrderLine.quantityReceived ?? 0) > 0;
+
+            const faRecord = await client
+              .from("fixedAsset")
+              .select("locationId, fixedAssetClassId")
+              .eq("id", invoiceLine.assetId)
+              .single();
+            const faLocationId = faRecord.data?.locationId ?? null;
+            const faClassId = faRecord.data?.fixedAssetClassId ?? null;
+
+            const jlStartIdxFa = journalLineInserts.length;
+            let faFixedAssetClassId: string | null = null;
+
+            if (wasReceived && invoiceLine.purchaseOrderLineId) {
+              // Receipt was already posted — reverse the GR/IR accrual
+              const existingJournalLines =
+                journalLinesByPurchaseOrderLine[
+                  invoiceLine.purchaseOrderLineId
+                ] ?? [];
+
+              let receiptCost = 0;
+              for (const entry of existingJournalLines) {
+                if (
+                  (entry.amount ?? 0) > 0 &&
+                  entry.description === "Fixed Asset Acquisition"
+                ) {
+                  receiptCost += Math.abs(entry.amount ?? 0);
+                }
+              }
+              if (receiptCost === 0) {
+                for (const entry of existingJournalLines) {
+                  if (
+                    (entry.amount ?? 0) < 0 &&
+                    entry.description === "Goods Received Not Invoiced"
+                  ) {
+                    receiptCost += Math.abs(entry.amount ?? 0);
+                  }
+                }
+              }
+
+              const invoiceCost = totalLineCostWithWeightedShipping;
+              const variance = invoiceCost - receiptCost;
+
+              journalLineReference = nanoid();
+
+              // DR GR/IR at receipt cost (clear the accrual)
+              journalLineInserts.push({
+                accountId:
+                  accountDefaults.data.goodsReceivedNotInvoicedAccount,
+                description: "GR/IR Clearing",
+                amount: debit("liability", receiptCost),
+                quantity: invoiceLineQuantityInInventoryUnit,
+                documentType: "Invoice",
+                documentId: purchaseInvoice.data?.id,
+                externalDocumentId: purchaseInvoice.data?.supplierReference,
+                documentLineReference: journalReference.to.purchaseInvoice(
+                  invoiceLine.purchaseOrderLineId
+                ),
+                journalLineReference,
+                companyId,
+              });
+
+              if (Math.abs(variance) > 0.005) {
+                journalLineInserts.push({
+                  accountId: accountDefaults.data.purchaseVarianceAccount,
+                  description: "Purchase Price Variance",
+                  amount: debit("expense", variance),
+                  quantity: invoiceLineQuantityInInventoryUnit,
+                  documentType: "Invoice",
+                  documentId: purchaseInvoice.data?.id,
+                  externalDocumentId: purchaseInvoice.data?.supplierReference,
+                  documentLineReference: journalReference.to.purchaseInvoice(
+                    invoiceLine.purchaseOrderLineId
+                  ),
+                  journalLineReference,
+                  companyId,
+                });
+              }
+
+              // CR Payables at invoice cost
+              journalLineInserts.push({
+                accountId: accountDefaults.data.payablesAccount,
+                description: "Accounts Payable",
+                amount: credit("liability", invoiceCost),
+                quantity: invoiceLineQuantityInInventoryUnit,
+                documentType: "Invoice",
+                documentId: purchaseInvoice.data?.id,
+                externalDocumentId: purchaseInvoice.data?.supplierReference,
+                documentLineReference: journalReference.to.purchaseInvoice(
+                  invoiceLine.purchaseOrderLineId
+                ),
+                journalLineReference,
+                companyId,
+              });
+
+              // Update FA acquisition cost if variance exists
+              if (Math.abs(variance) > 0.005) {
+                const assetRecord = await client
+                  .from("fixedAsset")
+                  .select("id, acquisitionCost")
+                  .eq("id", invoiceLine.assetId)
+                  .single();
+                if (!assetRecord.error) {
+                  await client
+                    .from("fixedAsset")
+                    .update({
+                      acquisitionCost:
+                        Number(assetRecord.data.acquisitionCost) + variance,
+                      updatedBy: userId,
+                    })
+                    .eq("id", invoiceLine.assetId);
+                }
+              }
+              faFixedAssetClassId = faClassId;
+            } else {
+              // Direct invoice (no prior receipt) — full acquisition
+              const assetRecord = await client
+                .from("fixedAsset")
+                .select(
+                  "id, status, acquisitionDate, depreciationStartDate, acquisitionCost, fixedAssetClassId, fixedAssetClass:fixedAssetClassId(assetAccountId)"
+                )
+                .eq("id", invoiceLine.assetId)
+                .single();
+
+              if (assetRecord.error)
+                throw new Error("Failed to fetch fixed asset");
+
+              faFixedAssetClassId = assetRecord.data.fixedAssetClassId ?? null;
+
+              journalLineReference = nanoid();
+
+              journalLineInserts.push({
+                accountId: (assetRecord.data.fixedAssetClass as any)
+                  .assetAccountId,
+                description: "Fixed Asset Acquisition",
+                amount: debit("asset", totalLineCostWithWeightedShipping),
+                quantity: invoiceLineQuantityInInventoryUnit,
+                documentType: "Invoice",
+                documentId: purchaseInvoice.data?.id,
+                externalDocumentId: purchaseInvoice.data?.supplierReference,
+                documentLineReference: invoiceLine.purchaseOrderLineId
+                  ? journalReference.to.purchaseInvoice(
+                      invoiceLine.purchaseOrderLineId
+                    )
+                  : null,
+                journalLineReference,
+                companyId,
+              });
+
+              journalLineInserts.push({
+                accountId: accountDefaults.data.payablesAccount,
+                description: "Accounts Payable",
+                amount: credit("liability", totalLineCostWithWeightedShipping),
+                quantity: invoiceLineQuantityInInventoryUnit,
+                documentType: "Invoice",
+                documentId: purchaseInvoice.data?.id,
+                externalDocumentId: purchaseInvoice.data?.supplierReference,
+                documentLineReference: invoiceLine.purchaseOrderLineId
+                  ? journalReference.to.purchaseInvoice(
+                      invoiceLine.purchaseOrderLineId
+                    )
+                  : null,
+                journalLineReference,
+                companyId,
+              });
+
+              const updateData: Record<string, any> = {
+                acquisitionCost:
+                  (Number(assetRecord.data.acquisitionCost) ?? 0) +
+                  totalLineCostWithWeightedShipping,
+                updatedBy: userId,
+              };
+              if (!assetRecord.data.acquisitionDate) {
+                updateData.acquisitionDate = today;
+              }
+              if (!assetRecord.data.depreciationStartDate) {
+                updateData.depreciationStartDate = today;
+              }
+              if (assetRecord.data.status === "Draft") {
+                updateData.status = "Active";
+              }
+
+              if (invoiceLine.locationId) {
+                updateData.locationId = invoiceLine.locationId;
+              }
+
+              await client
+                .from("fixedAsset")
+                .update(updateData)
+                .eq("id", invoiceLine.assetId);
+            }
+
+            const faJlCount = journalLineInserts.length - jlStartIdxFa;
+            const assetDimMeta = {
+              supplierTypeId: supplier.data.supplierTypeId ?? null,
+              itemPostingGroupId: null,
+              locationId: invoiceLine.locationId ?? purchaseOrderLine?.locationId ?? faLocationId,
+              costCenterId: null,
+              processId: null,
+              fixedAssetClassId: faFixedAssetClassId,
+            };
+            for (let i = 0; i < faJlCount; i++) {
+              journalLineDimensionsMeta.push(assetDimMeta);
+            }
+          }
           break;
+        }
         case "Comment":
           break;
         case "G/L Account": {
@@ -1111,6 +1355,8 @@ serve(async (req: Request) => {
               itemPostingGroupId: null,
               locationId: invoiceLine.locationId ?? null,
               costCenterId: invoiceLine.costCenterId ?? null,
+              processId: null,
+              fixedAssetClassId: null,
             };
             journalLineDimensionsMeta.push(glDimMeta, glDimMeta);
           }
@@ -1336,6 +1582,22 @@ serve(async (req: Request) => {
                 journalLineId: jl.id,
                 dimensionId: dimensionMap.get("CostCenter")!,
                 valueId: meta.costCenterId,
+                companyId,
+              });
+            }
+            if (meta.processId && dimensionMap.has("Process")) {
+              journalLineDimensionInserts.push({
+                journalLineId: jl.id,
+                dimensionId: dimensionMap.get("Process")!,
+                valueId: meta.processId,
+                companyId,
+              });
+            }
+            if (meta.fixedAssetClassId && dimensionMap.has("FixedAssetClass")) {
+              journalLineDimensionInserts.push({
+                journalLineId: jl.id,
+                dimensionId: dimensionMap.get("FixedAssetClass")!,
+                valueId: meta.fixedAssetClassId,
                 companyId,
               });
             }

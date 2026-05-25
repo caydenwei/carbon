@@ -64,7 +64,7 @@ serve(async (req: Request) => {
     const [productionEvent, accountDefaults, dimensions] = await Promise.all([
       client
         .from("productionEvent")
-        .select("*, jobOperation!inner(jobId)")
+        .select("*, jobOperation!inner(jobId, processId)")
         .eq("id", productionEventId)
         .single(),
       getDefaultPostingGroup(client, companyId),
@@ -73,7 +73,7 @@ serve(async (req: Request) => {
         .select("id, entityType")
         .eq("companyGroupId", companyRecord.data.companyGroupId)
         .eq("active", true)
-        .in("entityType", ["ItemPostingGroup", "Location", "Employee"]),
+        .in("entityType", ["ItemPostingGroup", "Location", "Employee", "WorkCenter", "Process"]),
     ]);
 
     if (productionEvent.error) throw new Error("Failed to fetch production event");
@@ -248,6 +248,23 @@ serve(async (req: Request) => {
               journalLineId: jl.id,
               dimensionId: dimensionMap.get("Employee")!,
               valueId: event.employeeId,
+              companyId,
+            });
+          }
+          if (event.workCenterId && dimensionMap.has("WorkCenter")) {
+            dimensionInserts.push({
+              journalLineId: jl.id,
+              dimensionId: dimensionMap.get("WorkCenter")!,
+              valueId: event.workCenterId,
+              companyId,
+            });
+          }
+          const processId = (event.jobOperation as any)?.processId as string | null;
+          if (processId && dimensionMap.has("Process")) {
+            dimensionInserts.push({
+              journalLineId: jl.id,
+              dimensionId: dimensionMap.get("Process")!,
+              valueId: processId,
               companyId,
             });
           }

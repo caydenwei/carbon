@@ -53,7 +53,7 @@ export default function useItemsSubmodules() {
       ]
     },
     {
-      name: t`Configure Materials`,
+      name: t`Material Properties`,
       routes: [
         {
           name: t`Dimensions`,

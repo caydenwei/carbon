@@ -889,6 +889,15 @@ msgstr "Ask anything"
 msgid "Assembly:"
 msgstr "Assembly:"
 
+msgid "Asset"
+msgstr "Asset"
+
+msgid "Asset Classes"
+msgstr "Asset Classes"
+
+msgid "Assets"
+msgstr "Assets"
+
 msgid "Assign To"
 msgstr "Assign To"
 
@@ -1421,9 +1430,6 @@ msgstr "Configure how preventative maintenance dispatches are automatically gene
 
 msgid "Configure Item"
 msgstr "Configure Item"
-
-msgid "Configure Materials"
-msgstr "Configure Materials"
 
 msgid "Configure notifications for when gauges go out of calibration."
 msgstr "Configure notifications for when gauges go out of calibration."
@@ -2412,6 +2418,9 @@ msgstr "Department Name"
 msgid "Departments"
 msgstr "Departments"
 
+msgid "Depreciation"
+msgstr "Depreciation"
+
 msgid "Description"
 msgstr "Description"
 
@@ -2880,6 +2889,9 @@ msgstr "Enable to allow shared workstation mode."
 
 msgid "Enable to automatically post transactions to the general ledger."
 msgstr "Enable to automatically post transactions to the general ledger."
+
+msgid "Enable to configure tax-specific depreciation methods on asset classes (e.g., MACRS, accelerated)."
+msgstr "Enable to configure tax-specific depreciation methods on asset classes (e.g., MACRS, accelerated)."
 
 msgid "Enable to generate IDs and descriptions for raw materials."
 msgstr "Enable to generate IDs and descriptions for raw materials."
@@ -3511,6 +3523,12 @@ msgstr "Fiscal Years"
 
 msgid "Fixed"
 msgstr "Fixed"
+
+msgid "Fixed Asset"
+msgstr "Fixed Asset"
+
+msgid "Fixed Assets"
+msgstr "Fixed Assets"
 
 msgid "Fixed Reorder"
 msgstr "Fixed Reorder"
@@ -4425,6 +4443,9 @@ msgstr "Material ID"
 
 msgid "Material IDs"
 msgstr "Material IDs"
+
+msgid "Material Properties"
+msgstr "Material Properties"
 
 msgid "Material Shape"
 msgstr "Material Shape"
@@ -6506,6 +6527,9 @@ msgstr "Scrap Reasons"
 msgid "Search"
 msgstr "Search"
 
+msgid "Search accounts..."
+msgstr "Search accounts..."
+
 msgid "Search across your workspace..."
 msgstr "Search across your workspace..."
 
@@ -6929,6 +6953,9 @@ msgstr "Sign in with Google"
 
 msgid "Sign in with Outlook"
 msgstr "Sign in with Outlook"
+
+msgid "Sign in with Passkey"
+msgstr "Sign in with Passkey"
 
 msgid "Sign Out"
 msgstr "Sign Out"
@@ -7381,6 +7408,9 @@ msgstr "Tax"
 msgid "Tax & Additional Costs"
 msgstr "Tax & Additional Costs"
 
+msgid "Tax & Shipping"
+msgstr "Tax & Shipping"
+
 msgid "Tax Amount"
 msgstr "Tax Amount"
 
@@ -7680,6 +7710,12 @@ msgstr "Track every change to your orders, invoices, customers, and more."
 
 msgid "Track every change to your orders, invoices, customers, suppliers, and more."
 msgstr "Track every change to your orders, invoices, customers, suppliers, and more."
+
+msgid "Track tax depreciation separately"
+msgstr "Track tax depreciation separately"
+
+msgid "Track tax depreciation separately from book depreciation and automatically post deferred tax liability entries."
+msgstr "Track tax depreciation separately from book depreciation and automatically post deferred tax liability entries."
 
 msgid "Track when batches or serials of this item expire."
 msgstr "Track when batches or serials of this item expire."

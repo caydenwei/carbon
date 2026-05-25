@@ -21,6 +21,7 @@ import {
   dimensions,
   failureModes,
   fiscalYearSettings,
+  fixedAssetClasses,
   gaugeTypes,
   getGroupId,
   groups,
@@ -480,6 +481,32 @@ async function seedDev() {
           companyId
         ]
       );
+
+      // Seed fixed asset classes
+      for (const fac of fixedAssetClasses) {
+        await client.query(
+          `INSERT INTO "fixedAssetClass" (
+            "name", "depreciationMethod", "usefulLifeMonths", "residualValuePercent",
+            "assetAccountId", "accumulatedDepreciationAccountId",
+            "depreciationExpenseAccountId", "writeOffAccountId",
+            "writeDownAccountId", "disposalAccountId",
+            "companyId", "createdBy"
+          ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, 'system')`,
+          [
+            fac.name,
+            fac.depreciationMethod,
+            fac.usefulLifeMonths,
+            fac.residualValuePercent,
+            accountIdByKey[fac.assetAccount],
+            accountIdByKey[fac.accumulatedDepreciationAccount],
+            accountIdByKey[fac.depreciationExpenseAccount],
+            accountIdByKey[fac.writeOffAccount],
+            accountIdByKey[fac.writeDownAccount],
+            accountIdByKey[fac.disposalAccount],
+            companyId
+          ]
+        );
+      }
 
       // Seed default location (required for inventory, jobs, etc.)
       // Must be after accountDefaults since location trigger copies from accountDefaults

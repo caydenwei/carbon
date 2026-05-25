@@ -799,6 +799,9 @@ msgstr "Sign in with Google"
 msgid "Sign in with Outlook"
 msgstr "Sign in with Outlook"
 
+msgid "Sign in with Passkey"
+msgstr "Sign in with Passkey"
+
 msgid "Sign Out"
 msgstr "Sign Out"
 

@@ -6,6 +6,7 @@ import {
   CardContent,
   CardHeader,
   CardTitle,
+  Checkbox,
   cn,
   DatePicker,
   DropdownMenu,
@@ -92,6 +93,16 @@ const ReceiptLines = () => {
   const routeData = useRouteData<{
     receipt: Receipt;
     receiptLines: ReceiptLine[];
+    fixedAssetLines: {
+      id: string;
+      purchaseOrderLineId: string;
+      assetId: string;
+      assetName: string | null;
+      assetReadableId: string | null;
+      description: string | null;
+      received: boolean;
+      serialNumber: string | null;
+    }[];
     receiptFiles: PostgrestResponse<StorageItem>;
     receiptLineTracking: ItemTracking[];
     batchProperties: PostgrestResponse<BatchProperty>;
@@ -278,10 +289,102 @@ const ReceiptLines = () => {
           </div>
         </CardContent>
       </Card>
+      {routeData?.fixedAssetLines && routeData.fixedAssetLines.length > 0 && (
+        <Card>
+          <CardHeader>
+            <CardTitle>
+              <Trans>Fixed Assets</Trans>
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="border rounded-lg">
+              {routeData.fixedAssetLines.map((line, index) => (
+                <ReceiptFixedAssetLineItem
+                  key={line.id}
+                  line={line}
+                  isReadOnly={isPosted}
+                  className={
+                    index < routeData.fixedAssetLines.length - 1
+                      ? "border-b"
+                      : ""
+                  }
+                />
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      )}
       <Outlet />
     </>
   );
 };
+
+function ReceiptFixedAssetLineItem({
+  line,
+  isReadOnly,
+  className
+}: {
+  line: {
+    id: string;
+    purchaseOrderLineId: string;
+    assetId: string;
+    assetName: string | null;
+    assetReadableId: string | null;
+    description: string | null;
+    received: boolean;
+    serialNumber: string | null;
+  };
+  isReadOnly: boolean;
+  className?: string;
+}) {
+  const fetcher = useFetcher();
+  const [serialNumber, setSerialNumber] = useState(line.serialNumber ?? "");
+
+  const updateField = (field: string, value: string) => {
+    const formData = new FormData();
+    formData.append("id", line.id);
+    formData.append("field", field);
+    formData.append("value", value);
+    fetcher.submit(formData, {
+      method: "post",
+      action: path.to.receiptFixedAssetLineUpdate
+    });
+  };
+
+  return (
+    <div className={cn("flex items-center gap-4 p-6", className)}>
+      <Checkbox
+        isChecked={line.received}
+        disabled={isReadOnly}
+        onCheckedChange={(checked) =>
+          updateField("received", String(checked === true))
+        }
+      />
+      <VStack spacing={0} className="flex-1 min-w-0">
+        <span className="text-sm font-medium">
+          {line.assetName ?? line.description ?? "Fixed Asset"}
+        </span>
+        {line.assetReadableId && (
+          <span className="text-xs text-muted-foreground">
+            {line.assetReadableId}
+          </span>
+        )}
+      </VStack>
+      <Input
+        placeholder="Serial Number"
+        value={serialNumber}
+        isDisabled={isReadOnly}
+        className="w-48"
+        onChange={(e) => setSerialNumber(e.target.value)}
+        onBlur={() => {
+          if (serialNumber !== (line.serialNumber ?? "")) {
+            updateField("serialNumber", serialNumber);
+          }
+        }}
+      />
+    </div>
+  );
+}
 
 function ReceiptLineItem({
   line,

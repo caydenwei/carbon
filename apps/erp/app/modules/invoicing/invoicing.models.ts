@@ -42,7 +42,7 @@ export const salesInvoiceLineType = [
   "Material",
   "Tool",
   "Consumable",
-  // "Fixed Asset",
+  "Fixed Asset",
   // "G/L Account",
   "Comment"
 ] as const;
@@ -102,7 +102,7 @@ export const purchaseInvoiceLineValidator = z
   .object({
     id: zfd.text(z.string().optional()),
     invoiceId: z.string().min(1, { message: "Invoice is required" }),
-    invoiceLineType: z.enum([...methodItemType, "G/L Account"], {
+    invoiceLineType: z.enum([...methodItemType, "G/L Account", "Fixed Asset"], {
       errorMap: (issue, ctx) => ({
         message: "Type is required"
       })
@@ -162,6 +162,16 @@ export const purchaseInvoiceLineValidator = z
       message: "Description is required",
       path: ["description"]
     }
+  )
+  .refine(
+    (data) =>
+      data.invoiceLineType === "Fixed Asset"
+        ? (data.quantity ?? 1) === 1
+        : true,
+    {
+      message: "Fixed Asset quantity must be 1",
+      path: ["quantity"]
+    }
   );
 
 export const salesInvoiceValidator = z.object({
@@ -211,16 +221,18 @@ export const salesInvoiceLineValidator = z
   .object({
     id: zfd.text(z.string().optional()),
     invoiceId: z.string().min(1, { message: "Invoice is required" }),
-    invoiceLineType: z.enum(methodItemType, {
+    invoiceLineType: z.enum([...methodItemType, "Fixed Asset"], {
       errorMap: (issue, ctx) => ({
         message: "Type is required"
       })
     }),
-    methodType: z.enum(methodType, {
-      errorMap: (issue, ctx) => ({
-        message: "Method is required"
+    methodType: z
+      .enum(methodType, {
+        errorMap: (issue, ctx) => ({
+          message: "Method is required"
+        })
       })
-    }),
+      .optional(),
     purchaseOrderId: zfd.text(z.string().optional()),
     purchaseOrderLineId: zfd.text(z.string().optional()),
     itemId: zfd.text(z.string().optional()),
@@ -230,9 +242,7 @@ export const salesInvoiceLineValidator = z
     nonTaxableAddOnCost: zfd.numeric(z.number().optional().default(0)),
     description: zfd.text(z.string().optional()),
     quantity: zfd.numeric(z.number().optional()),
-    unitOfMeasureCode: z
-      .string()
-      .min(1, { message: "Unit of measure is required" }),
+    unitOfMeasureCode: zfd.text(z.string().default("EA")),
     unitPrice: zfd.numeric(z.number().optional()),
     shippingCost: zfd.numeric(z.number().optional().default(0)),
     taxPercent: zfd.numeric(z.number().optional().default(0)),
@@ -249,7 +259,7 @@ export const salesInvoiceLineValidator = z
         : true,
     {
       message: "Item is required",
-      path: ["itemId"] // path of error
+      path: ["itemId"]
     }
   )
   .refine(
@@ -259,6 +269,26 @@ export const salesInvoiceLineValidator = z
         : true,
     {
       message: "Location is required",
-      path: ["locationId"] // path of error
+      path: ["locationId"]
+    }
+  )
+  .refine(
+    (data) => {
+      if (data.invoiceLineType === "Fixed Asset") return true;
+      return !!data.methodType;
+    },
+    {
+      message: "Method is required",
+      path: ["methodType"]
+    }
+  )
+  .refine(
+    (data) =>
+      data.invoiceLineType === "Fixed Asset"
+        ? (data.quantity ?? 1) === 1
+        : true,
+    {
+      message: "Fixed Asset quantity must be 1",
+      path: ["quantity"]
     }
   );

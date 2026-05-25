@@ -13,6 +13,7 @@ import { Analytics } from "@vercel/analytics/react";
 import type React from "react";
 import type {
   ActionFunctionArgs,
+  LinksFunction,
   LoaderFunctionArgs,
   MetaFunction
 } from "react-router";
@@ -30,13 +31,12 @@ import { getMode, setMode } from "~/services/mode.server";
 import Background from "~/styles/background.css?url";
 import NProgress from "~/styles/nprogress.css?url";
 import Tailwind from "~/styles/tailwind.css?url";
-import type { Route } from "./+types/root";
 import { getTheme } from "./services/theme.server";
 
 export const middleware = [flashMiddleware];
 export const clientMiddleware = [flashClientMiddleware];
 
-export const links: Route.LinksFunction = () => [
+export const links: LinksFunction = () => [
   { rel: "stylesheet", href: Tailwind },
   { rel: "stylesheet", href: Background },
   { rel: "stylesheet", href: NProgress }
@@ -200,9 +200,14 @@ export function ErrorBoundary({ error }: { error: unknown }) {
       <div className="light">
         <div className="flex flex-col w-full h-screen  items-center justify-center space-y-4 ">
           <img
-            src="/carbon-logo-mark.svg"
+            src="/carbon-mark-light.svg"
             alt="Carbon Logo"
-            className="block max-w-[60px]"
+            className="block max-w-[60px] dark:hidden"
+          />
+          <img
+            src="/carbon-mark-dark.svg"
+            alt="Carbon Logo"
+            className="max-w-[60px] hidden dark:block"
           />
           <Heading size="h1">Something went wrong</Heading>
           <p className="text-muted-foreground max-w-2xl">{message}</p>

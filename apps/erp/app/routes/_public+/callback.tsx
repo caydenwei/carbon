@@ -1,6 +1,5 @@
 import {
   assertIsPost,
-  CONTROLLED_ENVIRONMENT,
   callbackValidator,
   carbonClient,
   error,
@@ -17,7 +16,7 @@ import {
 } from "@carbon/auth/session.server";
 import { getUserByEmail } from "@carbon/auth/users.server";
 import { validator } from "@carbon/form";
-import { Alert, AlertDescription, AlertTitle, cn, VStack } from "@carbon/react";
+import { Alert, AlertDescription, AlertTitle, VStack } from "@carbon/react";
 import { Trans } from "@lingui/react/macro";
 import { useEffect, useRef, useState } from "react";
 import { LuTriangleAlert } from "react-icons/lu";
@@ -170,17 +169,26 @@ export default function AuthCallback() {
           </VStack>
         </div>
       ) : (
-        <div
-          className={cn(
-            "hexagon-loader-container",
-            CONTROLLED_ENVIRONMENT && "grayscale"
-          )}
-        >
-          <div className="hexagon-loader">
-            <div className="hexagon" />
-            <div className="hexagon" />
-            <div className="hexagon" />
-          </div>
+        <div className="flex items-end justify-center gap-1.5 h-8">
+          {[0, 1, 2, 3, 4].map((i) => (
+            <div
+              key={i}
+              className="w-1.5 rounded-sm bg-primary"
+              style={{
+                animationName: "loading-bars",
+                animationDuration: "1.2s",
+                animationTimingFunction: "ease-in-out",
+                animationIterationCount: "infinite",
+                animationDelay: `${i * 0.1}s`
+              }}
+            />
+          ))}
+          <style>
+            {`@keyframes loading-bars {
+              0%, 100% { height: 8px; opacity: 0.3; }
+              50% { height: 32px; opacity: 1; }
+            }`}
+          </style>
         </div>
       )}
     </div>

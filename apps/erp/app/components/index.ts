@@ -8,6 +8,7 @@ import CustomerAvatar from "./CustomerAvatar";
 import { DateSelect } from "./DateSelect";
 import { DeferredFiles } from "./DeferredFiles";
 import { DirectionAwareTabs } from "./DirectionAwareTabs";
+import DocumentHeader from "./DocumentHeader";
 import DocumentPreview from "./DocumentPreview";
 import Documents from "./Documents";
 import EmployeeAvatar from "./EmployeeAvatar";
@@ -48,6 +49,7 @@ export {
   DateSelect,
   DeferredFiles,
   DirectionAwareTabs,
+  DocumentHeader,
   DocumentPreview,
   Documents,
   EmployeeAvatar,

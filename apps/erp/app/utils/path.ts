@@ -14,6 +14,7 @@ export const path = {
     api: {
       abilities: `${api}/resources/abilities`,
       accounts: `${api}/accounting/accounts`,
+      assetClasses: `${api}/accounting/asset-classes`,
       assign: `${api}/assign`,
       batchNumbers: (itemId: string) =>
         generatePath(`${api}/inventory/batch-numbers?itemId=${itemId}`),
@@ -418,6 +419,35 @@ export const path = {
     accountingGroupsPurchasing: `${x}/accounting/groups/purchasing`,
     accountingGroupsSales: `${x}/accounting/groups/sales`,
     accountingRoot: `${x}/accounting`,
+    fixedAssets: `${x}/accounting/fixed-assets`,
+    fixedAsset: (id: string) => generatePath(`${x}/fixed-asset/${id}`),
+    fixedAssetDetails: (id: string) =>
+      generatePath(`${x}/fixed-asset/${id}/details`),
+    fixedAssetDispose: (id: string) =>
+      generatePath(`${x}/fixed-asset/${id}/dispose`),
+    fixedAssetRegister: (id: string) =>
+      generatePath(`${x}/fixed-asset/${id}/register`),
+    fixedAssetPurchase: (id: string) =>
+      generatePath(`${x}/fixed-asset/${id}/purchase`),
+    fixedAssetSell: (id: string) => generatePath(`${x}/fixed-asset/${id}/sell`),
+    newFixedAsset: `${x}/accounting/fixed-assets/new`,
+    deleteFixedAsset: (id: string) =>
+      generatePath(`${x}/fixed-asset/${id}/delete`),
+    assetClasses: `${x}/accounting/asset-classes`,
+    assetClass: (id: string) =>
+      generatePath(`${x}/accounting/asset-class/${id}`),
+    newAssetClass: `${x}/accounting/asset-classes/new`,
+    deleteAssetClass: (id: string) =>
+      generatePath(`${x}/accounting/asset-class/${id}/delete`),
+    depreciationRuns: `${x}/accounting/depreciation-runs`,
+    depreciationRun: (id: string) =>
+      generatePath(`${x}/depreciation-run/${id}`),
+    newDepreciationRun: `${x}/accounting/depreciation-runs/new`,
+    deleteDepreciationRun: (id: string) =>
+      generatePath(`${x}/depreciation-run/${id}/delete`),
+    repeatDepreciationRun: (id: string) =>
+      generatePath(`${x}/depreciation-run/${id}/repeat`),
+    fixedAssetImport: `${x}/accounting/fixed-asset-import`,
     intercompany: `${x}/accounting/intercompany`,
     newIntercompanyTransaction: `${x}/accounting/intercompany/new`,
     activeMethodVersion: (id: string) =>
@@ -1442,6 +1472,7 @@ export const path = {
     receiptDetails: (id: string) => generatePath(`${x}/receipt/${id}/details`),
     receiptLineDelete: (id: string) =>
       generatePath(`${x}/receipt/lines/${id}/delete`),
+    receiptFixedAssetLineUpdate: `${x}/receipt/fixed-asset-lines/update`,
     receiptLineSplit: `${x}/receipt/lines/split`,
     receiptLines: (id: string) => generatePath(`${x}/receipt/${id}/lines`),
     receiptLinesTracking: (id: string) =>
@@ -1610,6 +1641,7 @@ export const path = {
     shipment: (id: string) => generatePath(`${x}/shipment/${id}`),
     shipmentDetails: (id: string) =>
       generatePath(`${x}/shipment/${id}/details`),
+    shipmentFixedAssetLineUpdate: `${x}/shipment/fixed-asset-lines/update`,
     shipmentLineDelete: (id: string) =>
       generatePath(`${x}/shipment/lines/${id}/delete`),
     shipmentLineSplit: `${x}/shipment/lines/split`,

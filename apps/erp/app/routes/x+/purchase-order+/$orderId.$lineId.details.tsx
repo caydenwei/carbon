@@ -170,6 +170,8 @@ export default function EditPurchaseOrderLineRoute() {
     supplierUnitPrice: line?.supplierUnitPrice ?? 0,
     costCenterId: line?.costCenterId ?? "",
     taxPercent: line?.taxPercent ?? 0,
+    assetReadableId: (line as any)?.assetReadableId ?? "",
+    assetName: (line as any)?.assetName ?? "",
     ...getCustomFields(line?.customFields)
   };
 
@@ -183,7 +185,13 @@ export default function EditPurchaseOrderLineRoute() {
         id={line?.id ?? ""}
         table="purchaseOrderLine"
         title="Notes"
-        subTitle={line.itemReadableId ?? ""}
+        subTitle={
+          line.purchaseOrderLineType === "Fixed Asset"
+            ? (line.assetName ?? line.description ?? "")
+            : line.purchaseOrderLineType === "G/L Account"
+              ? (line.description ?? "")
+              : (line.itemReadableId ?? "")
+        }
         internalNotes={line.internalNotes as JSONContent}
         externalNotes={line.externalNotes as JSONContent}
       />

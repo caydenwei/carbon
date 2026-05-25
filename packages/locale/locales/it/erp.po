@@ -889,6 +889,15 @@ msgstr ""
 msgid "Assembly:"
 msgstr ""
 
+msgid "Asset"
+msgstr ""
+
+msgid "Asset Classes"
+msgstr ""
+
+msgid "Assets"
+msgstr ""
+
 msgid "Assign To"
 msgstr ""
 
@@ -1420,9 +1429,6 @@ msgid "Configure how preventative maintenance dispatches are automatically gener
 msgstr ""
 
 msgid "Configure Item"
-msgstr ""
-
-msgid "Configure Materials"
 msgstr ""
 
 msgid "Configure notifications for when gauges go out of calibration."
@@ -2412,6 +2418,9 @@ msgstr ""
 msgid "Departments"
 msgstr ""
 
+msgid "Depreciation"
+msgstr ""
+
 msgid "Description"
 msgstr ""
 
@@ -2879,6 +2888,9 @@ msgid "Enable to allow shared workstation mode."
 msgstr ""
 
 msgid "Enable to automatically post transactions to the general ledger."
+msgstr ""
+
+msgid "Enable to configure tax-specific depreciation methods on asset classes (e.g., MACRS, accelerated)."
 msgstr ""
 
 msgid "Enable to generate IDs and descriptions for raw materials."
@@ -3510,6 +3522,12 @@ msgid "Fiscal Years"
 msgstr ""
 
 msgid "Fixed"
+msgstr ""
+
+msgid "Fixed Asset"
+msgstr ""
+
+msgid "Fixed Assets"
 msgstr ""
 
 msgid "Fixed Reorder"
@@ -4424,6 +4442,9 @@ msgid "Material ID"
 msgstr ""
 
 msgid "Material IDs"
+msgstr ""
+
+msgid "Material Properties"
 msgstr ""
 
 msgid "Material Shape"
@@ -6506,6 +6527,9 @@ msgstr ""
 msgid "Search"
 msgstr ""
 
+msgid "Search accounts..."
+msgstr ""
+
 msgid "Search across your workspace..."
 msgstr ""
 
@@ -6928,6 +6952,9 @@ msgid "Sign in with Google"
 msgstr ""
 
 msgid "Sign in with Outlook"
+msgstr ""
+
+msgid "Sign in with Passkey"
 msgstr ""
 
 msgid "Sign Out"
@@ -7381,6 +7408,9 @@ msgstr ""
 msgid "Tax & Additional Costs"
 msgstr ""
 
+msgid "Tax & Shipping"
+msgstr ""
+
 msgid "Tax Amount"
 msgstr ""
 
@@ -7679,6 +7709,12 @@ msgid "Track every change to your orders, invoices, customers, and more."
 msgstr ""
 
 msgid "Track every change to your orders, invoices, customers, suppliers, and more."
+msgstr ""
+
+msgid "Track tax depreciation separately"
+msgstr ""
+
+msgid "Track tax depreciation separately from book depreciation and automatically post deferred tax liability entries."
 msgstr ""
 
 msgid "Track when batches or serials of this item expire."

@@ -285,9 +285,14 @@ export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
       <div className="light">
         <div className="flex flex-col w-full h-screen items-center justify-center space-y-4 ">
           <img
-            src="/carbon-logo-mark.svg"
+            src="/carbon-mark-light.svg"
             alt="Carbon Logo"
-            className="block max-w-[60px]"
+            className="block max-w-[60px] dark:hidden"
+          />
+          <img
+            src="/carbon-mark-dark.svg"
+            alt="Carbon Logo"
+            className="max-w-[60px] hidden dark:block"
           />
           <Heading size="h1">Something went wrong</Heading>
           <p className="text-muted-foreground max-w-2xl">{message}</p>

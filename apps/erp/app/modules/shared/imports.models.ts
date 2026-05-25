@@ -938,6 +938,63 @@ export const fieldMappings = {
         default: "false"
       }
     }
+  },
+  fixedAsset: {
+    name: {
+      label: "Name",
+      required: true,
+      type: "string"
+    },
+    fixedAssetClassId: {
+      label: "Asset Class ID",
+      required: true,
+      type: "string"
+    },
+    serialNumber: {
+      label: "Serial Number",
+      required: false,
+      type: "string"
+    },
+    acquisitionCost: {
+      label: "Acquisition Cost",
+      required: true,
+      type: "string"
+    },
+    acquisitionDate: {
+      label: "Acquisition Date",
+      required: true,
+      type: "string"
+    },
+    accumulatedDepreciation: {
+      label: "Accumulated Depreciation",
+      required: false,
+      type: "string"
+    },
+    depreciationMethod: {
+      label: "Depreciation Method",
+      required: false,
+      type: "enum",
+      enumData: {
+        description: "The depreciation method for this asset",
+        options: ["Straight Line", "Declining Balance", "Units of Production"],
+        default: "Straight Line"
+      }
+    },
+    usefulLifeMonths: {
+      label: "Useful Life (Months)",
+      required: false,
+      type: "string"
+    },
+    residualValuePercent: {
+      label: "Residual Value %",
+      required: false,
+      type: "string"
+    },
+    locationId: {
+      label: "Location ID",
+      required: false,
+      type: "string"
+    }
   }
 } as const;
 
@@ -953,7 +1010,8 @@ export const importPermissions: Record<keyof typeof fieldMappings, string> = {
   fixture: "parts",
   consumable: "parts",
   workCenter: "production",
-  process: "production"
+  process: "production",
+  fixedAsset: "accounting"
 };
 
 export const importSchemas: Record<
@@ -1379,5 +1437,49 @@ export const importSchemas: Record<
       .describe(
         "Whether scanning a barcode should complete all operations for this process"
       )
+  }),
+  fixedAsset: z.object({
+    name: z
+      .string()
+      .min(1, { message: "Name is required" })
+      .describe("The name of the fixed asset"),
+    fixedAssetClassId: z
+      .string()
+      .min(1, { message: "Asset Class is required" })
+      .describe("The ID of the fixed asset class"),
+    serialNumber: z
+      .string()
+      .optional()
+      .describe("The serial number of the asset"),
+    acquisitionCost: z
+      .string()
+      .optional()
+      .describe("The acquisition cost of the asset"),
+    acquisitionDate: z
+      .string()
+      .optional()
+      .describe("The date the asset was acquired (YYYY-MM-DD)"),
+    accumulatedDepreciation: z
+      .string()
+      .optional()
+      .describe("The accumulated depreciation to date"),
+    depreciationMethod: z
+      .string()
+      .optional()
+      .describe(
+        "The depreciation method: Straight Line, Declining Balance, or Units of Production"
+      ),
+    usefulLifeMonths: z
+      .string()
+      .optional()
+      .describe("The useful life of the asset in months"),
+    residualValuePercent: z
+      .string()
+      .optional()
+      .describe("The residual value as a percentage of acquisition cost"),
+    locationId: z
+      .string()
+      .optional()
+      .describe("The location ID where the asset is located")
   })
 } as const;

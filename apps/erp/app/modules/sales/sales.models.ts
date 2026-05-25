@@ -821,8 +821,11 @@ export const salesOrderLineValidator = z
   )
   .refine(
     (data) => {
-      // If sales order line type is not "Comment", we require a method type
-      if (data.salesOrderLineType !== "Comment" && !data.methodType) {
+      if (
+        data.salesOrderLineType !== "Comment" &&
+        data.salesOrderLineType !== "Fixed Asset" &&
+        !data.methodType
+      ) {
         return false;
       }
       return true;
@@ -830,6 +833,16 @@ export const salesOrderLineValidator = z
     {
       message: "Method type is required",
       path: ["methodType"]
+    }
+  )
+  .refine(
+    (data) =>
+      data.salesOrderLineType === "Fixed Asset"
+        ? (data.saleQuantity ?? 1) === 1
+        : true,
+    {
+      message: "Fixed Asset quantity must be 1",
+      path: ["saleQuantity"]
     }
   );
 

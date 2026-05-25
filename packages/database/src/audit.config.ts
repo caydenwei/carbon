@@ -394,6 +394,13 @@ export const auditConfig = {
           createFields: ["quantity", "overridePrice", "active"]
         }
       }
+    },
+
+    fixedAsset: {
+      label: "Fixed Asset",
+      tables: {
+        fixedAsset: { role: "root" }
+      }
     }
   } satisfies Record<string, EntityConfig>,
 
@@ -467,7 +474,8 @@ export const auditConfig = {
     maintenanceDispatchComment: "Dispatch Comment",
     pricingRule: "Pricing Rule",
     customerItemPriceOverride: "Price Override",
-    customerItemPriceOverrideBreak: "Quantity Break"
+    customerItemPriceOverrideBreak: "Quantity Break",
+    fixedAsset: "Fixed Asset"
   } satisfies Partial<Record<TableName, string>>,
 
   /** Fields to skip in diff computation */

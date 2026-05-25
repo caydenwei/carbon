@@ -627,6 +627,20 @@ export async function updateAccountingEnabledSetting(
     .eq("id", companyId);
 }
 
+export async function updateAssetTaxDepreciationSettings(
+  client: SupabaseClient<Database>,
+  companyId: string,
+  settings: {
+    assetTaxDepreciationEnabled: boolean;
+    assetTaxRate: number | null;
+  }
+) {
+  return client
+    .from("companySettings")
+    .update(sanitize(settings))
+    .eq("id", companyId);
+}
+
 export async function updateTimeCardSetting(
   client: SupabaseClient<Database>,
   companyId: string,

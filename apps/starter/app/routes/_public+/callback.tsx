@@ -141,8 +141,22 @@ export default function AuthCallback() {
 
   return (
     <div className="flex flex-col items-center justify-center">
-      <div className="flex justify-center mb-4">
-        <img src="/carbon-logo-mark.svg" alt="Carbon Logo" className="w-36" />
+      <div className="flex justify-center mb-8">
+        <img
+          src="/carbon-mark-light.svg"
+          alt="Carbon Logo"
+          className="w-24 dark:hidden"
+        />
+        <img
+          src="/carbon-mark-dark.svg"
+          alt="Carbon Logo"
+          className="w-24 hidden dark:block"
+        />
+        <img
+          src="/carbon-mark-dark.svg"
+          alt="Carbon Logo"
+          className="w-24 hidden dark:block"
+        />
       </div>
       {error ? (
         <div className="rounded-lg md:bg-card md:border md:border-border md:shadow-lg p-8 mt-8 w-[380px]">
@@ -166,12 +180,26 @@ export default function AuthCallback() {
           </VStack>
         </div>
       ) : (
-        <div className="hexagon-loader-container">
-          <div className="hexagon-loader">
-            <div className="hexagon" />
-            <div className="hexagon" />
-            <div className="hexagon" />
-          </div>
+        <div className="flex items-end justify-center gap-1.5 h-8">
+          {[0, 1, 2, 3, 4].map((i) => (
+            <div
+              key={i}
+              className="w-1.5 rounded-sm bg-primary"
+              style={{
+                animationName: "loading-bars",
+                animationDuration: "1.2s",
+                animationTimingFunction: "ease-in-out",
+                animationIterationCount: "infinite",
+                animationDelay: `${i * 0.1}s`
+              }}
+            />
+          ))}
+          <style>
+            {`@keyframes loading-bars {
+              0%, 100% { height: 8px; opacity: 0.3; }
+              50% { height: 32px; opacity: 1; }
+            }`}
+          </style>
         </div>
       )}
     </div>

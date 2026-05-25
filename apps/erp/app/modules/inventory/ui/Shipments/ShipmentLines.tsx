@@ -6,6 +6,7 @@ import {
   CardContent,
   CardHeader,
   CardTitle,
+  Checkbox,
   Combobox,
   cn,
   DropdownMenu,
@@ -86,6 +87,16 @@ const ShipmentLines = () => {
     shipment: Shipment;
     shipmentLines: ShipmentLine[];
     shipmentLineTracking: ShipmentLineTracking[];
+    fixedAssetLines: {
+      id: string;
+      salesOrderLineId: string;
+      assetId: string;
+      assetName: string | null;
+      assetReadableId: string | null;
+      description: string | null;
+      shipped: boolean;
+      serialNumber: string | null;
+    }[];
   }>(path.to.shipment(shipmentId));
 
   const shipmentsById = new Map<string, ShipmentLine>(
@@ -284,10 +295,102 @@ const ShipmentLines = () => {
           </div>
         </CardContent>
       </Card>
+      {routeData?.fixedAssetLines && routeData.fixedAssetLines.length > 0 && (
+        <Card>
+          <CardHeader>
+            <CardTitle>
+              <Trans>Fixed Assets</Trans>
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="border rounded-lg">
+              {routeData.fixedAssetLines.map((line, index) => (
+                <ShipmentFixedAssetLineItem
+                  key={line.id}
+                  line={line}
+                  isReadOnly={isReadOnly}
+                  className={
+                    index < routeData.fixedAssetLines.length - 1
+                      ? "border-b"
+                      : ""
+                  }
+                />
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      )}
       <Outlet />
     </>
   );
 };
+
+function ShipmentFixedAssetLineItem({
+  line,
+  isReadOnly,
+  className
+}: {
+  line: {
+    id: string;
+    salesOrderLineId: string;
+    assetId: string;
+    assetName: string | null;
+    assetReadableId: string | null;
+    description: string | null;
+    shipped: boolean;
+    serialNumber: string | null;
+  };
+  isReadOnly: boolean;
+  className?: string;
+}) {
+  const fetcher = useFetcher();
+  const [serialNumber, setSerialNumber] = useState(line.serialNumber ?? "");
+
+  const updateField = (field: string, value: string) => {
+    const formData = new FormData();
+    formData.append("id", line.id);
+    formData.append("field", field);
+    formData.append("value", value);
+    fetcher.submit(formData, {
+      method: "post",
+      action: path.to.shipmentFixedAssetLineUpdate
+    });
+  };
+
+  return (
+    <div className={cn("flex items-center gap-4 p-6", className)}>
+      <Checkbox
+        isChecked={line.shipped}
+        disabled={isReadOnly}
+        onCheckedChange={(checked) =>
+          updateField("shipped", String(checked === true))
+        }
+      />
+      <VStack spacing={0} className="flex-1 min-w-0">
+        <span className="text-sm font-medium">
+          {line.assetName ?? line.description ?? "Fixed Asset"}
+        </span>
+        {line.assetReadableId && (
+          <span className="text-xs text-muted-foreground">
+            {line.assetReadableId}
+          </span>
+        )}
+      </VStack>
+      <Input
+        placeholder="Serial Number"
+        value={serialNumber}
+        isDisabled={isReadOnly}
+        className="w-48"
+        onChange={(e) => setSerialNumber(e.target.value)}
+        onBlur={() => {
+          if (serialNumber !== (line.serialNumber ?? "")) {
+            updateField("serialNumber", serialNumber);
+          }
+        }}
+      />
+    </div>
+  );
+}
 
 function ShipmentLineItem({
   line,

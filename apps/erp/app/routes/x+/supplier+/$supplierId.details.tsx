@@ -62,6 +62,7 @@ export default function SupplierEditRoute() {
   const initialValues = {
     ...routeData.supplier,
     id: routeData?.supplier?.id ?? undefined,
+    readableId: routeData?.supplier?.readableId ?? undefined,
     name: routeData?.supplier?.name ?? "",
     supplierTypeId: routeData?.supplier?.supplierTypeId ?? undefined,
     supplierStatus: routeData?.supplier?.status as "Active",

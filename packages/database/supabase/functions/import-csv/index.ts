@@ -166,27 +166,32 @@ async function fetchLiveEntityIds(
 }
 
 /**
- * Build a name → id map for an entity table, scoped to a company. Used as a
- * fallback dedup key when the CSV's Unique ID has no externalIntegrationMapping
- * row yet (e.g., the entity was created in-app, then a CSV with the same name
- * is imported). Without this, the INSERT would fail the per-company name
- * uniqueness constraint (supplier_name_unique / customer_name_unique).
+ * Build a name → id map for an entity table, scoped to a company and to the
+ * specific names the caller cares about. Used as a fallback dedup key when
+ * the CSV's Unique ID has no externalIntegrationMapping row yet (e.g., the
+ * entity was created in-app, then a CSV with the same name is imported).
+ * Scoping the query to `namesToCheck` avoids a full-table scan on
+ * supplier/customer for companies with large rosters.
  */
 async function getNameMap(
   entityType: "supplier" | "customer",
-  cId: string
+  cId: string,
+  namesToCheck: string[]
 ): Promise<Map<string, string>> {
+  if (namesToCheck.length === 0) return new Map();
   const rows =
     entityType === "supplier"
       ? await db
           .selectFrom("supplier")
           .select(["id", "name"])
           .where("companyId", "=", cId)
+          .where("name", "in", namesToCheck)
           .execute()
       : await db
           .selectFrom("customer")
           .select(["id", "name"])
           .where("companyId", "=", cId)
+          .where("name", "in", namesToCheck)
           .execute();
   return new Map(rows.map((r) => [r.name, r.id]));
 }
@@ -287,6 +292,363 @@ async function upsertCsvMappings(
         }))
     )
     .execute();
+}
+
+/**
+ * Address/payment/shipping fields that can ride along on a supplier or
+ * customer CSV row. Written to side-tables (address + supplierLocation /
+ * supplierPayment / supplierShipping, mirror for customer) after the parent
+ * upsert lands.
+ */
+type PartnerExtensionData = {
+  locationName?: string;
+  addressLine1?: string;
+  addressLine2?: string;
+  city?: string;
+  state?: string;
+  postalCode?: string;
+  countryCode?: string;
+  paymentTermId?: string;
+  shippingMethodId?: string;
+  incoterm?: string;
+  incotermLocation?: string;
+};
+
+function extractPartnerExtensions(
+  record: Record<string, string>
+): PartnerExtensionData {
+  return {
+    locationName: record.locationName,
+    addressLine1: record.addressLine1,
+    addressLine2: record.addressLine2,
+    city: record.city,
+    state: record.state,
+    postalCode: record.postalCode,
+    countryCode: record.countryCode,
+    paymentTermId: record.paymentTermId,
+    shippingMethodId: record.shippingMethodId,
+    incoterm: record.incoterm,
+    incotermLocation: record.incotermLocation,
+  };
+}
+
+function hasAnyAddressField(ext: PartnerExtensionData): boolean {
+  // Require addressLine1 to recognize a row as having an address. It's the
+  // most distinguishing line of a postal address and also doubles as the
+  // location-name fallback when `Location Name` is blank — without it,
+  // creating a supplierLocation/customerLocation would have no usable label.
+  return !!ext.addressLine1;
+}
+
+function buildAddressFields(
+  ext: PartnerExtensionData
+): {
+  addressLine1: string | null;
+  addressLine2: string | null;
+  city: string | null;
+  stateProvince: string | null;
+  postalCode: string | null;
+  countryCode: string | null;
+} {
+  return {
+    addressLine1: ext.addressLine1 || null,
+    addressLine2: ext.addressLine2 || null,
+    city: ext.city || null,
+    // The CSV field is `state` (user-facing label "State / Region"); the
+    // column was renamed to stateProvince in migration 20240928155702.
+    stateProvince: ext.state || null,
+    postalCode: ext.postalCode || null,
+    // address.countryCode is TEXT storing ISO 3166-1 alpha-2 (e.g., "US"),
+    // post-20240928155702_country-codes.
+    countryCode: ext.countryCode || null,
+  };
+}
+
+/**
+ * Bulk-load the addressId of each entity's primary (lowest-id) location.
+ * Used by the supplier/customer extension UPDATE paths to avoid an N+1
+ * SELECT per entity inside the per-row loop. New inserts pass undefined
+ * since by construction they have no location yet.
+ */
+async function preloadPrimaryLocationAddressIds(
+  trx: typeof db,
+  entityType: "supplier" | "customer",
+  entityIds: string[]
+): Promise<Map<string, string>> {
+  if (entityIds.length === 0) return new Map();
+  const rows =
+    entityType === "supplier"
+      ? await trx
+          .selectFrom("supplierLocation")
+          .select(["supplierId", "id", "addressId"])
+          .where("supplierId", "in", entityIds)
+          .orderBy("id")
+          .execute()
+      : await trx
+          .selectFrom("customerLocation")
+          .select(["customerId", "id", "addressId"])
+          .where("customerId", "in", entityIds)
+          .orderBy("id")
+          .execute();
+  const map = new Map<string, string>();
+  for (const row of rows) {
+    const key =
+      entityType === "supplier"
+        ? (row as { supplierId: string }).supplierId
+        : (row as { customerId: string }).customerId;
+    if (!map.has(key)) map.set(key, row.addressId);
+  }
+  return map;
+}
+
+async function writeSupplierExtensions(
+  trx: typeof db,
+  supplierId: string,
+  ext: PartnerExtensionData,
+  companyId: string,
+  userId: string,
+  // Pre-fetched addressId of the supplier's existing primary location, if
+  // any. Caller bulk-loads these for the whole batch to avoid an N+1
+  // SELECT per supplier. undefined means "no existing location → insert".
+  existingAddressId: string | undefined
+): Promise<void> {
+  const now = new Date().toISOString();
+
+  if (hasAnyAddressField(ext)) {
+    const addressFields = buildAddressFields(ext);
+
+    if (existingAddressId) {
+      await trx
+        .updateTable("address")
+        .set(addressFields)
+        .where("id", "=", existingAddressId)
+        .execute();
+    } else {
+      const inserted = await trx
+        .insertInto("address")
+        .values({ ...addressFields, companyId })
+        .returning(["id"])
+        .executeTakeFirst();
+      if (inserted?.id) {
+        await trx
+          .insertInto("supplierLocation")
+          .values({
+            supplierId,
+            addressId: inserted.id,
+            // supplierLocation.name is NOT NULL. Prefer the user's
+            // Location Name column; fall back to Address Line 1 so the row
+            // always has a recognizable label.
+            name: ext.locationName || ext.addressLine1,
+          })
+          .execute();
+      }
+    }
+  }
+
+  if (ext.paymentTermId) {
+    // The sync_create_supplier_entries interceptor creates the supplierPayment
+    // row on supplier INSERT; UPSERT here makes us resilient to edge cases
+    // where that row is somehow missing.
+    await trx
+      .insertInto("supplierPayment")
+      .values({
+        supplierId,
+        paymentTermId: ext.paymentTermId,
+        companyId,
+        updatedAt: now,
+        updatedBy: userId,
+      })
+      .onConflict((oc) =>
+        oc.column("supplierId").doUpdateSet({
+          paymentTermId: ext.paymentTermId,
+          updatedAt: now,
+          updatedBy: userId,
+        })
+      )
+      .execute();
+  }
+
+  if (ext.shippingMethodId || ext.incoterm || ext.incotermLocation) {
+    // Build the conditional update separately from the always-set fields so
+    // ON CONFLICT only touches columns the user provided in the CSV — blank
+    // cells don't overwrite existing values on re-import. The incoterm cast
+    // narrows `string` to the Postgres enum union; Postgres rejects invalid
+    // values at insert time as a safety net.
+    const partialUpdate = {
+      ...(ext.shippingMethodId
+        ? { shippingMethodId: ext.shippingMethodId }
+        : {}),
+      ...(ext.incoterm
+        ? {
+            incoterm: ext.incoterm as Database["public"]["Enums"]["incoterm"],
+          }
+        : {}),
+      ...(ext.incotermLocation
+        ? { incotermLocation: ext.incotermLocation }
+        : {}),
+    };
+    await trx
+      .insertInto("supplierShipping")
+      .values({
+        supplierId,
+        companyId,
+        updatedAt: now,
+        updatedBy: userId,
+        ...partialUpdate,
+      })
+      .onConflict((oc) =>
+        oc.column("supplierId").doUpdateSet({
+          updatedAt: now,
+          updatedBy: userId,
+          ...partialUpdate,
+        })
+      )
+      .execute();
+  }
+}
+
+async function writeCustomerExtensions(
+  trx: typeof db,
+  customerId: string,
+  ext: PartnerExtensionData,
+  companyId: string,
+  userId: string,
+  existingAddressId: string | undefined
+): Promise<void> {
+  const now = new Date().toISOString();
+
+  if (hasAnyAddressField(ext)) {
+    const addressFields = buildAddressFields(ext);
+
+    if (existingAddressId) {
+      await trx
+        .updateTable("address")
+        .set(addressFields)
+        .where("id", "=", existingAddressId)
+        .execute();
+    } else {
+      const inserted = await trx
+        .insertInto("address")
+        .values({ ...addressFields, companyId })
+        .returning(["id"])
+        .executeTakeFirst();
+      if (inserted?.id) {
+        await trx
+          .insertInto("customerLocation")
+          .values({
+            customerId,
+            addressId: inserted.id,
+            // customerLocation.name is NOT NULL. Prefer the user's
+            // Location Name column; fall back to Address Line 1.
+            name: ext.locationName || ext.addressLine1,
+          })
+          .execute();
+      }
+    }
+  }
+
+  if (ext.paymentTermId) {
+    await trx
+      .insertInto("customerPayment")
+      .values({
+        customerId,
+        paymentTermId: ext.paymentTermId,
+        companyId,
+        updatedAt: now,
+        updatedBy: userId,
+      })
+      .onConflict((oc) =>
+        oc.column("customerId").doUpdateSet({
+          paymentTermId: ext.paymentTermId,
+          updatedAt: now,
+          updatedBy: userId,
+        })
+      )
+      .execute();
+  }
+
+}
+
+/**
+ * Idempotent supplierPart writes for the part/material/tool/fixture/consumable
+ * import flow. One CSV row optionally creates one supplierPart link; re-imports
+ * UPDATE the existing row (matched by (itemId, supplierId) per company).
+ */
+type SupplierPartImportLink = {
+  itemId: string;
+  supplierId: string;
+  supplierPartId?: string;
+  supplierUnitOfMeasureCode?: string;
+  minimumOrderQuantity?: string;
+  conversionFactor?: string;
+  unitPrice?: string;
+};
+
+async function writeSupplierPartLinks(
+  trx: typeof db,
+  links: SupplierPartImportLink[],
+  companyId: string,
+  userId: string
+): Promise<void> {
+  if (links.length === 0) return;
+  const itemIds = [...new Set(links.map((l) => l.itemId))];
+  const supplierIds = [...new Set(links.map((l) => l.supplierId))];
+  const existing = await trx
+    .selectFrom("supplierPart")
+    .select(["id", "itemId", "supplierId"])
+    .where("itemId", "in", itemIds)
+    .where("supplierId", "in", supplierIds)
+    .where("companyId", "=", companyId)
+    .execute();
+  const existingByPair = new Map(
+    existing.map((e) => [`${e.itemId}:${e.supplierId}`, e.id])
+  );
+
+  const now = new Date().toISOString();
+  for (const link of links) {
+    const key = `${link.itemId}:${link.supplierId}`;
+    const existingId = existingByPair.get(key);
+    const numericMOQ = link.minimumOrderQuantity
+      ? Number.parseInt(link.minimumOrderQuantity, 10)
+      : null;
+    const numericConversion = link.conversionFactor
+      ? Number.parseFloat(link.conversionFactor)
+      : 1;
+    const numericPrice = link.unitPrice
+      ? Number.parseFloat(link.unitPrice)
+      : null;
+
+    if (existingId) {
+      await trx
+        .updateTable("supplierPart")
+        .set({
+          supplierPartId: link.supplierPartId || null,
+          supplierUnitOfMeasureCode: link.supplierUnitOfMeasureCode || null,
+          minimumOrderQuantity: numericMOQ,
+          conversionFactor: numericConversion,
+          unitPrice: numericPrice,
+          updatedAt: now,
+          updatedBy: userId,
+        })
+        .where("id", "=", existingId)
+        .execute();
+    } else {
+      await trx
+        .insertInto("supplierPart")
+        .values({
+          itemId: link.itemId,
+          supplierId: link.supplierId,
+          supplierPartId: link.supplierPartId || null,
+          supplierUnitOfMeasureCode: link.supplierUnitOfMeasureCode || null,
+          minimumOrderQuantity: numericMOQ,
+          conversionFactor: numericConversion,
+          unitPrice: numericPrice,
+          companyId,
+          createdBy: userId,
+        })
+        .execute();
+    }
+  }
 }
 
 async function upsertTaxIdentifiers(
@@ -433,7 +795,14 @@ serve(async (req: Request) => {
     switch (table) {
       case "customer": {
         const externalIdMap = await getCsvExternalIdMap("customer", companyId);
-        const nameMap = await getNameMap("customer", companyId);
+        const csvNames = Array.from(
+          new Set(
+            mappedRecords
+              .map((r) => r.name)
+              .filter((n): n is string => typeof n === "string" && n !== "")
+          )
+        );
+        const nameMap = await getNameMap("customer", companyId, csvNames);
         const customerIds = new Set();
         // Tracks names queued for INSERT in this batch so a second CSV row
         // with the same name doesn't trip the (name, companyId) unique
@@ -463,6 +832,11 @@ serve(async (req: Request) => {
             entityId: string;
             externalId: string;
           }> = [];
+          const extForInserts: PartnerExtensionData[] = [];
+          const extForUpdates: Array<{
+            entityId: string;
+            ext: PartnerExtensionData;
+          }> = [];
 
           const isCustomerValid = (
             record: Record<string, string>
@@ -471,7 +845,23 @@ serve(async (req: Request) => {
           };
 
           for (const record of mappedRecords) {
-            const { id, taxId, ...rest } = record;
+            const ext = extractPartnerExtensions(record);
+            const {
+              id,
+              taxId,
+              locationName: _ln,
+              addressLine1: _a1,
+              addressLine2: _a2,
+              city: _city,
+              state: _state,
+              postalCode: _pc,
+              countryCode: _cc,
+              paymentTermId: _pt,
+              shippingMethodId: _sm,
+              incoterm: _ic,
+              incotermLocation: _icl,
+              ...rest
+            } = record;
             const matchedByCsvId = externalIdMap.get(id);
             const matchedByName =
               matchedByCsvId === undefined && rest.name
@@ -491,6 +881,7 @@ serve(async (req: Request) => {
                   },
                 });
                 customerTaxUpdates.push({ entityId: existingEntityId, taxId });
+                extForUpdates.push({ entityId: existingEntityId, ext });
                 if (matchedByCsvId === undefined) {
                   csvIdsForNameMatchedUpdates.push({
                     entityId: existingEntityId,
@@ -513,6 +904,7 @@ serve(async (req: Request) => {
               });
               customerTaxForInserts.push({ taxId });
               csvIdsForInserts.push(id);
+              extForInserts.push(ext);
             }
           }
 
@@ -548,6 +940,17 @@ serve(async (req: Request) => {
               companyId,
               userId
             );
+            for (let i = 0; i < inserted.length; i++) {
+              // Newly-inserted customers can't have an existing location yet.
+              await writeCustomerExtensions(
+                trx,
+                inserted[i].id!,
+                extForInserts[i] ?? {},
+                companyId,
+                userId,
+                undefined
+              );
+            }
           }
           if (customerUpdates.length > 0) {
             for (const update of customerUpdates) {
@@ -564,6 +967,22 @@ serve(async (req: Request) => {
               companyId,
               userId
             );
+            const customerAddressByEntity =
+              await preloadPrimaryLocationAddressIds(
+                trx,
+                "customer",
+                extForUpdates.map((u) => u.entityId)
+              );
+            for (const { entityId, ext } of extForUpdates) {
+              await writeCustomerExtensions(
+                trx,
+                entityId,
+                ext,
+                companyId,
+                userId,
+                customerAddressByEntity.get(entityId)
+              );
+            }
           }
           if (csvIdsForNameMatchedUpdates.length > 0) {
             await upsertCsvMappings(
@@ -579,7 +998,14 @@ serve(async (req: Request) => {
       }
       case "supplier": {
         const externalIdMap = await getCsvExternalIdMap("supplier", companyId);
-        const nameMap = await getNameMap("supplier", companyId);
+        const csvNames = Array.from(
+          new Set(
+            mappedRecords
+              .map((r) => r.name)
+              .filter((n): n is string => typeof n === "string" && n !== "")
+          )
+        );
+        const nameMap = await getNameMap("supplier", companyId, csvNames);
         const supplierIds = new Set();
         const namesQueuedForInsert = new Set<string>();
 
@@ -602,6 +1028,14 @@ serve(async (req: Request) => {
             entityId: string;
             externalId: string;
           }> = [];
+          // Parallel to supplierInserts / supplierUpdates — captures the
+          // address/payment/incoterm fields so we can write to side-tables
+          // after the parent upsert lands.
+          const extForInserts: PartnerExtensionData[] = [];
+          const extForUpdates: Array<{
+            entityId: string;
+            ext: PartnerExtensionData;
+          }> = [];
 
           const isSupplierValid = (
             record: Record<string, string>
@@ -610,7 +1044,23 @@ serve(async (req: Request) => {
           };
 
           for (const record of mappedRecords) {
-            const { id, taxId, ...rest } = record;
+            const ext = extractPartnerExtensions(record);
+            const {
+              id,
+              taxId,
+              locationName: _ln,
+              addressLine1: _a1,
+              addressLine2: _a2,
+              city: _city,
+              state: _state,
+              postalCode: _pc,
+              countryCode: _cc,
+              paymentTermId: _pt,
+              shippingMethodId: _sm,
+              incoterm: _ic,
+              incotermLocation: _icl,
+              ...rest
+            } = record;
             const matchedByCsvId = externalIdMap.get(id);
             const matchedByName =
               matchedByCsvId === undefined && rest.name
@@ -630,6 +1080,7 @@ serve(async (req: Request) => {
                   },
                 });
                 supplierTaxUpdates.push({ entityId: existingEntityId, taxId });
+                extForUpdates.push({ entityId: existingEntityId, ext });
                 if (matchedByCsvId === undefined) {
                   csvIdsForNameMatchedUpdates.push({
                     entityId: existingEntityId,
@@ -652,6 +1103,7 @@ serve(async (req: Request) => {
               });
               supplierTaxForInserts.push({ taxId });
               csvIdsForInserts.push(id);
+              extForInserts.push(ext);
             }
           }
 
@@ -687,6 +1139,17 @@ serve(async (req: Request) => {
               companyId,
               userId
             );
+            for (let i = 0; i < inserted.length; i++) {
+              // Newly-inserted suppliers can't have an existing location yet.
+              await writeSupplierExtensions(
+                trx,
+                inserted[i].id!,
+                extForInserts[i] ?? {},
+                companyId,
+                userId,
+                undefined
+              );
+            }
           }
           if (supplierUpdates.length > 0) {
             for (const update of supplierUpdates) {
@@ -703,6 +1166,22 @@ serve(async (req: Request) => {
               companyId,
               userId
             );
+            const supplierAddressByEntity =
+              await preloadPrimaryLocationAddressIds(
+                trx,
+                "supplier",
+                extForUpdates.map((u) => u.entityId)
+              );
+            for (const { entityId, ext } of extForUpdates) {
+              await writeSupplierExtensions(
+                trx,
+                entityId,
+                ext,
+                companyId,
+                userId,
+                supplierAddressByEntity.get(entityId)
+              );
+            }
           }
           if (csvIdsForNameMatchedUpdates.length > 0) {
             await upsertCsvMappings(
@@ -745,6 +1224,19 @@ serve(async (req: Request) => {
             id: string;
             data: Database["public"]["Tables"]["material"]["Update"];
           }[] = [];
+
+          // Optional supplier-part fields ride along on each row. Parallel to
+          // itemInserts; supplierPartLinks accumulates the full resolved
+          // links (with the item's actual DB id) as the inserts/updates land.
+          const supplierPartForInserts: Array<{
+            supplierId?: string;
+            supplierPartId?: string;
+            supplierUnitOfMeasureCode?: string;
+            minimumOrderQuantity?: string;
+            conversionFactor?: string;
+            unitPrice?: string;
+          }> = [];
+          const supplierPartLinks: SupplierPartImportLink[] = [];
 
           const itemValidator = z.object({
             id: z.string(),
@@ -810,6 +1302,20 @@ serve(async (req: Request) => {
                 },
               });
 
+              // Existing item: we already know its id, so the supplierPart
+              // link can be queued directly.
+              if (record.supplierId) {
+                supplierPartLinks.push({
+                  itemId: existingEntityId,
+                  supplierId: record.supplierId,
+                  supplierPartId: record.supplierPartId,
+                  supplierUnitOfMeasureCode: record.supplierUnitOfMeasureCode,
+                  minimumOrderQuantity: record.minimumOrderQuantity,
+                  conversionFactor: record.conversionFactor,
+                  unitPrice: record.unitPrice,
+                });
+              }
+
               if (table === "material") {
                 const material = materialValidator.safeParse(record);
                 if (material.success) {
@@ -852,6 +1358,17 @@ serve(async (req: Request) => {
               };
               itemInserts.push(newItem);
               csvIdsForInserts.push(getExternalId(id));
+              // New item: id will come back from the bulk insert. Capture
+              // supplier-part data in a parallel array so we can build the
+              // link once the id is known.
+              supplierPartForInserts.push({
+                supplierId: record.supplierId,
+                supplierPartId: record.supplierPartId,
+                supplierUnitOfMeasureCode: record.supplierUnitOfMeasureCode,
+                minimumOrderQuantity: record.minimumOrderQuantity,
+                conversionFactor: record.conversionFactor,
+                unitPrice: record.unitPrice,
+              });
 
               if (table === "material") {
                 const material = materialValidator.safeParse(record);
@@ -949,6 +1466,24 @@ serve(async (req: Request) => {
                 .values(materialInserts)
                 .execute();
             }
+
+            // Build supplier-part links for the items we just inserted.
+            // supplierPartForInserts is parallel to itemInserts and only the
+            // rows where supplierId is set produce a link.
+            for (let i = 0; i < insertedItems.length; i++) {
+              const sp = supplierPartForInserts[i];
+              if (sp?.supplierId && insertedItems[i].id) {
+                supplierPartLinks.push({
+                  itemId: insertedItems[i].id!,
+                  supplierId: sp.supplierId,
+                  supplierPartId: sp.supplierPartId,
+                  supplierUnitOfMeasureCode: sp.supplierUnitOfMeasureCode,
+                  minimumOrderQuantity: sp.minimumOrderQuantity,
+                  conversionFactor: sp.conversionFactor,
+                  unitPrice: sp.unitPrice,
+                });
+              }
+            }
           }
 
           console.log({
@@ -1010,6 +1545,13 @@ serve(async (req: Request) => {
               }
             }
           }
+
+          await writeSupplierPartLinks(
+            trx,
+            supplierPartLinks,
+            companyId,
+            userId
+          );
         });
 
         break;

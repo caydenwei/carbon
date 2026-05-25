@@ -10,10 +10,18 @@ import {
   Badge,
   Button,
   HStack,
+  Modal,
+  ModalBody,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
+  ModalOverlay,
+  ModalTitle,
   Tooltip,
   TooltipContent,
   TooltipTrigger,
   toast,
+  useDisclosure,
   VStack
 } from "@carbon/react";
 import { Trans, useLingui } from "@lingui/react/macro";
@@ -59,6 +67,8 @@ const JobProperties = () => {
     tags: { name: string }[];
     trackedEntities: Promise<PostgrestResponse<TrackedEntity>>;
   }>(path.to.job(jobId));
+
+  const unlinkDisclosure = useDisclosure();
 
   const fetcher = useFetcher<typeof action>();
   useEffect(() => {
@@ -297,9 +307,7 @@ const JobProperties = () => {
               variant="ghost"
               size="sm"
               leftIcon={<LuUnlink2 className="w-3 h-3" />}
-              onClick={() => {
-                onUpdate("salesOrderLineId", null);
-              }}
+              onClick={unlinkDisclosure.onOpen}
             >
               Unlink
             </Button>
@@ -569,6 +577,48 @@ const JobProperties = () => {
         tags={routeData?.job.tags ?? []}
         onUpdate={onUpdateCustomFields}
       />
+
+      {unlinkDisclosure.isOpen && (
+        <Modal
+          open={unlinkDisclosure.isOpen}
+          onOpenChange={(open) => {
+            if (!open) unlinkDisclosure.onClose();
+          }}
+        >
+          <ModalOverlay />
+          <ModalContent>
+            <ModalHeader>
+              <ModalTitle>
+                <Trans>Unlink job from sales order?</Trans>
+              </ModalTitle>
+            </ModalHeader>
+            <ModalBody>
+              <p className="text-sm text-muted-foreground">
+                <Trans>
+                  This will remove {routeData?.job?.jobId}'s link to{" "}
+                  {routeData?.job?.salesOrderReadableId}. The job will no longer
+                  appear under the sales order and shipments won't find it.
+                </Trans>
+              </p>
+            </ModalBody>
+            <ModalFooter>
+              <Button variant="secondary" onClick={unlinkDisclosure.onClose}>
+                <Trans>Cancel</Trans>
+              </Button>
+              <Button
+                variant="destructive"
+                leftIcon={<LuUnlink2 className="w-3 h-3" />}
+                onClick={() => {
+                  onUpdate("salesOrderLineId", null);
+                  unlinkDisclosure.onClose();
+                }}
+              >
+                <Trans>Unlink</Trans>
+              </Button>
+            </ModalFooter>
+          </ModalContent>
+        </Modal>
+      )}
     </VStack>
   );
 };

@@ -1178,6 +1178,9 @@ msgstr "Carbon Logo"
 msgid "Carbon Value"
 msgstr "Carbon Value"
 
+msgid "Cards"
+msgstr "Cards"
+
 msgid "Carrier"
 msgstr "Carrier"
 
@@ -2829,6 +2832,9 @@ msgstr "Employee Types"
 
 msgid "Employees"
 msgstr "Employees"
+
+msgid "Empty work centers"
+msgstr "Empty work centers"
 
 msgid "Enable audit logging in settings to start tracking changes to your data."
 msgstr "Enable audit logging in settings to start tracking changes to your data."
@@ -7520,6 +7526,11 @@ msgstr "This will overwrite the existing quote method"
 msgid "This will recalculate the unit cost from the active make method's bill of materials and processes using the batch size. The current cost will be overwritten. Do you want to continue?"
 msgstr "This will recalculate the unit cost from the active make method's bill of materials and processes using the batch size. The current cost will be overwritten. Do you want to continue?"
 
+#. placeholder {0}: routeData?.job?.jobId
+#. placeholder {1}: routeData?.job?.salesOrderReadableId
+msgid "This will remove {0}'s link to {1}. The job will no longer appear under the sales order and shipments won't find it."
+msgstr "This will remove {0}'s link to {1}. The job will no longer appear under the sales order and shipments won't find it."
+
 msgid "This will replace all method materials of other revisions with this revision."
 msgstr "This will replace all method materials of other revisions with this revision."
 
@@ -7810,6 +7821,9 @@ msgstr "Unlimited Functional Support"
 
 msgid "Unlink"
 msgstr "Unlink"
+
+msgid "Unlink job from sales order?"
+msgstr "Unlink job from sales order?"
 
 msgid "Unsupported source document type: {sourceDocument}"
 msgstr "Unsupported source document type: {sourceDocument}"

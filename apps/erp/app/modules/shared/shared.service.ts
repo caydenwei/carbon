@@ -437,9 +437,9 @@ export async function getApprovalRuleByAmount(
     .eq("enabled", true);
 
   if (amount !== undefined && amount !== null) {
-    query = query
-      .lte("lowerBoundAmount", amount)
-      .or(`upperBoundAmount.is.null,upperBoundAmount.gt.${amount}`);
+    // The matching tier is the highest one whose floor is at or below the
+    // amount; the next tier's floor is where its coverage ends.
+    query = query.lte("lowerBoundAmount", amount);
   } else {
     query = query.eq("lowerBoundAmount", 0);
   }

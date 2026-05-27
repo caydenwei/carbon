@@ -533,6 +533,9 @@ msgstr ""
 msgid "Approval Date"
 msgstr "批准日期"
 
+msgid "Approval is required at or above this amount, up to the next rule's minimum"
+msgstr ""
+
 msgid "Approval Requirements"
 msgstr "批准要求"
 
@@ -3787,9 +3790,6 @@ msgstr "隐藏、固定和重新排序列"
 msgid "Higher priority wins ties and applies first for markups"
 msgstr "更高的优先级在平局时获胜，并首先应用于加价"
 
-msgid "Highest-tier rule has a maximum"
-msgstr ""
-
 msgid "History"
 msgstr "历史"
 
@@ -4282,9 +4282,6 @@ msgstr "保留任何相关收据不变"
 msgid "Leave empty for exact match"
 msgstr "留空以精确匹配"
 
-msgid "Leave empty for no upper limit"
-msgstr ""
-
 msgid "Leave this page"
 msgstr "离开此页面"
 
@@ -4625,9 +4622,6 @@ msgstr "最大数量"
 
 msgid "Maximum"
 msgstr "最大值"
-
-msgid "Maximum Amount"
-msgstr ""
 
 msgid "Maximum Inventory Quantity"
 msgstr "最大库存数量"
@@ -6000,10 +5994,6 @@ msgstr "采购订单已成功删除"
 
 msgid "Purchase Orders"
 msgstr "采购订单"
-
-#. placeholder {0}: currencyFormatter.format(poTopTierGap)
-msgid "Purchase orders above {0} will not require approval. Edit the top-tier rule and clear the Maximum Amount, or add a higher rule with no maximum."
-msgstr ""
 
 msgid "Purchase orders required"
 msgstr "采购订单必需"

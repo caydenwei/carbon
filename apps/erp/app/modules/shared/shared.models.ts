@@ -49,29 +49,18 @@ export const approvalRequestValidator = z.object({
   approverGroupIds: zfd.repeatableOfType(z.string()).optional()
 });
 
-export const approvalRuleValidator = z
-  .object({
-    id: zfd.text(z.string().optional()),
-    documentType: z.enum(approvalDocumentType, {
-      errorMap: () => ({ message: "Document type is required" })
-    }),
-    approverGroupIds: z.array(
-      z.string().min(1, { message: "Invalid selection" })
-    ),
-    defaultApproverId: zfd.text(z.string().optional()),
-    lowerBoundAmount: zfd.numeric(z.number().gt(0).default(0)).optional(),
-    upperBoundAmount: zfd.numeric(z.number().gt(0).optional()),
-    enabled: zfd.checkbox()
-  })
-  .refine(
-    (data) =>
-      data.upperBoundAmount == null ||
-      data.upperBoundAmount > (data.lowerBoundAmount ?? 0),
-    {
-      message: "Maximum amount must be greater than minimum amount",
-      path: ["upperBoundAmount"]
-    }
-  );
+export const approvalRuleValidator = z.object({
+  id: zfd.text(z.string().optional()),
+  documentType: z.enum(approvalDocumentType, {
+    errorMap: () => ({ message: "Document type is required" })
+  }),
+  approverGroupIds: z.array(
+    z.string().min(1, { message: "Invalid selection" })
+  ),
+  defaultApproverId: zfd.text(z.string().optional()),
+  lowerBoundAmount: zfd.numeric(z.number().gt(0).default(0)).optional(),
+  enabled: zfd.checkbox()
+});
 
 export const approvalStatusType = [
   "Pending",

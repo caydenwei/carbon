@@ -533,6 +533,9 @@ msgstr "Approaching {PO_EMAIL_ATTACHMENT_LIMIT_MB} MB cap."
 msgid "Approval Date"
 msgstr "Approval Date"
 
+msgid "Approval is required at or above this amount, up to the next rule's minimum"
+msgstr "Approval is required at or above this amount, up to the next rule's minimum"
+
 msgid "Approval Requirements"
 msgstr "Approval Requirements"
 
@@ -3787,9 +3790,6 @@ msgstr "Hide, pin and reorder columns"
 msgid "Higher priority wins ties and applies first for markups"
 msgstr "Higher priority wins ties and applies first for markups"
 
-msgid "Highest-tier rule has a maximum"
-msgstr "Highest-tier rule has a maximum"
-
 msgid "History"
 msgstr "History"
 
@@ -4282,9 +4282,6 @@ msgstr "Leave any related receipts untouched"
 msgid "Leave empty for exact match"
 msgstr "Leave empty for exact match"
 
-msgid "Leave empty for no upper limit"
-msgstr "Leave empty for no upper limit"
-
 msgid "Leave this page"
 msgstr "Leave this page"
 
@@ -4625,9 +4622,6 @@ msgstr "Max Quantity"
 
 msgid "Maximum"
 msgstr "Maximum"
-
-msgid "Maximum Amount"
-msgstr "Maximum Amount"
 
 msgid "Maximum Inventory Quantity"
 msgstr "Maximum Inventory Quantity"
@@ -6000,10 +5994,6 @@ msgstr "Purchase order removed successfully"
 
 msgid "Purchase Orders"
 msgstr "Purchase Orders"
-
-#. placeholder {0}: currencyFormatter.format(poTopTierGap)
-msgid "Purchase orders above {0} will not require approval. Edit the top-tier rule and clear the Maximum Amount, or add a higher rule with no maximum."
-msgstr "Purchase orders above {0} will not require approval. Edit the top-tier rule and clear the Maximum Amount, or add a higher rule with no maximum."
 
 msgid "Purchase orders required"
 msgstr "Purchase orders required"

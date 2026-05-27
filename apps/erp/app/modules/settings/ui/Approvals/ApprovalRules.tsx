@@ -1,7 +1,4 @@
 import {
-  Alert,
-  AlertDescription,
-  AlertTitle,
   Button,
   Card,
   CardContent,
@@ -14,15 +11,14 @@ import {
 } from "@carbon/react";
 import { Trans } from "@lingui/react/macro";
 import { memo, useMemo } from "react";
-import { LuPlus, LuTriangleAlert } from "react-icons/lu";
+import { LuPlus } from "react-icons/lu";
 import { Link } from "react-router";
 import { Empty } from "~/components";
-import { useCurrencyFormatter, usePermissions } from "~/hooks";
+import { usePermissions } from "~/hooks";
 import {
   type ApprovalRule,
   approvalDocumentTypesWithAmounts
 } from "~/modules/shared";
-import { topTierExplicitMax } from "~/modules/shared/approval-rules.coverage";
 import { path } from "~/utils/path";
 import ApprovalRuleCard from "./ApprovalRuleCard";
 
@@ -36,11 +32,15 @@ const ApprovalRules = memo(
   ({ poRules, qdRules, supplierRules }: ApprovalRulesProps) => {
     const permissions = usePermissions();
     const canCreate = permissions.can("update", "settings");
-    const currencyFormatter = useCurrencyFormatter();
-    const poTopTierGap = useMemo(
-      () => topTierExplicitMax(poRules, "purchaseOrder"),
-      [poRules]
-    );
+
+    // A rule's ceiling is the next-higher tier's minimum (null for the top tier).
+    const nextTierFloor = useMemo(() => {
+      const floors = Array.from(
+        new Set(poRules.map((r) => r.lowerBoundAmount ?? 0))
+      ).sort((a, b) => a - b);
+      return (lowerBoundAmount: number): number | null =>
+        floors.find((f) => f > lowerBoundAmount) ?? null;
+    }, [poRules]);
 
     return (
       <ScrollArea className="h-full w-full">
@@ -76,22 +76,6 @@ const ApprovalRules = memo(
                 </div>
               </CardHeader>
               <CardContent>
-                {poTopTierGap != null && (
-                  <Alert variant="warning" className="mb-4">
-                    <LuTriangleAlert className="h-4 w-4" />
-                    <AlertTitle>
-                      <Trans>Highest-tier rule has a maximum</Trans>
-                    </AlertTitle>
-                    <AlertDescription>
-                      <Trans>
-                        Purchase orders above{" "}
-                        {currencyFormatter.format(poTopTierGap)} will not
-                        require approval. Edit the top-tier rule and clear the
-                        Maximum Amount, or add a higher rule with no maximum.
-                      </Trans>
-                    </AlertDescription>
-                  </Alert>
-                )}
                 {poRules.length === 0 ? (
                   <Empty className="my-4" />
                 ) : (
@@ -103,6 +87,7 @@ const ApprovalRules = memo(
                           key={rule.id}
                           rule={rule}
                           documentType="purchaseOrder"
+                          upperBound={nextTierFloor(rule.lowerBoundAmount ?? 0)}
                         />
                       ))}
                   </VStack>

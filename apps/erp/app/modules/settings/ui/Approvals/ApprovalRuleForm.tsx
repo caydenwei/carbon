@@ -56,6 +56,7 @@ const ApprovalRuleForm = ({
           : [],
         defaultApproverId: rule.defaultApproverId ?? undefined,
         lowerBoundAmount: rule.lowerBoundAmount ?? 0,
+        upperBoundAmount: rule.upperBoundAmount ?? undefined,
         escalationDays: rule.escalationDays ?? undefined
       }
     : {
@@ -64,6 +65,7 @@ const ApprovalRuleForm = ({
         enabled: true,
         approverGroupIds: [],
         lowerBoundAmount: 0,
+        upperBoundAmount: undefined,
         escalationDays: undefined
       };
 
@@ -103,14 +105,25 @@ const ApprovalRuleForm = ({
                 approvalDocumentTypesWithAmounts.includes(
                   effectiveDocumentType
                 ) && (
-                  <FormNumber
-                    name="lowerBoundAmount"
-                    label={t`Minimum Amount`}
-                    formatOptions={{
-                      style: "currency",
-                      currency: baseCurrencyCode
-                    }}
-                  />
+                  <>
+                    <FormNumber
+                      name="lowerBoundAmount"
+                      label={t`Minimum Amount`}
+                      formatOptions={{
+                        style: "currency",
+                        currency: baseCurrencyCode
+                      }}
+                    />
+                    <FormNumber
+                      name="upperBoundAmount"
+                      label={t`Maximum Amount`}
+                      helperText={t`Leave empty for no upper limit`}
+                      formatOptions={{
+                        style: "currency",
+                        currency: baseCurrencyCode
+                      }}
+                    />
+                  </>
                 )}
 
               <Users

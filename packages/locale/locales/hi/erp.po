@@ -3787,6 +3787,9 @@ msgstr "कॉलम को छिपाएं, पिन करें और �
 msgid "Higher priority wins ties and applies first for markups"
 msgstr "उच्च प्राथमिकता टाई जीतती है और मार्कअप के लिए पहले लागू होती है"
 
+msgid "Highest-tier rule has a maximum"
+msgstr ""
+
 msgid "History"
 msgstr "इतिहास"
 
@@ -4279,6 +4282,9 @@ msgstr "किसी भी संबंधित रसीदों को अ�
 msgid "Leave empty for exact match"
 msgstr "सटीक मिलान के लिए खाली छोड़ें"
 
+msgid "Leave empty for no upper limit"
+msgstr ""
+
 msgid "Leave this page"
 msgstr "इस पृष्ठ को छोड़ें"
 
@@ -4619,6 +4625,9 @@ msgstr "अधिकतम मात्रा"
 
 msgid "Maximum"
 msgstr "अधिकतम"
+
+msgid "Maximum Amount"
+msgstr ""
 
 msgid "Maximum Inventory Quantity"
 msgstr "अधिकतम इन्वेंटरी मात्रा"
@@ -5991,6 +6000,10 @@ msgstr "क्रय आदेश सफलतापूर्वक हटा �
 
 msgid "Purchase Orders"
 msgstr "क्रय आदेश"
+
+#. placeholder {0}: currencyFormatter.format(poTopTierGap)
+msgid "Purchase orders above {0} will not require approval. Edit the top-tier rule and clear the Maximum Amount, or add a higher rule with no maximum."
+msgstr ""
 
 msgid "Purchase orders required"
 msgstr "क्रय आदेश आवश्यक हैं"

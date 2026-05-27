@@ -59,6 +59,15 @@ const ApprovalRuleDetails = memo(
             </FieldItem>
           )}
 
+          {documentType === "purchaseOrder" &&
+            rule.upperBoundAmount != null && (
+              <FieldItem icon={LuDollarSign} label={t`Maximum Amount`}>
+                <p className="text-sm font-semibold text-foreground leading-relaxed">
+                  {currencyFormatter.format(rule.upperBoundAmount)}
+                </p>
+              </FieldItem>
+            )}
+
           {/* Approver Groups */}
           <FieldItem icon={LuUsers} label={t`Who Can Approve`}>
             {rule.approverGroupIds && rule.approverGroupIds.length > 0 ? (

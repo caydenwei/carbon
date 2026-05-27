@@ -1726,6 +1726,7 @@ export type Database = {
           lowerBoundAmount: number
           updatedAt: string | null
           updatedBy: string | null
+          upperBoundAmount: number | null
         }
         Insert: {
           approverGroupIds?: string[] | null
@@ -1740,6 +1741,7 @@ export type Database = {
           lowerBoundAmount?: number
           updatedAt?: string | null
           updatedBy?: string | null
+          upperBoundAmount?: number | null
         }
         Update: {
           approverGroupIds?: string[] | null
@@ -1754,6 +1756,7 @@ export type Database = {
           lowerBoundAmount?: number
           updatedAt?: string | null
           updatedBy?: string | null
+          upperBoundAmount?: number | null
         }
         Relationships: [
           {

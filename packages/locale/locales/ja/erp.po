@@ -3787,6 +3787,9 @@ msgstr "列を非表示、ピン留め、並び替え"
 msgid "Higher priority wins ties and applies first for markups"
 msgstr "優先度が高いほど同点を制し、マークアップに最初に適用されます"
 
+msgid "Highest-tier rule has a maximum"
+msgstr ""
+
 msgid "History"
 msgstr "履歴"
 
@@ -4279,6 +4282,9 @@ msgstr "関連するすべての領収書はそのままにしておく"
 msgid "Leave empty for exact match"
 msgstr "正確な一致のために空のままにしてください"
 
+msgid "Leave empty for no upper limit"
+msgstr ""
+
 msgid "Leave this page"
 msgstr "このページを離れる"
 
@@ -4619,6 +4625,9 @@ msgstr "最大数量"
 
 msgid "Maximum"
 msgstr "最大"
+
+msgid "Maximum Amount"
+msgstr ""
 
 msgid "Maximum Inventory Quantity"
 msgstr "最大在庫数量"
@@ -5991,6 +6000,10 @@ msgstr "購買注文が正常に削除されました"
 
 msgid "Purchase Orders"
 msgstr "購入注文"
+
+#. placeholder {0}: currencyFormatter.format(poTopTierGap)
+msgid "Purchase orders above {0} will not require approval. Edit the top-tier rule and clear the Maximum Amount, or add a higher rule with no maximum."
+msgstr ""
 
 msgid "Purchase orders required"
 msgstr "購入注文が必要です"

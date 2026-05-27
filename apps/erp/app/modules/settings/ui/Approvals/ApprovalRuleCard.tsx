@@ -78,7 +78,9 @@ const ApprovalRuleCard = memo(
                       {approvalDocumentTypesWithAmounts.includes(
                         documentType
                       ) &&
-                        ` over ${currencyFormatter.format(rule.lowerBoundAmount ?? 0)}`}
+                        (rule.upperBoundAmount != null
+                          ? ` ${currencyFormatter.format(rule.lowerBoundAmount ?? 0)} – ${currencyFormatter.format(rule.upperBoundAmount)}`
+                          : ` over ${currencyFormatter.format(rule.lowerBoundAmount ?? 0)}`)}
                     </Heading>
                     <Status
                       color={rule.enabled ? "green" : "gray"}

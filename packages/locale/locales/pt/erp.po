@@ -3787,6 +3787,9 @@ msgstr "Ocultar, fixar e reordenar colunas"
 msgid "Higher priority wins ties and applies first for markups"
 msgstr "Prioridade mais alta vence empates e se aplica primeiro para margens"
 
+msgid "Highest-tier rule has a maximum"
+msgstr ""
+
 msgid "History"
 msgstr "Histórico"
 
@@ -4279,6 +4282,9 @@ msgstr "Deixar qualquer recebimento relacionado intocado"
 msgid "Leave empty for exact match"
 msgstr "Deixe vazio para correspondência exata"
 
+msgid "Leave empty for no upper limit"
+msgstr ""
+
 msgid "Leave this page"
 msgstr "Sair desta página"
 
@@ -4619,6 +4625,9 @@ msgstr "Quantidade Máxima"
 
 msgid "Maximum"
 msgstr "Máximo"
+
+msgid "Maximum Amount"
+msgstr ""
 
 msgid "Maximum Inventory Quantity"
 msgstr "Quantidade Máxima de Inventário"
@@ -5991,6 +6000,10 @@ msgstr "Ordem de compra removida com sucesso"
 
 msgid "Purchase Orders"
 msgstr "Pedidos de Compra"
+
+#. placeholder {0}: currencyFormatter.format(poTopTierGap)
+msgid "Purchase orders above {0} will not require approval. Edit the top-tier rule and clear the Maximum Amount, or add a higher rule with no maximum."
+msgstr ""
 
 msgid "Purchase orders required"
 msgstr "Ordens de compra necessárias"

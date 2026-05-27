@@ -38,6 +38,7 @@ import {
   canApproveRequest,
   canCancelRequest,
   getLatestApprovalRequestForDocument,
+  getLowerTierApproverUserIds,
   rejectRequest
 } from "~/modules/shared";
 import { getUser } from "~/modules/users/users.server";
@@ -152,6 +153,41 @@ export async function action(args: ActionFunctionArgs) {
     } catch (e) {
       console.error("Failed to trigger approval decision notification", e);
     }
+  }
+
+  // Notified-of-spend cascade. Purchase orders use tiered amount rules,
+  // so when a decision is made at a high tier we ping the approvers of
+  // every enabled rule with a strictly lower threshold — they get
+  // visibility into spend that bypassed their tier. Filtered to exclude
+  // the requester (already notified above) and the current approver.
+  try {
+    const lowerTierIds = await getLowerTierApproverUserIds(
+      serviceRole,
+      "purchaseOrder",
+      companyId,
+      approvalRequest.data.amount ?? undefined
+    );
+    const recipients = lowerTierIds.filter(
+      (id) => id !== requestedBy && id !== userId
+    );
+    if (recipients.length > 0) {
+      await trigger("notify", {
+        event:
+          decision === "Approved"
+            ? NotificationEvent.ApprovalApproved
+            : NotificationEvent.ApprovalRejected,
+        companyId,
+        documentId: orderId,
+        documentType: "purchaseOrder",
+        recipient: { type: "users", userIds: recipients },
+        from: userId
+      });
+    }
+  } catch (e) {
+    console.error(
+      "Failed to trigger lower-tier spend notification for purchase order",
+      e
+    );
   }
 
   // If approved, handle post-approval tasks: PDF generation, document creation, email, price updates

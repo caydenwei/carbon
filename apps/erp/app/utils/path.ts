@@ -1405,6 +1405,8 @@ export const path = {
       generatePath(`${x}/purchase-order/${id}/payment`),
     purchaseOrderFinalize: (id: string) =>
       generatePath(`${x}/purchase-order/${id}/finalize`),
+    supplierDefaultAttachments: (supplierId: string) =>
+      generatePath(`${x}/supplier/${supplierId}/default-attachments`),
     purchaseOrderRoot: `${x}/purchase-order`,
     purchaseOrderStatus: (id: string) =>
       generatePath(`${x}/purchase-order/${id}/status`),

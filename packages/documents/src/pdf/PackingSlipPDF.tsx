@@ -2,7 +2,7 @@ import bwipjs from "@bwip-js/node";
 import type { Database } from "@carbon/database";
 import type { JSONContent } from "@carbon/react";
 import type { TrackedEntityAttributes } from "@carbon/utils";
-import { formatCityStatePostalCode, formatDate } from "@carbon/utils";
+import { formatDate } from "@carbon/utils";
 import { Image, Text, View } from "@react-pdf/renderer";
 import { createTw } from "react-pdf-tailwind";
 import { generateQRCode } from "../qr/qr-code";
@@ -115,9 +115,10 @@ const PackingSlipPDF = ({
               )}
               {addressLine1 && <Text style={tw("mt-1")}>{addressLine1}</Text>}
               {addressLine2 && <Text>{addressLine2}</Text>}
-              {(city || stateProvince || postalCode) && (
+              {city && <Text>{city}</Text>}
+              {(stateProvince || postalCode) && (
                 <Text>
-                  {formatCityStatePostalCode(city, stateProvince, postalCode)}
+                  {[stateProvince, postalCode].filter(Boolean).join(" ")}
                 </Text>
               )}
               {countryCode && <Text>{countryCode}</Text>}

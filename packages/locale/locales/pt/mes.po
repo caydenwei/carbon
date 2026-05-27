@@ -85,6 +85,9 @@ msgstr "Tem certeza de que deseja excluir este cartão de ponto? Esta ação nã
 msgid "Are you sure you want to end all production events? This will end all active operations without completing or finishing them."
 msgstr "Tem certeza de que deseja encerrar todos os eventos de produção? Isso encerrará todas as operações ativas sem concluí-las ou finalizá-las."
 
+msgid "Are you sure you want to leave this page?"
+msgstr "Tem certeza que deseja sair desta página?"
+
 msgid "Assigned"
 msgstr "Atribuído"
 
@@ -425,6 +428,9 @@ msgstr "Kit"
 
 msgid "Labor"
 msgstr "Mão de Obra"
+
+msgid "Leave this page"
+msgstr "Sair desta página"
 
 msgid "Let's build something"
 msgstr "Vamos construir algo"
@@ -856,6 +862,9 @@ msgstr "Status"
 msgid "Statuses"
 msgstr "Status"
 
+msgid "Stay on this page"
+msgstr "Ficar nesta página"
+
 msgid "Steps"
 msgstr "Etapas"
 
@@ -928,6 +937,9 @@ msgstr "Materiais de série/lote não emitidos"
 
 msgid "Unknown"
 msgstr "Desconhecido"
+
+msgid "Unsaved changes"
+msgstr "Alterações não salvas"
 
 msgid "Update"
 msgstr "Atualizar"

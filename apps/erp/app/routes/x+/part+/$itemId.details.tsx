@@ -14,6 +14,7 @@ import type {
 } from "react-router";
 import { Await, redirect, useLoaderData, useParams } from "react-router";
 import { CadModel, DeferredFiles } from "~/components";
+import DefaultAttachmentsPanel from "~/components/DefaultAttachmentsPanel";
 import { usePermissions, useRouteData } from "~/hooks";
 import type { ItemFile, MakeMethod, PartSummary } from "~/modules/items";
 import {
@@ -57,7 +58,14 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
   const url = new URL(request.url);
   const requestedMethodId = url.searchParams.get("methodId");
 
-  const makeMethods = await getMakeMethods(client, itemId, companyId);
+  const [makeMethods, defaultAttachmentsResult] = await Promise.all([
+    getMakeMethods(client, itemId, companyId),
+    client.storage
+      .from("private")
+      .list(`${companyId}/default-attachments/item/${itemId}`)
+  ]);
+  const defaultAttachments = defaultAttachmentsResult.data ?? [];
+
   const makeMethod = requestedMethodId
     ? (makeMethods.data?.find((m) => m.id === requestedMethodId) ??
       makeMethods.data?.find((m) => m.status === "Active") ??
@@ -66,12 +74,12 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
       makeMethods.data?.[0]);
 
   if (!makeMethod) {
-    return { methodData: null, tags: [] };
+    return { methodData: null, tags: [], defaultAttachments };
   }
 
   const fullMethod = await getMakeMethodById(client, makeMethod.id, companyId);
   if (fullMethod.error || !fullMethod.data) {
-    return { methodData: null, tags: [] };
+    return { methodData: null, tags: [], defaultAttachments };
   }
 
   const [methodMaterials, methodOperations, tags, partManufacturing] =
@@ -121,7 +129,8 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
       partManufacturing: partManufacturing.data,
       ...configData
     },
-    tags: tags.data ?? []
+    tags: tags.data ?? [],
+    defaultAttachments
   };
 }
 
@@ -212,7 +221,8 @@ export default function PartDetailsRoute() {
   if (!itemId) throw new Error("Could not find itemId");
 
   const permissions = usePermissions();
-  const { methodData, tags } = useLoaderData<typeof loader>();
+  const { methodData, tags, defaultAttachments } =
+    useLoaderData<typeof loader>();
 
   const partData = useRouteData<{
     partSummary: PartSummary;
@@ -326,6 +336,13 @@ export default function PartDetailsRoute() {
               />
             )}
           </DeferredFiles>
+
+          <DefaultAttachmentsPanel
+            files={defaultAttachments ?? []}
+            storagePathPrefix={`default-attachments/item/${itemId}`}
+            title={t`Default Attachments on Purchase Orders`}
+            description={t`Files attached here ride along whenever this item appears on a purchase order email.`}
+          />
 
           <CadModel
             isReadOnly={!permissions.can("update", "parts")}

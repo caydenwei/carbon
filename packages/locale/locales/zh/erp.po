@@ -49,6 +49,9 @@ msgstr "{0} 上传成功"
 msgid "{maxSizeMB}MB limit"
 msgstr "{maxSizeMB}MB 限制"
 
+msgid "{name} deleted"
+msgstr ""
+
 msgid "{scopeCount} permissions"
 msgstr "{scopeCount} 个权限"
 
@@ -524,6 +527,9 @@ msgstr "应用定价规则"
 msgid "Apply To"
 msgstr "应用于"
 
+msgid "Approaching {PO_EMAIL_ATTACHMENT_LIMIT_MB} MB cap."
+msgstr ""
+
 msgid "Approval Date"
 msgstr "批准日期"
 
@@ -850,6 +856,9 @@ msgstr "你确定要完成报价吗？"
 msgid "Are you sure you want to finalize the supplier quote?"
 msgstr "您确定要完成供应商报价吗？"
 
+msgid "Are you sure you want to leave this page?"
+msgstr "您确定要离开此页面吗？"
+
 #. placeholder {0}: selectedPurchaseInvoice.invoiceId!
 #. placeholder {0}: selectedSalesInvoice.invoiceId!
 msgid "Are you sure you want to permanently delete {0}?"
@@ -951,6 +960,9 @@ msgstr "附加文件"
 
 msgid "Attachment"
 msgstr "附件"
+
+msgid "Attachments"
+msgstr ""
 
 msgid "Attribute"
 msgstr "属性"
@@ -1201,6 +1213,9 @@ msgstr "无法发布 — 货运单包含已过期的追踪实体。"
 
 msgid "Cannot send RFQ"
 msgstr "无法发送询价单"
+
+msgid "Cannot upload — supplier interaction not yet created"
+msgstr ""
 
 msgid "Cannot upload to parts bucket without item ID"
 msgstr "无法在没有项目ID的情况下上传到零件存储桶"
@@ -2164,6 +2179,12 @@ msgstr "默认账户"
 msgid "Default Approver"
 msgstr "默认审批人"
 
+msgid "Default Attachments"
+msgstr ""
+
+msgid "Default Attachments on Purchase Orders"
+msgstr ""
+
 msgid "Default CC Recipients"
 msgstr "默认抄送收件人"
 
@@ -2571,6 +2592,9 @@ msgstr "下载 PDF"
 
 msgid "Draft"
 msgstr "草稿"
+
+msgid "Drag & drop files, or click to browse"
+msgstr ""
 
 msgid "Drag and drop a Purchase Order PDF here, or click to select a file"
 msgstr "将采购订单 PDF 拖放到此处，或点击选择文件"
@@ -3068,6 +3092,9 @@ msgstr "加载制造方法出错"
 msgid "Error moving file"
 msgstr "移动文件出错"
 
+msgid "Error removing file"
+msgstr ""
+
 msgid "Error removing model from {sourceDocument}"
 msgstr "从{sourceDocument}中删除模型时出错"
 
@@ -3127,6 +3154,9 @@ msgstr "每个条件都必须匹配"
 
 msgid "Everything from Starter"
 msgstr "Starter 中的所有功能"
+
+msgid "Exceeds {PO_EMAIL_ATTACHMENT_LIMIT_MB} MB total — remove some attachments to send."
+msgstr ""
 
 msgid "Exchange Rate"
 msgstr "汇率"
@@ -3476,6 +3506,10 @@ msgstr "未能更新供应商报价行"
 msgid "Failed to update thumbnail path"
 msgstr "无法更新缩略图路径"
 
+#. placeholder {0}: file.name
+msgid "Failed to upload {0}"
+msgstr ""
+
 msgid "Failed to upload CSV file."
 msgstr "未能上传 CSV 文件。"
 
@@ -3578,6 +3612,15 @@ msgstr "不支持的文件类型。请使用 JPG、PNG、WebP 或 GIF。"
 
 msgid "Files"
 msgstr "文件"
+
+msgid "Files attached here ride along on every purchase order email by default. Suppliers will receive them alongside the PO PDF."
+msgstr ""
+
+msgid "Files attached here ride along on every purchase order email sent to this supplier (in addition to company-wide defaults)."
+msgstr ""
+
+msgid "Files attached here ride along whenever this item appears on a purchase order email."
+msgstr ""
 
 msgid "Filter"
 msgstr "筛选"
@@ -4241,6 +4284,9 @@ msgstr "留空以精确匹配"
 
 msgid "Leave empty for no upper limit"
 msgstr ""
+
+msgid "Leave this page"
+msgstr "离开此页面"
 
 msgid "Left item"
 msgstr "左项"
@@ -5067,6 +5113,9 @@ msgstr "未找到地址"
 msgid "No archived logs yet. Logs older than {0} days will be automatically archived and available for download here."
 msgstr "还没有存档日志。超过 {0} 天的日志将自动存档，并可在此处下载。"
 
+msgid "No attachments."
+msgstr ""
+
 msgid "No available filters"
 msgstr "没有可用的筛选器"
 
@@ -5108,6 +5157,9 @@ msgstr "没有数据存在"
 
 msgid "No days off scheduled"
 msgstr "未安排休息日"
+
+msgid "No default attachments yet."
+msgstr ""
 
 msgid "No draft versions available"
 msgstr "没有可用的草稿版本"
@@ -5714,6 +5766,9 @@ msgstr "采购订单"
 
 msgid "PO Number"
 msgstr "采购订单号"
+
+msgid "PO PDF"
+msgstr ""
 
 msgid "Policy & Procedure"
 msgstr "政策与程序"
@@ -7271,6 +7326,9 @@ msgstr "状态分布"
 msgid "Statuses"
 msgstr "状态"
 
+msgid "Stay on this page"
+msgstr "留在此页面"
+
 msgid "Step"
 msgstr "步骤"
 
@@ -7294,6 +7352,9 @@ msgstr "库存转移向导"
 
 msgid "Stock Transfers"
 msgstr "库存转移"
+
+msgid "Storage client not available"
+msgstr ""
 
 msgid "Storage Type"
 msgstr "存储类型"
@@ -7965,6 +8026,9 @@ msgstr "类型"
 msgid "Type a message..."
 msgstr "输入消息..."
 
+msgid "Type an email and press Enter to add an external recipient"
+msgstr ""
+
 msgid "Type of Permission Update"
 msgstr "权限更新类型"
 
@@ -8036,6 +8100,9 @@ msgstr "取消链接"
 
 msgid "Unlink job from sales order?"
 msgstr "从销售订单取消关联工作？"
+
+msgid "Unsaved changes"
+msgstr "未保存的更改"
 
 msgid "Unsupported source document type: {sourceDocument}"
 msgstr "不支持的源文档类型：{sourceDocument}"

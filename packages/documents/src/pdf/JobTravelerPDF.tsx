@@ -1,7 +1,7 @@
 import type { Database } from "@carbon/database";
 import { getMESUrl } from "@carbon/env";
 import type { JSONContent } from "@carbon/react";
-import { formatDate, formatDurationMinutes } from "@carbon/utils";
+import { formatDate, formatFactor } from "@carbon/utils";
 import { Image, StyleSheet, Text, View } from "@react-pdf/renderer";
 import { createTw } from "react-pdf-tailwind";
 import { generateQRCode } from "../qr/qr-code";
@@ -332,17 +332,17 @@ export const JobTravelerPageContent = ({
               );
             }
 
-            const setupTimeFormatted = formatDurationMinutes(
+            const setupTimeFormatted = formatFactor(
               operation.setupTime,
-              { style: "short" }
+              operation.setupUnit
             );
-            const laborTimeFormatted = formatDurationMinutes(
+            const laborTimeFormatted = formatFactor(
               operation.laborTime,
-              { style: "short" }
+              operation.laborUnit
             );
-            const machineTimeFormatted = formatDurationMinutes(
+            const machineTimeFormatted = formatFactor(
               operation.machineTime,
-              { style: "short" }
+              operation.machineUnit
             );
             const hasExpectedTimes =
               setupTimeFormatted || laborTimeFormatted || machineTimeFormatted;

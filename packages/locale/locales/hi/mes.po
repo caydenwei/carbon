@@ -85,6 +85,9 @@ msgstr "क्या आप सुनिश्चित हैं कि आप 
 msgid "Are you sure you want to end all production events? This will end all active operations without completing or finishing them."
 msgstr "क्या आप सुनिश्चित हैं कि आप सभी उत्पादन घटनाओं को समाप्त करना चाहते हैं? यह सभी सक्रिय संचालन को पूरा किए बिना या समाप्त किए बिना समाप्त कर देगा।"
 
+msgid "Are you sure you want to leave this page?"
+msgstr "क्या आप वाकई इस पृष्ठ को छोड़ना चाहते हैं?"
+
 msgid "Assigned"
 msgstr "निर्दिष्ट"
 
@@ -425,6 +428,9 @@ msgstr "किट"
 
 msgid "Labor"
 msgstr "श्रम"
+
+msgid "Leave this page"
+msgstr "इस पृष्ठ को छोड़ें"
 
 msgid "Let's build something"
 msgstr "चलिए कुछ बनाते हैं"
@@ -856,6 +862,9 @@ msgstr "स्थिति"
 msgid "Statuses"
 msgstr "स्थितियाँ"
 
+msgid "Stay on this page"
+msgstr "इस पृष्ठ पर रहें"
+
 msgid "Steps"
 msgstr "चरण"
 
@@ -928,6 +937,9 @@ msgstr "अजारी सीरीज़/बैच सामग्री"
 
 msgid "Unknown"
 msgstr "अज्ञात"
+
+msgid "Unsaved changes"
+msgstr "असहेजे परिवर्तन"
 
 msgid "Update"
 msgstr "अपडेट करें"

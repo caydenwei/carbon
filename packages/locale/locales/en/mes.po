@@ -85,6 +85,9 @@ msgstr "Are you sure you want to delete this timecard? This cannot be undone."
 msgid "Are you sure you want to end all production events? This will end all active operations without completing or finishing them."
 msgstr "Are you sure you want to end all production events? This will end all active operations without completing or finishing them."
 
+msgid "Are you sure you want to leave this page?"
+msgstr "Are you sure you want to leave this page?"
+
 msgid "Assigned"
 msgstr "Assigned"
 
@@ -425,6 +428,9 @@ msgstr "Kit"
 
 msgid "Labor"
 msgstr "Labor"
+
+msgid "Leave this page"
+msgstr "Leave this page"
 
 msgid "Let's build something"
 msgstr "Let's build something"
@@ -856,6 +862,9 @@ msgstr "Status"
 msgid "Statuses"
 msgstr "Statuses"
 
+msgid "Stay on this page"
+msgstr "Stay on this page"
+
 msgid "Steps"
 msgstr "Steps"
 
@@ -928,6 +937,9 @@ msgstr "Unissued serial/batch materials"
 
 msgid "Unknown"
 msgstr "Unknown"
+
+msgid "Unsaved changes"
+msgstr "Unsaved changes"
 
 msgid "Update"
 msgstr "Update"

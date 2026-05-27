@@ -85,6 +85,9 @@ msgstr "¿Está seguro de que desea eliminar esta tarjeta de tiempo? Esta acció
 msgid "Are you sure you want to end all production events? This will end all active operations without completing or finishing them."
 msgstr "¿Está seguro de que desea finalizar todos los eventos de producción? Esto terminará todas las operaciones activas sin completarlas ni finalizarlas."
 
+msgid "Are you sure you want to leave this page?"
+msgstr "¿Estás seguro de que quieres salir de esta página?"
+
 msgid "Assigned"
 msgstr "Asignado"
 
@@ -425,6 +428,9 @@ msgstr "Kit"
 
 msgid "Labor"
 msgstr "Mano de obra"
+
+msgid "Leave this page"
+msgstr "Salir de esta página"
 
 msgid "Let's build something"
 msgstr "Construyamos algo"
@@ -856,6 +862,9 @@ msgstr "Estado"
 msgid "Statuses"
 msgstr "Estados"
 
+msgid "Stay on this page"
+msgstr "Quedarse en esta página"
+
 msgid "Steps"
 msgstr "Pasos"
 
@@ -928,6 +937,9 @@ msgstr "Materiales de serie/lote no emitidos"
 
 msgid "Unknown"
 msgstr "Desconocido"
+
+msgid "Unsaved changes"
+msgstr "Cambios no guardados"
 
 msgid "Update"
 msgstr "Actualizar"

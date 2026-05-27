@@ -85,6 +85,9 @@ msgstr "Czy na pewno chcesz usunąć tę kartę czasu pracy? Tej operacji nie mo
 msgid "Are you sure you want to end all production events? This will end all active operations without completing or finishing them."
 msgstr "Czy na pewno chcesz zakończyć wszystkie zdarzenia produkcyjne? Spowoduje to zakończenie wszystkich aktywnych operacji bez ich ukończenia."
 
+msgid "Are you sure you want to leave this page?"
+msgstr "Czy na pewno chcesz opuścić tę stronę?"
+
 msgid "Assigned"
 msgstr "Przypisane"
 
@@ -425,6 +428,9 @@ msgstr "Zestaw"
 
 msgid "Labor"
 msgstr "Robocizna"
+
+msgid "Leave this page"
+msgstr "Opuść tę stronę"
 
 msgid "Let's build something"
 msgstr "Zbudujmy coś"
@@ -856,6 +862,9 @@ msgstr "Status"
 msgid "Statuses"
 msgstr "Statusy"
 
+msgid "Stay on this page"
+msgstr "Zostań na tej stronie"
+
 msgid "Steps"
 msgstr "Kroki"
 
@@ -928,6 +937,9 @@ msgstr "Niewydane materiały seryjne/partyjne"
 
 msgid "Unknown"
 msgstr "Nieznane"
+
+msgid "Unsaved changes"
+msgstr "Niezapisane zmiany"
 
 msgid "Update"
 msgstr "Aktualizuj"

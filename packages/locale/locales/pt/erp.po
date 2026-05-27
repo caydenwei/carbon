@@ -49,6 +49,9 @@ msgstr "{0} enviado com sucesso"
 msgid "{maxSizeMB}MB limit"
 msgstr "{maxSizeMB}MB limit"
 
+msgid "{name} deleted"
+msgstr ""
+
 msgid "{scopeCount} permissions"
 msgstr "{scopeCount} permissões"
 
@@ -524,6 +527,9 @@ msgstr "Aplicar regras de preços"
 msgid "Apply To"
 msgstr "Aplicar a"
 
+msgid "Approaching {PO_EMAIL_ATTACHMENT_LIMIT_MB} MB cap."
+msgstr ""
+
 msgid "Approval Date"
 msgstr "Data de Aprovação"
 
@@ -850,6 +856,9 @@ msgstr "Tem certeza de que deseja finalizar a cotação?"
 msgid "Are you sure you want to finalize the supplier quote?"
 msgstr "Tem a certeza de que deseja finalizar a cotação do fornecedor?"
 
+msgid "Are you sure you want to leave this page?"
+msgstr "Tem certeza que deseja sair desta página?"
+
 #. placeholder {0}: selectedPurchaseInvoice.invoiceId!
 #. placeholder {0}: selectedSalesInvoice.invoiceId!
 msgid "Are you sure you want to permanently delete {0}?"
@@ -951,6 +960,9 @@ msgstr "Anexar Arquivo"
 
 msgid "Attachment"
 msgstr "Anexo"
+
+msgid "Attachments"
+msgstr ""
 
 msgid "Attribute"
 msgstr "Atributo"
@@ -1201,6 +1213,9 @@ msgstr "Não é possível postar — o envio contém entidades rastreadas expira
 
 msgid "Cannot send RFQ"
 msgstr "Não é possível enviar RFQ"
+
+msgid "Cannot upload — supplier interaction not yet created"
+msgstr ""
 
 msgid "Cannot upload to parts bucket without item ID"
 msgstr "Não é possível fazer upload para o bucket de peças sem ID do item"
@@ -2164,6 +2179,12 @@ msgstr "Contas Padrão"
 msgid "Default Approver"
 msgstr "Aprovador Padrão"
 
+msgid "Default Attachments"
+msgstr ""
+
+msgid "Default Attachments on Purchase Orders"
+msgstr ""
+
 msgid "Default CC Recipients"
 msgstr "Destinatários CC Padrão"
 
@@ -2571,6 +2592,9 @@ msgstr "Baixar PDF"
 
 msgid "Draft"
 msgstr "Rascunho"
+
+msgid "Drag & drop files, or click to browse"
+msgstr ""
 
 msgid "Drag and drop a Purchase Order PDF here, or click to select a file"
 msgstr "Arraste e solte um PDF de Ordem de Compra aqui, ou clique para selecionar um arquivo"
@@ -3068,6 +3092,9 @@ msgstr "Erro ao carregar método de fabricação"
 msgid "Error moving file"
 msgstr "Erro ao mover arquivo"
 
+msgid "Error removing file"
+msgstr ""
+
 msgid "Error removing model from {sourceDocument}"
 msgstr "Erro ao remover modelo de {sourceDocument}"
 
@@ -3127,6 +3154,9 @@ msgstr "Todas as condições devem corresponder"
 
 msgid "Everything from Starter"
 msgstr "Tudo do Starter"
+
+msgid "Exceeds {PO_EMAIL_ATTACHMENT_LIMIT_MB} MB total — remove some attachments to send."
+msgstr ""
 
 msgid "Exchange Rate"
 msgstr "Taxa de Câmbio"
@@ -3476,6 +3506,10 @@ msgstr "Falha ao atualizar linha de cotação do fornecedor"
 msgid "Failed to update thumbnail path"
 msgstr "Falha ao atualizar caminho da miniatura"
 
+#. placeholder {0}: file.name
+msgid "Failed to upload {0}"
+msgstr ""
+
 msgid "Failed to upload CSV file."
 msgstr "Falha ao carregar arquivo CSV."
 
@@ -3578,6 +3612,15 @@ msgstr "Tipo de arquivo não suportado. Use JPG, PNG, WebP ou GIF."
 
 msgid "Files"
 msgstr "Ficheiros"
+
+msgid "Files attached here ride along on every purchase order email by default. Suppliers will receive them alongside the PO PDF."
+msgstr ""
+
+msgid "Files attached here ride along on every purchase order email sent to this supplier (in addition to company-wide defaults)."
+msgstr ""
+
+msgid "Files attached here ride along whenever this item appears on a purchase order email."
+msgstr ""
 
 msgid "Filter"
 msgstr "Filtro"
@@ -4241,6 +4284,9 @@ msgstr "Deixe vazio para correspondência exata"
 
 msgid "Leave empty for no upper limit"
 msgstr ""
+
+msgid "Leave this page"
+msgstr "Sair desta página"
 
 msgid "Left item"
 msgstr "Item esquerdo"
@@ -5067,6 +5113,9 @@ msgstr "Nenhum endereço encontrado"
 msgid "No archived logs yet. Logs older than {0} days will be automatically archived and available for download here."
 msgstr "Nenhum log arquivado ainda. Logs com mais de {0} dias serão automaticamente arquivados e disponíveis para download aqui."
 
+msgid "No attachments."
+msgstr ""
+
 msgid "No available filters"
 msgstr "Nenhum filtro disponível"
 
@@ -5108,6 +5157,9 @@ msgstr "Nenhum dado existe"
 
 msgid "No days off scheduled"
 msgstr "Nenhum dia de folga agendado"
+
+msgid "No default attachments yet."
+msgstr ""
 
 msgid "No draft versions available"
 msgstr "Nenhuma versão de rascunho disponível"
@@ -5714,6 +5766,9 @@ msgstr "PO"
 
 msgid "PO Number"
 msgstr "Número da PO"
+
+msgid "PO PDF"
+msgstr ""
 
 msgid "Policy & Procedure"
 msgstr "Política e Procedimento"
@@ -7271,6 +7326,9 @@ msgstr "Distribuição de Status"
 msgid "Statuses"
 msgstr "Estados"
 
+msgid "Stay on this page"
+msgstr "Ficar nesta página"
+
 msgid "Step"
 msgstr "Etapa"
 
@@ -7294,6 +7352,9 @@ msgstr "Assistente de Transferência de Estoque"
 
 msgid "Stock Transfers"
 msgstr "Transferências de Estoque"
+
+msgid "Storage client not available"
+msgstr ""
 
 msgid "Storage Type"
 msgstr "Tipo de Armazenamento"
@@ -7965,6 +8026,9 @@ msgstr "Tipo"
 msgid "Type a message..."
 msgstr "Digite uma mensagem..."
 
+msgid "Type an email and press Enter to add an external recipient"
+msgstr ""
+
 msgid "Type of Permission Update"
 msgstr "Tipo de Atualização de Permissão"
 
@@ -8036,6 +8100,9 @@ msgstr "Desvinculação"
 
 msgid "Unlink job from sales order?"
 msgstr "Desassociar trabalho da ordem de venda?"
+
+msgid "Unsaved changes"
+msgstr "Alterações não salvas"
 
 msgid "Unsupported source document type: {sourceDocument}"
 msgstr "Tipo de documento de origem não suportado: {sourceDocument}"

@@ -11,10 +11,7 @@ export function getLineDescription(
     case "Comment":
       return line?.description;
     default:
-      const supplierPartNumber = line.supplierPartId
-        ? ` (${line.supplierPartId})`
-        : "";
-      return line?.itemReadableId + supplierPartNumber;
+      return line?.supplierPartId ?? line?.itemReadableId;
   }
 }
 

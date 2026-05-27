@@ -56,21 +56,13 @@ const Header = ({ company, title, documentId, fixed }: HeaderProps) => {
           {company.name && <Text style={tw("font-bold")}>{company.name}</Text>}
           {company.addressLine1 && <Text>{company.addressLine1}</Text>}
           {company.addressLine2 && <Text>{company.addressLine2}</Text>}
-          {(company.city ||
-            company.stateProvince ||
-            company.postalCode ||
-            company.countryCode) && (
+          {(company.city || company.stateProvince || company.postalCode) && (
             <Text>
-              {[
-                formatCityStatePostalCode(
-                  company.city,
-                  company.stateProvince,
-                  company.postalCode
-                ),
-                company.countryCode
-              ]
-                .filter(Boolean)
-                .join(" ")}
+              {formatCityStatePostalCode(
+                company.city,
+                company.stateProvince,
+                company.postalCode
+              )}
             </Text>
           )}
         </View>

@@ -12,6 +12,7 @@
 - **No Laziness:** Identify root causes. Avoid temporary fixes. Apply senior developer standards.
 - **Minimal Impact:** Touch only what is necessary. Avoid introducing new bugs.
 - **Demand Elegance:** For non-trivial changes, pause and ask whether there is a more elegant solution. If a fix feels hacky, implement the solution you would choose knowing everything you now know. Critically evaluate your own work before presenting it.
+- **Use existing components.** Grep `packages/react/src/` and `apps/erp/app/components/` before writing UI. Prefer built-in variants over custom `bg-*`/`text-*` classes.
 
 ## Workflow Orchestration
 

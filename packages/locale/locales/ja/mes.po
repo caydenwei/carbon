@@ -85,6 +85,9 @@ msgstr "このタイムカードを削除してもよろしいですか？この
 msgid "Are you sure you want to end all production events? This will end all active operations without completing or finishing them."
 msgstr "すべての生産イベントを終了してもよろしいですか？すべてのアクティブな工程が完了せずに終了します。"
 
+msgid "Are you sure you want to leave this page?"
+msgstr "このページを離れてもよろしいですか？"
+
 msgid "Assigned"
 msgstr "割当済み"
 
@@ -425,6 +428,9 @@ msgstr "キット"
 
 msgid "Labor"
 msgstr "作業"
+
+msgid "Leave this page"
+msgstr "このページを離れる"
 
 msgid "Let's build something"
 msgstr "さあ、何かを作りましょう"
@@ -856,6 +862,9 @@ msgstr "ステータス"
 msgid "Statuses"
 msgstr "ステータス一覧"
 
+msgid "Stay on this page"
+msgstr "このページに留まる"
+
 msgid "Steps"
 msgstr "ステップ"
 
@@ -928,6 +937,9 @@ msgstr "未払出のシリアル/バッチ材料"
 
 msgid "Unknown"
 msgstr "不明"
+
+msgid "Unsaved changes"
+msgstr "未保存の変更"
 
 msgid "Update"
 msgstr "更新"

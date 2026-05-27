@@ -2218,3 +2218,56 @@ export async function getPurchasingRFQSuppliersWithLinks(
     .select("*, supplier:supplierId(id, name)")
     .eq("purchasingRfqId", purchasingRfqId);
 }
+
+export type PoDefaultAttachment = {
+  source: "company" | "supplier" | "item";
+  name: string;
+  size: number | null;
+  path: string;
+};
+
+export async function getDefaultAttachmentsForPO(
+  client: SupabaseClient<Database>,
+  args: {
+    companyId: string;
+    supplierId: string | null;
+    itemIds: string[];
+  }
+): Promise<PoDefaultAttachment[]> {
+  const { companyId, supplierId, itemIds } = args;
+
+  const prefixes: { source: PoDefaultAttachment["source"]; path: string }[] = [
+    { source: "company", path: `${companyId}/default-attachments/company` }
+  ];
+  if (supplierId) {
+    prefixes.push({
+      source: "supplier",
+      path: `${companyId}/default-attachments/supplier/${supplierId}`
+    });
+  }
+  for (const id of itemIds ?? []) {
+    prefixes.push({
+      source: "item",
+      path: `${companyId}/default-attachments/item/${id}`
+    });
+  }
+
+  const results = await Promise.all(
+    prefixes.map(({ path }) => client.storage.from("private").list(path))
+  );
+
+  return results.flatMap((result, idx) => {
+    const { source, path: prefix } = prefixes[idx];
+    return (result.data ?? []).map((f) => ({
+      source,
+      name: f.name,
+      size:
+        (f.metadata as { size?: number } | null | undefined)?.size != null
+          ? Math.round(
+              ((f.metadata as { size?: number }).size as number) / 1024
+            )
+          : null,
+      path: `${prefix}/${f.name}`
+    }));
+  });
+}

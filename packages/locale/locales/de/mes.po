@@ -85,6 +85,9 @@ msgstr "Möchten Sie diese Zeitkarte wirklich löschen? Dies kann nicht rückgä
 msgid "Are you sure you want to end all production events? This will end all active operations without completing or finishing them."
 msgstr "Möchten Sie wirklich alle Produktionsereignisse beenden? Dadurch werden alle aktiven Arbeitsgänge beendet, ohne sie abzuschließen."
 
+msgid "Are you sure you want to leave this page?"
+msgstr "Möchten Sie diese Seite wirklich verlassen?"
+
 msgid "Assigned"
 msgstr "Zugewiesen"
 
@@ -425,6 +428,9 @@ msgstr "Bausatz"
 
 msgid "Labor"
 msgstr "Arbeit"
+
+msgid "Leave this page"
+msgstr "Diese Seite verlassen"
 
 msgid "Let's build something"
 msgstr "Lassen Sie uns etwas bauen"
@@ -856,6 +862,9 @@ msgstr "Status"
 msgid "Statuses"
 msgstr "Status"
 
+msgid "Stay on this page"
+msgstr "Auf dieser Seite bleiben"
+
 msgid "Steps"
 msgstr "Schritte"
 
@@ -928,6 +937,9 @@ msgstr "Nicht ausgegebene Serien-/Chargenmaterialien"
 
 msgid "Unknown"
 msgstr "Unbekannt"
+
+msgid "Unsaved changes"
+msgstr "Nicht gespeicherte Änderungen"
 
 msgid "Update"
 msgstr "Aktualisieren"

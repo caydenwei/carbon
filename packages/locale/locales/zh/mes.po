@@ -85,6 +85,9 @@ msgstr "确定要删除此考勤记录吗？此操作无法撤销。"
 msgid "Are you sure you want to end all production events? This will end all active operations without completing or finishing them."
 msgstr "确定要结束所有生产事件吗？这将终止所有活跃工序，而不会完成它们。"
 
+msgid "Are you sure you want to leave this page?"
+msgstr "您确定要离开此页面吗？"
+
 msgid "Assigned"
 msgstr "已分配"
 
@@ -425,6 +428,9 @@ msgstr "套件"
 
 msgid "Labor"
 msgstr "人工"
+
+msgid "Leave this page"
+msgstr "离开此页面"
 
 msgid "Let's build something"
 msgstr "让我们开始构建"
@@ -856,6 +862,9 @@ msgstr "状态"
 msgid "Statuses"
 msgstr "状态"
 
+msgid "Stay on this page"
+msgstr "留在此页面"
+
 msgid "Steps"
 msgstr "步骤"
 
@@ -928,6 +937,9 @@ msgstr "未发放的序列号/批次物料"
 
 msgid "Unknown"
 msgstr "未知"
+
+msgid "Unsaved changes"
+msgstr "未保存的更改"
 
 msgid "Update"
 msgstr "更新"

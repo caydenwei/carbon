@@ -85,6 +85,9 @@ msgstr "Êtes-vous sûr de vouloir supprimer cette fiche de temps ? Cette action
 msgid "Are you sure you want to end all production events? This will end all active operations without completing or finishing them."
 msgstr "Êtes-vous sûr de vouloir mettre fin à tous les événements de production ? Cela arrêtera toutes les opérations actives sans les terminer ni les achever."
 
+msgid "Are you sure you want to leave this page?"
+msgstr "Êtes-vous sûr de vouloir quitter cette page ?"
+
 msgid "Assigned"
 msgstr "Assigné"
 
@@ -425,6 +428,9 @@ msgstr "Kit"
 
 msgid "Labor"
 msgstr "Main-d'œuvre"
+
+msgid "Leave this page"
+msgstr "Quitter cette page"
 
 msgid "Let's build something"
 msgstr "Construisons quelque chose"
@@ -856,6 +862,9 @@ msgstr "Statut"
 msgid "Statuses"
 msgstr "Statuts"
 
+msgid "Stay on this page"
+msgstr "Rester sur cette page"
+
 msgid "Steps"
 msgstr "Étapes"
 
@@ -928,6 +937,9 @@ msgstr "Matériaux série/lot non distribués"
 
 msgid "Unknown"
 msgstr "Inconnu"
+
+msgid "Unsaved changes"
+msgstr "Modifications non enregistrées"
 
 msgid "Update"
 msgstr "Mettre à jour"

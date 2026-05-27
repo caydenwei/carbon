@@ -49,6 +49,9 @@ msgstr "{0} सफलतापूर्वक अपलोड हो गया"
 msgid "{maxSizeMB}MB limit"
 msgstr "{maxSizeMB}MB सीमा"
 
+msgid "{name} deleted"
+msgstr ""
+
 msgid "{scopeCount} permissions"
 msgstr "{scopeCount} अनुमतियाँ"
 
@@ -524,6 +527,9 @@ msgstr "मूल्य निर्धारण नियम लागू क�
 msgid "Apply To"
 msgstr "लागू करें"
 
+msgid "Approaching {PO_EMAIL_ATTACHMENT_LIMIT_MB} MB cap."
+msgstr ""
+
 msgid "Approval Date"
 msgstr "अनुमोदन तारीख"
 
@@ -850,6 +856,9 @@ msgstr "क्या आप सुनिश्चित हैं कि आप 
 msgid "Are you sure you want to finalize the supplier quote?"
 msgstr "क्या आप सुनिश्चित हैं कि आप आपूर्तिकर्ता उद्धरण को अंतिम रूप देना चाहते हैं?"
 
+msgid "Are you sure you want to leave this page?"
+msgstr "क्या आप वाकई इस पृष्ठ को छोड़ना चाहते हैं?"
+
 #. placeholder {0}: selectedPurchaseInvoice.invoiceId!
 #. placeholder {0}: selectedSalesInvoice.invoiceId!
 msgid "Are you sure you want to permanently delete {0}?"
@@ -951,6 +960,9 @@ msgstr "फ़ाइल संलग्न करें"
 
 msgid "Attachment"
 msgstr "संलग्नक"
+
+msgid "Attachments"
+msgstr ""
 
 msgid "Attribute"
 msgstr "विशेषता"
@@ -1201,6 +1213,9 @@ msgstr "पोस्ट नहीं कर सकते — शिपमें�
 
 msgid "Cannot send RFQ"
 msgstr "RFQ नहीं भेज सकते"
+
+msgid "Cannot upload — supplier interaction not yet created"
+msgstr ""
 
 msgid "Cannot upload to parts bucket without item ID"
 msgstr "आइटम आईडी के बिना पार्ट्स बकेट में अपलोड नहीं कर सकते"
@@ -2164,6 +2179,12 @@ msgstr "डिफ़ॉल्ट खाते"
 msgid "Default Approver"
 msgstr "डिफ़ॉल्ट अनुमोदक"
 
+msgid "Default Attachments"
+msgstr ""
+
+msgid "Default Attachments on Purchase Orders"
+msgstr ""
+
 msgid "Default CC Recipients"
 msgstr "डिफ़ॉल्ट CC प्राप्तकर्ता"
 
@@ -2571,6 +2592,9 @@ msgstr "PDF डाउनलोड करें"
 
 msgid "Draft"
 msgstr "ड्राफ्ट"
+
+msgid "Drag & drop files, or click to browse"
+msgstr ""
 
 msgid "Drag and drop a Purchase Order PDF here, or click to select a file"
 msgstr "यहाँ एक खरीद आदेश PDF को ड्रैग और ड्रॉप करें, या एक फ़ाइल चुनने के लिए क्लिक करें"
@@ -3068,6 +3092,9 @@ msgstr "मेक विधि लोड करने में त्रुट�
 msgid "Error moving file"
 msgstr "फ़ाइल स्थानांतरित करने में त्रुटि"
 
+msgid "Error removing file"
+msgstr ""
+
 msgid "Error removing model from {sourceDocument}"
 msgstr "{sourceDocument} से मॉडल हटाने में त्रुटि"
 
@@ -3127,6 +3154,9 @@ msgstr "हर शर्त मेल खानी चाहिए"
 
 msgid "Everything from Starter"
 msgstr "स्टार्टर से सब कुछ"
+
+msgid "Exceeds {PO_EMAIL_ATTACHMENT_LIMIT_MB} MB total — remove some attachments to send."
+msgstr ""
 
 msgid "Exchange Rate"
 msgstr "विनिमय दर"
@@ -3476,6 +3506,10 @@ msgstr "आपूर्तिकर्ता उद्धरण लाइन क
 msgid "Failed to update thumbnail path"
 msgstr "थंबनेल पथ अपडेट करने में विफल"
 
+#. placeholder {0}: file.name
+msgid "Failed to upload {0}"
+msgstr ""
+
 msgid "Failed to upload CSV file."
 msgstr "CSV फ़ाइल अपलोड करने में विफल।"
 
@@ -3578,6 +3612,15 @@ msgstr "फ़ाइल प्रकार समर्थित नहीं �
 
 msgid "Files"
 msgstr "फ़ाइलें"
+
+msgid "Files attached here ride along on every purchase order email by default. Suppliers will receive them alongside the PO PDF."
+msgstr ""
+
+msgid "Files attached here ride along on every purchase order email sent to this supplier (in addition to company-wide defaults)."
+msgstr ""
+
+msgid "Files attached here ride along whenever this item appears on a purchase order email."
+msgstr ""
 
 msgid "Filter"
 msgstr "फ़िल्टर"
@@ -4241,6 +4284,9 @@ msgstr "सटीक मिलान के लिए खाली छोड़�
 
 msgid "Leave empty for no upper limit"
 msgstr ""
+
+msgid "Leave this page"
+msgstr "इस पृष्ठ को छोड़ें"
 
 msgid "Left item"
 msgstr "बाईं ओर की वस्तु"
@@ -5067,6 +5113,9 @@ msgstr "कोई पता नहीं मिला"
 msgid "No archived logs yet. Logs older than {0} days will be automatically archived and available for download here."
 msgstr "अभी तक कोई संग्रहीत लॉग नहीं है। {0} दिन से पुराने लॉग स्वचालित रूप से संग्रहीत किए जाएंगे और यहां डाउनलोड के लिए उपलब्ध होंगे।"
 
+msgid "No attachments."
+msgstr ""
+
 msgid "No available filters"
 msgstr "कोई उपलब्ध फ़िल्टर नहीं"
 
@@ -5108,6 +5157,9 @@ msgstr "कोई डेटा मौजूद नहीं है"
 
 msgid "No days off scheduled"
 msgstr "कोई दिन बंद निर्धारित नहीं है"
+
+msgid "No default attachments yet."
+msgstr ""
 
 msgid "No draft versions available"
 msgstr "कोई ड्राफ्ट संस्करण उपलब्ध नहीं है"
@@ -5714,6 +5766,9 @@ msgstr "PO"
 
 msgid "PO Number"
 msgstr "PO संख्या"
+
+msgid "PO PDF"
+msgstr ""
 
 msgid "Policy & Procedure"
 msgstr "नीति और प्रक्रिया"
@@ -7271,6 +7326,9 @@ msgstr "स्थिति वितरण"
 msgid "Statuses"
 msgstr "स्थितियाँ"
 
+msgid "Stay on this page"
+msgstr "इस पृष्ठ पर रहें"
+
 msgid "Step"
 msgstr "चरण"
 
@@ -7294,6 +7352,9 @@ msgstr "स्टॉक ट्रांसफर विज़ार्ड"
 
 msgid "Stock Transfers"
 msgstr "स्टॉक ट्रांसफर"
+
+msgid "Storage client not available"
+msgstr ""
 
 msgid "Storage Type"
 msgstr "स्टोरेज प्रकार"
@@ -7965,6 +8026,9 @@ msgstr "प्रकार"
 msgid "Type a message..."
 msgstr "एक संदेश लिखें..."
 
+msgid "Type an email and press Enter to add an external recipient"
+msgstr ""
+
 msgid "Type of Permission Update"
 msgstr "अनुमति अपडेट का प्रकार"
 
@@ -8036,6 +8100,9 @@ msgstr "अनलिंक करें"
 
 msgid "Unlink job from sales order?"
 msgstr "बिक्रय आदेश से नौकरी को अनलिंक करें?"
+
+msgid "Unsaved changes"
+msgstr "असहेजे परिवर्तन"
 
 msgid "Unsupported source document type: {sourceDocument}"
 msgstr "असमर्थित स्रोत दस्तावेज़ प्रकार: {sourceDocument}"

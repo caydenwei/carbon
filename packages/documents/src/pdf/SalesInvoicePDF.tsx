@@ -107,8 +107,7 @@ const SalesInvoicePDF = ({
   const registrationLine = composeRegistrationLine({
     companyName: company.name,
     country: company.countryCode,
-    eori: company.eori,
-    accountsReceivableEmail: companySettings?.accountsReceivableEmail
+    eori: company.eori
   });
 
   const paymentTerm = paymentTerms?.find(
@@ -177,7 +176,7 @@ const SalesInvoicePDF = ({
                 city={invoiceCity ?? customerCity}
                 stateProvince={invoiceStateProvince ?? customerStateProvince}
                 postalCode={invoicePostalCode ?? customerPostalCode}
-                countryCode={invoiceCountryName ?? customerCountryName}
+                country={invoiceCountryName ?? customerCountryName}
               />
               {customerTaxId &&
                 !isEoriCountry(invoiceCountryName ?? customerCountryName) && (
@@ -253,7 +252,7 @@ const SalesInvoicePDF = ({
                     city={shipmentCity}
                     stateProvince={shipmentStateProvince}
                     postalCode={shipmentPostalCode}
-                    countryCode={shipmentCountryName}
+                    country={shipmentCountryName}
                   />
                 </View>
               </View>
@@ -291,18 +290,8 @@ const SalesInvoicePDF = ({
         >
           <Text style={tw("w-1/2")}>Description</Text>
           <Text style={tw("w-1/6 text-center")}>Qty</Text>
-          <View style={tw("w-1/6 items-center")}>
-            <Text>Unit Price</Text>
-            <Text style={[tw("text-[7px] font-normal"), { opacity: 0.7 }]}>
-              {currencyCode}
-            </Text>
-          </View>
-          <View style={tw("w-1/6 items-center")}>
-            <Text>Total</Text>
-            <Text style={[tw("text-[7px] font-normal"), { opacity: 0.7 }]}>
-              {currencyCode}
-            </Text>
-          </View>
+          <Text style={tw("w-1/6 text-center")}>Unit Price</Text>
+          <Text style={tw("w-1/6 text-center")}>Total</Text>
         </View>
 
         {/* Rows */}
@@ -323,89 +312,91 @@ const SalesInvoicePDF = ({
             lineTaxAmount;
 
           return (
-            <View
-              key={line.id}
-              style={[
-                tw(
-                  "flex flex-row py-2 px-3 border-b border-gray-200 text-[10px]"
-                ),
-                {
-                  backgroundColor: isEven
-                    ? "transparent"
-                    : "rgba(249, 250, 251, 0.6)"
-                }
-              ]}
-              wrap={false}
-            >
-              <View style={tw("w-1/2 pr-2")}>
-                <Text style={tw("text-gray-800")}>
-                  {getLineDescription(line)}
+            <View key={line.id}>
+              <View
+                wrap={false}
+                style={[
+                  tw(
+                    "flex flex-row py-2 px-3 border-b border-gray-200 text-[10px]"
+                  ),
+                  {
+                    backgroundColor: isEven
+                      ? "transparent"
+                      : "rgba(249, 250, 251, 0.6)"
+                  }
+                ]}
+              >
+                <View style={tw("w-1/2 pr-2")}>
+                  <Text style={tw("text-gray-800")}>
+                    {getLineDescription(line)}
+                  </Text>
+                  <Text style={tw("text-[8px] text-gray-400 mt-0.5")}>
+                    {getLineDescriptionDetails(line)}
+                  </Text>
+                  {thumbnails &&
+                    line.id &&
+                    line.id in thumbnails &&
+                    thumbnails[line.id] && (
+                      <View style={tw("mt-1 w-16")}>
+                        <Image
+                          src={thumbnails[line.id]!}
+                          style={tw("w-full h-auto")}
+                        />
+                      </View>
+                    )}
+                  {line.invoiceLineType !== "Comment" &&
+                    totalTaxAndFees > 0 && (
+                      <View style={tw("mt-1")}>
+                        <Text style={tw("text-[8px] text-gray-400 font-bold")}>
+                          Tax & Fees
+                        </Text>
+                        {lineShippingCost > 0 && (
+                          <Text style={tw("text-[8px] text-gray-400")}>
+                            - Shipping
+                          </Text>
+                        )}
+                        {lineAddOnCost > 0 && (
+                          <Text style={tw("text-[8px] text-gray-400")}>
+                            - Add-On
+                          </Text>
+                        )}
+                        {lineNonTaxableAddOnCost > 0 && (
+                          <Text style={tw("text-[8px] text-gray-400")}>
+                            - Non-Taxable Add-On
+                          </Text>
+                        )}
+                        {lineTaxPercent > 0 && (
+                          <Text style={tw("text-[8px] text-gray-400")}>
+                            - Tax ({(lineTaxPercent * 100).toFixed(0)}%)
+                          </Text>
+                        )}
+                      </View>
+                    )}
+                </View>
+                <Text style={tw("w-1/6 text-center text-gray-600")}>
+                  {line.invoiceLineType === "Comment"
+                    ? ""
+                    : `${line.quantity} ${line.unitOfMeasureCode ?? "EA"}`}
                 </Text>
-                <Text style={tw("text-[8px] text-gray-400 mt-0.5")}>
-                  {getLineDescriptionDetails(line)}
+                <Text style={tw("w-1/6 text-center text-gray-600")}>
+                  {line.invoiceLineType === "Comment"
+                    ? ""
+                    : numberFormatter.format(line.convertedUnitPrice ?? 0)}
                 </Text>
-                {thumbnails &&
-                  line.id &&
-                  line.id in thumbnails &&
-                  thumbnails[line.id] && (
-                    <View style={tw("mt-1 w-16")}>
-                      <Image
-                        src={thumbnails[line.id]!}
-                        style={tw("w-full h-auto")}
-                      />
-                    </View>
-                  )}
-                {Object.keys(line.externalNotes ?? {}).length > 0 && (
-                  <View style={tw("mt-1")}>
-                    <Note
-                      key={`${line.id}-notes`}
-                      content={line.externalNotes as JSONContent}
-                    />
-                  </View>
-                )}
-                {line.invoiceLineType !== "Comment" && totalTaxAndFees > 0 && (
-                  <View style={tw("mt-1")}>
-                    <Text style={tw("text-[8px] text-gray-400 font-bold")}>
-                      Tax & Fees
-                    </Text>
-                    {lineShippingCost > 0 && (
-                      <Text style={tw("text-[8px] text-gray-400")}>
-                        - Shipping
-                      </Text>
-                    )}
-                    {lineAddOnCost > 0 && (
-                      <Text style={tw("text-[8px] text-gray-400")}>
-                        - Add-On
-                      </Text>
-                    )}
-                    {lineNonTaxableAddOnCost > 0 && (
-                      <Text style={tw("text-[8px] text-gray-400")}>
-                        - Non-Taxable Add-On
-                      </Text>
-                    )}
-                    {lineTaxPercent > 0 && (
-                      <Text style={tw("text-[8px] text-gray-400")}>
-                        - Tax ({(lineTaxPercent * 100).toFixed(0)}%)
-                      </Text>
-                    )}
-                  </View>
-                )}
+                <Text style={tw("w-1/6 text-center text-gray-800 font-medium")}>
+                  {line.invoiceLineType === "Comment"
+                    ? ""
+                    : numberFormatter.format(getLineTotal(line))}
+                </Text>
               </View>
-              <Text style={tw("w-1/6 text-center text-gray-600")}>
-                {line.invoiceLineType === "Comment"
-                  ? ""
-                  : `${line.quantity} ${line.unitOfMeasureCode ?? "EA"}`}
-              </Text>
-              <Text style={tw("w-1/6 text-center text-gray-600")}>
-                {line.invoiceLineType === "Comment"
-                  ? ""
-                  : numberFormatter.format(line.convertedUnitPrice ?? 0)}
-              </Text>
-              <Text style={tw("w-1/6 text-center text-gray-800 font-medium")}>
-                {line.invoiceLineType === "Comment"
-                  ? ""
-                  : numberFormatter.format(getLineTotal(line))}
-              </Text>
+              {Object.keys(line.externalNotes ?? {}).length > 0 && (
+                <View style={tw("px-3 py-2 border-b border-gray-200")}>
+                  <Note
+                    key={`${line.id}-notes`}
+                    content={line.externalNotes as JSONContent}
+                  />
+                </View>
+              )}
             </View>
           );
         })}
@@ -419,10 +410,10 @@ const SalesInvoicePDF = ({
               { backgroundColor: "rgba(249, 250, 251, 0.6)" }
             ]}
           >
-            <Text style={tw("w-[80%] text-right pr-3 text-gray-600")}>
+            <Text style={tw("w-5/6 text-right pr-3 text-gray-600")}>
               Subtotal ({currencyCode})
             </Text>
-            <Text style={tw("w-[20%] text-right text-gray-800")}>
+            <Text style={tw("w-1/6 text-center text-gray-800")}>
               {numberFormatter.format(
                 salesInvoiceLines.reduce(
                   (sum, line) =>
@@ -445,10 +436,10 @@ const SalesInvoicePDF = ({
                 { backgroundColor: "rgba(249, 250, 251, 0.6)" }
               ]}
             >
-              <Text style={tw("w-[80%] text-right pr-3 text-gray-600")}>
+              <Text style={tw("w-5/6 text-right pr-3 text-gray-600")}>
                 Add-Ons ({currencyCode})
               </Text>
-              <Text style={tw("w-[20%] text-right text-gray-800")}>
+              <Text style={tw("w-1/6 text-center text-gray-800")}>
                 {numberFormatter.format(
                   salesInvoiceLines.reduce(
                     (sum, line) =>
@@ -479,10 +470,10 @@ const SalesInvoicePDF = ({
                   { backgroundColor: "rgba(249, 250, 251, 0.6)" }
                 ]}
               >
-                <Text style={tw("w-[80%] text-right pr-3 text-gray-600")}>
+                <Text style={tw("w-5/6 text-right pr-3 text-gray-600")}>
                   Shipping ({currencyCode})
                 </Text>
-                <Text style={tw("w-[20%] text-right text-gray-800")}>
+                <Text style={tw("w-1/6 text-center text-gray-800")}>
                   {numberFormatter.format(totalShipping)}
                 </Text>
               </View>
@@ -497,10 +488,10 @@ const SalesInvoicePDF = ({
                 { backgroundColor: "rgba(249, 250, 251, 0.6)" }
               ]}
             >
-              <Text style={tw("w-[80%] text-right pr-3 text-gray-600")}>
+              <Text style={tw("w-5/6 text-right pr-3 text-gray-600")}>
                 Taxes ({currencyCode})
               </Text>
-              <Text style={tw("w-[20%] text-right text-gray-800")}>
+              <Text style={tw("w-1/6 text-center text-gray-800")}>
                 {numberFormatter.format(
                   salesInvoiceLines.reduce((sum, line) => {
                     const taxPercent = line.taxPercent ?? 0;
@@ -513,11 +504,10 @@ const SalesInvoicePDF = ({
 
           <View style={tw("h-[1px] bg-gray-200")} />
           <View style={tw("flex flex-row py-2 px-3 text-[9px]")}>
-            <Text style={tw("w-[80%] text-right pr-3 text-gray-800 font-bold")}>
-              Total
+            <Text style={tw("w-5/6 text-right pr-3 text-gray-800 font-bold")}>
+              Total ({currencyCode})
             </Text>
-            <Text style={tw("w-[20%] text-right text-gray-800 font-bold")}>
-              {currencyCode}{" "}
+            <Text style={tw("w-1/6 text-center text-gray-800 font-bold")}>
               {numberFormatter.format(
                 getTotal(salesInvoiceLines, salesInvoice, salesInvoiceShipment)
               )}

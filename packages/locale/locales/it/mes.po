@@ -85,6 +85,9 @@ msgstr "Sei sicuro di voler eliminare questo cartellino? Questa azione non può 
 msgid "Are you sure you want to end all production events? This will end all active operations without completing or finishing them."
 msgstr "Sei sicuro di voler terminare tutti gli eventi di produzione? Questo terminerà tutte le operazioni attive senza completarle o finalizzarle."
 
+msgid "Are you sure you want to leave this page?"
+msgstr "Sei sicuro di voler lasciare questa pagina?"
+
 msgid "Assigned"
 msgstr "Assegnato"
 
@@ -425,6 +428,9 @@ msgstr "Kit"
 
 msgid "Labor"
 msgstr "Manodopera"
+
+msgid "Leave this page"
+msgstr "Lascia questa pagina"
 
 msgid "Let's build something"
 msgstr "Costruiamo qualcosa"
@@ -856,6 +862,9 @@ msgstr "Stato"
 msgid "Statuses"
 msgstr "Stati"
 
+msgid "Stay on this page"
+msgstr "Rimani su questa pagina"
+
 msgid "Steps"
 msgstr "Fasi"
 
@@ -928,6 +937,9 @@ msgstr "Materiali seriali/lotto non prelevati"
 
 msgid "Unknown"
 msgstr "Sconosciuto"
+
+msgid "Unsaved changes"
+msgstr "Modifiche non salvate"
 
 msgid "Update"
 msgstr "Aggiorna"

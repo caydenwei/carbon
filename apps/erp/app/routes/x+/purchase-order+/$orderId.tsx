@@ -16,6 +16,7 @@ import { PanelProvider, ResizablePanels } from "~/components/Layout/Panels";
 import { getPaymentTermsList } from "~/modules/accounting";
 import { upsertDocument } from "~/modules/documents";
 import {
+  getDefaultAttachmentsForPO,
   getPurchaseOrder,
   getPurchaseOrderDelivery,
   getPurchaseOrderLines,
@@ -462,6 +463,37 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     canDelete = isRequester;
   }
 
+  const itemIds = Array.from(
+    new Set(
+      (lines.data ?? []).map((l) => l.itemId).filter((id): id is string => !!id)
+    )
+  );
+  const supplierInteractionId = purchaseOrder.data?.supplierInteractionId;
+  const [defaultAttachments, adHocDocs] = await Promise.all([
+    getDefaultAttachmentsForPO(serviceRole, {
+      companyId,
+      supplierId: purchaseOrder.data?.supplierId ?? null,
+      itemIds
+    }),
+    supplierInteractionId
+      ? getSupplierInteractionDocuments(
+          serviceRole,
+          companyId,
+          supplierInteractionId
+        )
+      : Promise.resolve([])
+  ]);
+  const adHocAttachments = adHocDocs.map((d) => ({
+    source: "po" as const,
+    name: d.name,
+    size:
+      (d.metadata as { size?: number } | null | undefined)?.size != null
+        ? Math.round(((d.metadata as { size?: number }).size as number) / 1024)
+        : null,
+    path: `${companyId}/supplier-interaction/${supplierInteractionId}/${d.name}`
+  }));
+  const resolvedAttachments = [...defaultAttachments, ...adHocAttachments];
+
   return {
     purchaseOrder: purchaseOrder.data,
     purchaseOrderDelivery: purchaseOrderDelivery.data,
@@ -477,7 +509,8 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     canApprove,
     canReopen,
     canDelete,
-    defaultCc
+    defaultCc,
+    resolvedAttachments
   };
 }
 

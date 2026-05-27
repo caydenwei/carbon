@@ -62,8 +62,7 @@ export async function updateAccountsReceivableBillingAddress(
 ) {
   return client
     .from("companyAccountsReceivableBillingAddress")
-    .update(sanitize({ ...data, updatedBy }))
-    .eq("id", companyId);
+    .upsert(sanitize({ id: companyId, ...data, updatedBy }));
 }
 
 export async function deactivateWebhooks(

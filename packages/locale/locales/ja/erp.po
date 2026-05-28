@@ -50,7 +50,7 @@ msgid "{maxSizeMB}MB limit"
 msgstr "{maxSizeMB}MB制限"
 
 msgid "{name} deleted"
-msgstr ""
+msgstr "{name}が削除されました"
 
 msgid "{scopeCount} permissions"
 msgstr "{scopeCount} 個の権限"
@@ -528,13 +528,13 @@ msgid "Apply To"
 msgstr "適用対象"
 
 msgid "Approaching {PO_EMAIL_ATTACHMENT_LIMIT_MB} MB cap."
-msgstr ""
+msgstr "{PO_EMAIL_ATTACHMENT_LIMIT_MB} MBの上限に近づいています。"
 
 msgid "Approval Date"
 msgstr "承認日"
 
 msgid "Approval is required at or above this amount, up to the next rule's minimum"
-msgstr ""
+msgstr "この金額以上で次のルールの最小値までの承認が必要です"
 
 msgid "Approval Requirements"
 msgstr "承認要件"
@@ -965,7 +965,7 @@ msgid "Attachment"
 msgstr "添付ファイル"
 
 msgid "Attachments"
-msgstr ""
+msgstr "添付ファイル"
 
 msgid "Attribute"
 msgstr "属性"
@@ -1218,7 +1218,7 @@ msgid "Cannot send RFQ"
 msgstr "RFQを送信できません"
 
 msgid "Cannot upload — supplier interaction not yet created"
-msgstr ""
+msgstr "アップロードできません — サプライヤーインタラクションがまだ作成されていません"
 
 msgid "Cannot upload to parts bucket without item ID"
 msgstr "アイテムIDなしでパーツバケットにアップロードできません"
@@ -2183,10 +2183,10 @@ msgid "Default Approver"
 msgstr "デフォルト承認者"
 
 msgid "Default Attachments"
-msgstr ""
+msgstr "デフォルト添付ファイル"
 
 msgid "Default Attachments on Purchase Orders"
-msgstr ""
+msgstr "購買注文のデフォルト添付ファイル"
 
 msgid "Default CC Recipients"
 msgstr "デフォルトCC受信者"
@@ -2597,7 +2597,7 @@ msgid "Draft"
 msgstr "下書き"
 
 msgid "Drag & drop files, or click to browse"
-msgstr ""
+msgstr "ファイルをドラッグ&ドロップするか、クリックして参照"
 
 msgid "Drag and drop a Purchase Order PDF here, or click to select a file"
 msgstr "購入発注書のPDFをここにドラッグアンドドロップするか、クリックしてファイルを選択してください"
@@ -3096,7 +3096,7 @@ msgid "Error moving file"
 msgstr "ファイルの移動エラー"
 
 msgid "Error removing file"
-msgstr ""
+msgstr "ファイルの削除エラー"
 
 msgid "Error removing model from {sourceDocument}"
 msgstr "{sourceDocument}からモデルを削除するときにエラーが発生しました"
@@ -3159,7 +3159,7 @@ msgid "Everything from Starter"
 msgstr "スターターのすべての機能"
 
 msgid "Exceeds {PO_EMAIL_ATTACHMENT_LIMIT_MB} MB total — remove some attachments to send."
-msgstr ""
+msgstr "{PO_EMAIL_ATTACHMENT_LIMIT_MB} MB を超えています — 送信するには添付ファイルを削除してください。"
 
 msgid "Exchange Rate"
 msgstr "為替レート"
@@ -3511,7 +3511,7 @@ msgstr "サムネイルパスの更新に失敗しました"
 
 #. placeholder {0}: file.name
 msgid "Failed to upload {0}"
-msgstr ""
+msgstr "アップロードに失敗しました {0}"
 
 msgid "Failed to upload CSV file."
 msgstr "CSVファイルのアップロードに失敗しました。"
@@ -3617,13 +3617,13 @@ msgid "Files"
 msgstr "ファイル"
 
 msgid "Files attached here ride along on every purchase order email by default. Suppliers will receive them alongside the PO PDF."
-msgstr ""
+msgstr "ここに添付されたファイルは、デフォルトではすべての発注メールに自動的に含まれます。サプライヤーはPO PDFと一緒にそれらを受け取ります。"
 
 msgid "Files attached here ride along on every purchase order email sent to this supplier (in addition to company-wide defaults)."
-msgstr ""
+msgstr "ここに添付されたファイルは、このサプライヤーに送信されるすべての発注メールに含まれます（会社全体のデフォルトに加えて）。"
 
 msgid "Files attached here ride along whenever this item appears on a purchase order email."
-msgstr ""
+msgstr "このファイルは、このアイテムが購買注文メールに表示されるたびに添付されます。"
 
 msgid "Filter"
 msgstr "フィルター"
@@ -5108,7 +5108,7 @@ msgid "No archived logs yet. Logs older than {0} days will be automatically arch
 msgstr "まだアーカイブされたログはありません。{0}日以上前のログは自動的にアーカイブされ、ここからダウンロードできます。"
 
 msgid "No attachments."
-msgstr ""
+msgstr "添付ファイルがありません。"
 
 msgid "No available filters"
 msgstr "利用可能なフィルターがありません"
@@ -5153,7 +5153,7 @@ msgid "No days off scheduled"
 msgstr "休暇の予定がありません"
 
 msgid "No default attachments yet."
-msgstr ""
+msgstr "まだデフォルト添付ファイルがありません。"
 
 msgid "No draft versions available"
 msgstr "ドラフト版は利用できません"
@@ -5762,7 +5762,7 @@ msgid "PO Number"
 msgstr "発注番号"
 
 msgid "PO PDF"
-msgstr ""
+msgstr "PO PDF"
 
 msgid "Policy & Procedure"
 msgstr "ポリシーと手順"
@@ -7344,7 +7344,7 @@ msgid "Stock Transfers"
 msgstr "在庫移動"
 
 msgid "Storage client not available"
-msgstr ""
+msgstr "ストレージクライアントが利用できません"
 
 msgid "Storage Type"
 msgstr "ストレージタイプ"
@@ -8017,7 +8017,7 @@ msgid "Type a message..."
 msgstr "メッセージを入力..."
 
 msgid "Type an email and press Enter to add an external recipient"
-msgstr ""
+msgstr "メールアドレスを入力してEnterキーを押すと、外部の受信者を追加できます"
 
 msgid "Type of Permission Update"
 msgstr "権限更新のタイプ"

@@ -50,7 +50,7 @@ msgid "{maxSizeMB}MB limit"
 msgstr "{maxSizeMB}MB 限制"
 
 msgid "{name} deleted"
-msgstr ""
+msgstr "{name} 已删除"
 
 msgid "{scopeCount} permissions"
 msgstr "{scopeCount} 个权限"
@@ -528,13 +528,13 @@ msgid "Apply To"
 msgstr "应用于"
 
 msgid "Approaching {PO_EMAIL_ATTACHMENT_LIMIT_MB} MB cap."
-msgstr ""
+msgstr "接近 {PO_EMAIL_ATTACHMENT_LIMIT_MB} MB 上限。"
 
 msgid "Approval Date"
 msgstr "批准日期"
 
 msgid "Approval is required at or above this amount, up to the next rule's minimum"
-msgstr ""
+msgstr "在此金额或以上需要批准，直到下一条规则的最低金额"
 
 msgid "Approval Requirements"
 msgstr "批准要求"
@@ -965,7 +965,7 @@ msgid "Attachment"
 msgstr "附件"
 
 msgid "Attachments"
-msgstr ""
+msgstr "附件"
 
 msgid "Attribute"
 msgstr "属性"
@@ -1218,7 +1218,7 @@ msgid "Cannot send RFQ"
 msgstr "无法发送询价单"
 
 msgid "Cannot upload — supplier interaction not yet created"
-msgstr ""
+msgstr "无法上传 — 供应商互动尚未创建"
 
 msgid "Cannot upload to parts bucket without item ID"
 msgstr "无法在没有项目ID的情况下上传到零件存储桶"
@@ -2183,10 +2183,10 @@ msgid "Default Approver"
 msgstr "默认审批人"
 
 msgid "Default Attachments"
-msgstr ""
+msgstr "默认附件"
 
 msgid "Default Attachments on Purchase Orders"
-msgstr ""
+msgstr "采购订单上的默认附件"
 
 msgid "Default CC Recipients"
 msgstr "默认抄送收件人"
@@ -2597,7 +2597,7 @@ msgid "Draft"
 msgstr "草稿"
 
 msgid "Drag & drop files, or click to browse"
-msgstr ""
+msgstr "拖放文件，或点击浏览"
 
 msgid "Drag and drop a Purchase Order PDF here, or click to select a file"
 msgstr "将采购订单 PDF 拖放到此处，或点击选择文件"
@@ -3096,7 +3096,7 @@ msgid "Error moving file"
 msgstr "移动文件出错"
 
 msgid "Error removing file"
-msgstr ""
+msgstr "删除文件出错"
 
 msgid "Error removing model from {sourceDocument}"
 msgstr "从{sourceDocument}中删除模型时出错"
@@ -3159,7 +3159,7 @@ msgid "Everything from Starter"
 msgstr "Starter 中的所有功能"
 
 msgid "Exceeds {PO_EMAIL_ATTACHMENT_LIMIT_MB} MB total — remove some attachments to send."
-msgstr ""
+msgstr "超过 {PO_EMAIL_ATTACHMENT_LIMIT_MB} MB 总限制 — 请删除一些附件以发送。"
 
 msgid "Exchange Rate"
 msgstr "汇率"
@@ -3511,7 +3511,7 @@ msgstr "无法更新缩略图路径"
 
 #. placeholder {0}: file.name
 msgid "Failed to upload {0}"
-msgstr ""
+msgstr "上传失败 {0}"
 
 msgid "Failed to upload CSV file."
 msgstr "未能上传 CSV 文件。"
@@ -3617,13 +3617,13 @@ msgid "Files"
 msgstr "文件"
 
 msgid "Files attached here ride along on every purchase order email by default. Suppliers will receive them alongside the PO PDF."
-msgstr ""
+msgstr "此处附加的文件将默认随每封采购订单电子邮件一起发送。供应商将与采购订单PDF一起收到它们。"
 
 msgid "Files attached here ride along on every purchase order email sent to this supplier (in addition to company-wide defaults)."
-msgstr ""
+msgstr "此处附加的文件将随附在发送给此供应商的每份采购订单电子邮件中（除了公司范围的默认设置）。"
 
 msgid "Files attached here ride along whenever this item appears on a purchase order email."
-msgstr ""
+msgstr "此处附加的文件会在此项目出现在采购订单电子邮件中时随之附加。"
 
 msgid "Filter"
 msgstr "筛选"
@@ -5108,7 +5108,7 @@ msgid "No archived logs yet. Logs older than {0} days will be automatically arch
 msgstr "还没有存档日志。超过 {0} 天的日志将自动存档，并可在此处下载。"
 
 msgid "No attachments."
-msgstr ""
+msgstr "没有附件。"
 
 msgid "No available filters"
 msgstr "没有可用的筛选器"
@@ -5153,7 +5153,7 @@ msgid "No days off scheduled"
 msgstr "未安排休息日"
 
 msgid "No default attachments yet."
-msgstr ""
+msgstr "还没有默认附件。"
 
 msgid "No draft versions available"
 msgstr "没有可用的草稿版本"
@@ -5762,7 +5762,7 @@ msgid "PO Number"
 msgstr "采购订单号"
 
 msgid "PO PDF"
-msgstr ""
+msgstr "采购订单 PDF"
 
 msgid "Policy & Procedure"
 msgstr "政策与程序"
@@ -7344,7 +7344,7 @@ msgid "Stock Transfers"
 msgstr "库存转移"
 
 msgid "Storage client not available"
-msgstr ""
+msgstr "存储客户端不可用"
 
 msgid "Storage Type"
 msgstr "存储类型"
@@ -8017,7 +8017,7 @@ msgid "Type a message..."
 msgstr "输入消息..."
 
 msgid "Type an email and press Enter to add an external recipient"
-msgstr ""
+msgstr "输入电子邮件并按 Enter 键以添加外部收件人"
 
 msgid "Type of Permission Update"
 msgstr "权限更新类型"

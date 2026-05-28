@@ -50,7 +50,7 @@ msgid "{maxSizeMB}MB limit"
 msgstr "{maxSizeMB}MB limit"
 
 msgid "{name} deleted"
-msgstr ""
+msgstr "{name} eliminado"
 
 msgid "{scopeCount} permissions"
 msgstr "{scopeCount} permissões"
@@ -528,13 +528,13 @@ msgid "Apply To"
 msgstr "Aplicar a"
 
 msgid "Approaching {PO_EMAIL_ATTACHMENT_LIMIT_MB} MB cap."
-msgstr ""
+msgstr "Aproximando-se do limite de {PO_EMAIL_ATTACHMENT_LIMIT_MB} MB."
 
 msgid "Approval Date"
 msgstr "Data de Aprovação"
 
 msgid "Approval is required at or above this amount, up to the next rule's minimum"
-msgstr ""
+msgstr "A aprovação é necessária neste valor ou acima dele, até o mínimo da próxima regra"
 
 msgid "Approval Requirements"
 msgstr "Requisitos de Aprovação"
@@ -965,7 +965,7 @@ msgid "Attachment"
 msgstr "Anexo"
 
 msgid "Attachments"
-msgstr ""
+msgstr "Anexos"
 
 msgid "Attribute"
 msgstr "Atributo"
@@ -1218,7 +1218,7 @@ msgid "Cannot send RFQ"
 msgstr "Não é possível enviar RFQ"
 
 msgid "Cannot upload — supplier interaction not yet created"
-msgstr ""
+msgstr "Não é possível fazer upload — interação com fornecedor ainda não foi criada"
 
 msgid "Cannot upload to parts bucket without item ID"
 msgstr "Não é possível fazer upload para o bucket de peças sem ID do item"
@@ -2183,10 +2183,10 @@ msgid "Default Approver"
 msgstr "Aprovador Padrão"
 
 msgid "Default Attachments"
-msgstr ""
+msgstr "Anexos Padrão"
 
 msgid "Default Attachments on Purchase Orders"
-msgstr ""
+msgstr "Anexos Padrão em Pedidos de Compra"
 
 msgid "Default CC Recipients"
 msgstr "Destinatários CC Padrão"
@@ -2597,7 +2597,7 @@ msgid "Draft"
 msgstr "Rascunho"
 
 msgid "Drag & drop files, or click to browse"
-msgstr ""
+msgstr "Arraste e solte arquivos, ou clique para procurar"
 
 msgid "Drag and drop a Purchase Order PDF here, or click to select a file"
 msgstr "Arraste e solte um PDF de Ordem de Compra aqui, ou clique para selecionar um arquivo"
@@ -3096,7 +3096,7 @@ msgid "Error moving file"
 msgstr "Erro ao mover arquivo"
 
 msgid "Error removing file"
-msgstr ""
+msgstr "Erro ao remover arquivo"
 
 msgid "Error removing model from {sourceDocument}"
 msgstr "Erro ao remover modelo de {sourceDocument}"
@@ -3159,7 +3159,7 @@ msgid "Everything from Starter"
 msgstr "Tudo do Starter"
 
 msgid "Exceeds {PO_EMAIL_ATTACHMENT_LIMIT_MB} MB total — remove some attachments to send."
-msgstr ""
+msgstr "Excede {PO_EMAIL_ATTACHMENT_LIMIT_MB} MB no total — remova alguns anexos para enviar."
 
 msgid "Exchange Rate"
 msgstr "Taxa de Câmbio"
@@ -3511,7 +3511,7 @@ msgstr "Falha ao atualizar caminho da miniatura"
 
 #. placeholder {0}: file.name
 msgid "Failed to upload {0}"
-msgstr ""
+msgstr "Falha ao carregar {0}"
 
 msgid "Failed to upload CSV file."
 msgstr "Falha ao carregar arquivo CSV."
@@ -3617,13 +3617,13 @@ msgid "Files"
 msgstr "Ficheiros"
 
 msgid "Files attached here ride along on every purchase order email by default. Suppliers will receive them alongside the PO PDF."
-msgstr ""
+msgstr "Os arquivos anexados aqui são incluídos em todos os emails de pedido de compra por padrão. Os fornecedores os receberão junto com o PDF do PO."
 
 msgid "Files attached here ride along on every purchase order email sent to this supplier (in addition to company-wide defaults)."
-msgstr ""
+msgstr "Arquivos anexados aqui são incluídos em todos os emails de pedido de compra enviados para este fornecedor (além dos padrões em toda a empresa)."
 
 msgid "Files attached here ride along whenever this item appears on a purchase order email."
-msgstr ""
+msgstr "Arquivos anexados aqui são incluídos sempre que este item aparece em um email de pedido de compra."
 
 msgid "Filter"
 msgstr "Filtro"
@@ -5108,7 +5108,7 @@ msgid "No archived logs yet. Logs older than {0} days will be automatically arch
 msgstr "Nenhum log arquivado ainda. Logs com mais de {0} dias serão automaticamente arquivados e disponíveis para download aqui."
 
 msgid "No attachments."
-msgstr ""
+msgstr "Sem anexos."
 
 msgid "No available filters"
 msgstr "Nenhum filtro disponível"
@@ -5153,7 +5153,7 @@ msgid "No days off scheduled"
 msgstr "Nenhum dia de folga agendado"
 
 msgid "No default attachments yet."
-msgstr ""
+msgstr "Nenhum anexo padrão ainda."
 
 msgid "No draft versions available"
 msgstr "Nenhuma versão de rascunho disponível"
@@ -5762,7 +5762,7 @@ msgid "PO Number"
 msgstr "Número da PO"
 
 msgid "PO PDF"
-msgstr ""
+msgstr "PDF da PO"
 
 msgid "Policy & Procedure"
 msgstr "Política e Procedimento"
@@ -7344,7 +7344,7 @@ msgid "Stock Transfers"
 msgstr "Transferências de Estoque"
 
 msgid "Storage client not available"
-msgstr ""
+msgstr "Cliente de armazenamento não disponível"
 
 msgid "Storage Type"
 msgstr "Tipo de Armazenamento"
@@ -8017,7 +8017,7 @@ msgid "Type a message..."
 msgstr "Digite uma mensagem..."
 
 msgid "Type an email and press Enter to add an external recipient"
-msgstr ""
+msgstr "Digite um email e pressione Enter para adicionar um destinatário externo"
 
 msgid "Type of Permission Update"
 msgstr "Tipo de Atualização de Permissão"

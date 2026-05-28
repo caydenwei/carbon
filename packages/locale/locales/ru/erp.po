@@ -50,7 +50,7 @@ msgid "{maxSizeMB}MB limit"
 msgstr "{maxSizeMB}МБ максимум"
 
 msgid "{name} deleted"
-msgstr ""
+msgstr "{name} удален"
 
 msgid "{scopeCount} permissions"
 msgstr "{scopeCount} разрешений"
@@ -528,13 +528,13 @@ msgid "Apply To"
 msgstr "Применить к"
 
 msgid "Approaching {PO_EMAIL_ATTACHMENT_LIMIT_MB} MB cap."
-msgstr ""
+msgstr "Приближение к лимиту {PO_EMAIL_ATTACHMENT_LIMIT_MB} МБ."
 
 msgid "Approval Date"
 msgstr "Дата одобрения"
 
 msgid "Approval is required at or above this amount, up to the next rule's minimum"
-msgstr ""
+msgstr "Одобрение требуется при этой сумме или выше, вплоть до минимума следующего правила"
 
 msgid "Approval Requirements"
 msgstr "Требования к утверждению"
@@ -965,7 +965,7 @@ msgid "Attachment"
 msgstr "Вложение"
 
 msgid "Attachments"
-msgstr ""
+msgstr "Вложения"
 
 msgid "Attribute"
 msgstr "Атрибут"
@@ -1218,7 +1218,7 @@ msgid "Cannot send RFQ"
 msgstr "Невозможно отправить РФП"
 
 msgid "Cannot upload — supplier interaction not yet created"
-msgstr ""
+msgstr "Невозможно загрузить — взаимодействие с поставщиком еще не создано"
 
 msgid "Cannot upload to parts bucket without item ID"
 msgstr "Невозможно загрузить в корзину деталей без ID элемента"
@@ -2183,10 +2183,10 @@ msgid "Default Approver"
 msgstr "Утверждающий по умолчанию"
 
 msgid "Default Attachments"
-msgstr ""
+msgstr "Вложения по умолчанию"
 
 msgid "Default Attachments on Purchase Orders"
-msgstr ""
+msgstr "Вложения по умолчанию в заказах на покупку"
 
 msgid "Default CC Recipients"
 msgstr "Получатели CC по умолчанию"
@@ -2597,7 +2597,7 @@ msgid "Draft"
 msgstr "Черновик"
 
 msgid "Drag & drop files, or click to browse"
-msgstr ""
+msgstr "Перетащите файлы или нажмите для обзора"
 
 msgid "Drag and drop a Purchase Order PDF here, or click to select a file"
 msgstr "Перетащите PDF-файл заказа на покупку сюда или нажмите, чтобы выбрать файл"
@@ -3096,7 +3096,7 @@ msgid "Error moving file"
 msgstr "Ошибка при перемещении файла"
 
 msgid "Error removing file"
-msgstr ""
+msgstr "Ошибка удаления файла"
 
 msgid "Error removing model from {sourceDocument}"
 msgstr "Ошибка при удалении модели из {sourceDocument}"
@@ -3159,7 +3159,7 @@ msgid "Everything from Starter"
 msgstr "Всё из Starter"
 
 msgid "Exceeds {PO_EMAIL_ATTACHMENT_LIMIT_MB} MB total — remove some attachments to send."
-msgstr ""
+msgstr "Превышает {PO_EMAIL_ATTACHMENT_LIMIT_MB} МБ всего — удалите некоторые вложения для отправки."
 
 msgid "Exchange Rate"
 msgstr "Курс обмена"
@@ -3511,7 +3511,7 @@ msgstr "Не удалось обновить путь миниатюры"
 
 #. placeholder {0}: file.name
 msgid "Failed to upload {0}"
-msgstr ""
+msgstr "Ошибка загрузки {0}"
 
 msgid "Failed to upload CSV file."
 msgstr "Не удалось загрузить CSV файл."
@@ -3617,13 +3617,13 @@ msgid "Files"
 msgstr "Файлы"
 
 msgid "Files attached here ride along on every purchase order email by default. Suppliers will receive them alongside the PO PDF."
-msgstr ""
+msgstr "Файлы, прикрепленные здесь, автоматически отправляются со всеми письмами о заказах на покупку. Поставщики получат их вместе с PDF-файлом заказа на покупку."
 
 msgid "Files attached here ride along on every purchase order email sent to this supplier (in addition to company-wide defaults)."
-msgstr ""
+msgstr "Файлы, прикрепленные здесь, отправляются вместе с каждым письмом заказа на покупку, отправленным этому поставщику (в дополнение к общекорпоративным значениям по умолчанию)."
 
 msgid "Files attached here ride along whenever this item appears on a purchase order email."
-msgstr ""
+msgstr "Файлы, прикрепленные здесь, автоматически добавляются при отправке этого товара в письме заказа на покупку."
 
 msgid "Filter"
 msgstr "Фильтр"
@@ -5108,7 +5108,7 @@ msgid "No archived logs yet. Logs older than {0} days will be automatically arch
 msgstr "Нет архивированных логов. Логи старше {0} дней будут автоматически архивированы и доступны для скачивания здесь."
 
 msgid "No attachments."
-msgstr ""
+msgstr "Нет вложений."
 
 msgid "No available filters"
 msgstr "Нет доступных фильтров"
@@ -5153,7 +5153,7 @@ msgid "No days off scheduled"
 msgstr "Нет запланированных выходных"
 
 msgid "No default attachments yet."
-msgstr ""
+msgstr "Пока нет вложений по умолчанию."
 
 msgid "No draft versions available"
 msgstr "Нет доступных черновиков версий"
@@ -5762,7 +5762,7 @@ msgid "PO Number"
 msgstr "Номер ПО"
 
 msgid "PO PDF"
-msgstr ""
+msgstr "ПО PDF"
 
 msgid "Policy & Procedure"
 msgstr "Политика и процедура"
@@ -7344,7 +7344,7 @@ msgid "Stock Transfers"
 msgstr "Передачи запасов"
 
 msgid "Storage client not available"
-msgstr ""
+msgstr "Клиент хранилища недоступен"
 
 msgid "Storage Type"
 msgstr "Тип хранилища"
@@ -8017,7 +8017,7 @@ msgid "Type a message..."
 msgstr "Введите сообщение..."
 
 msgid "Type an email and press Enter to add an external recipient"
-msgstr ""
+msgstr "Введите адрес электронной почты и нажмите Enter, чтобы добавить внешнего получателя"
 
 msgid "Type of Permission Update"
 msgstr "Тип обновления разрешений"

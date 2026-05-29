@@ -7521,6 +7521,227 @@ export type Database = {
           },
         ]
       }
+      demandForecastSource: {
+        Row: {
+          companyId: string
+          createdAt: string
+          demandProjectionId: string | null
+          id: string
+          itemId: string
+          jobId: string | null
+          locationId: string | null
+          parentItemId: string
+          periodId: string
+          quantity: number
+          salesOrderLineId: string | null
+          sourceType: Database["public"]["Enums"]["demandForecastSourceType"]
+        }
+        Insert: {
+          companyId: string
+          createdAt?: string
+          demandProjectionId?: string | null
+          id?: string
+          itemId: string
+          jobId?: string | null
+          locationId?: string | null
+          parentItemId: string
+          periodId: string
+          quantity: number
+          salesOrderLineId?: string | null
+          sourceType: Database["public"]["Enums"]["demandForecastSourceType"]
+        }
+        Update: {
+          companyId?: string
+          createdAt?: string
+          demandProjectionId?: string | null
+          id?: string
+          itemId?: string
+          jobId?: string | null
+          locationId?: string | null
+          parentItemId?: string
+          periodId?: string
+          quantity?: number
+          salesOrderLineId?: string | null
+          sourceType?: Database["public"]["Enums"]["demandForecastSourceType"]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "demandForecastSource_companyId_fkey"
+            columns: ["companyId"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "demandForecastSource_companyId_fkey"
+            columns: ["companyId"]
+            isOneToOne: false
+            referencedRelation: "company"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "demandForecastSource_companyId_fkey"
+            columns: ["companyId"]
+            isOneToOne: false
+            referencedRelation: "customFieldTables"
+            referencedColumns: ["companyId"]
+          },
+          {
+            foreignKeyName: "demandForecastSource_companyId_fkey"
+            columns: ["companyId"]
+            isOneToOne: false
+            referencedRelation: "integrations"
+            referencedColumns: ["companyId"]
+          },
+          {
+            foreignKeyName: "demandForecastSource_demandProjectionId_fkey"
+            columns: ["demandProjectionId"]
+            isOneToOne: false
+            referencedRelation: "demandProjection"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "demandForecastSource_itemId_fkey"
+            columns: ["itemId"]
+            isOneToOne: false
+            referencedRelation: "consumables"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "demandForecastSource_itemId_fkey"
+            columns: ["itemId"]
+            isOneToOne: false
+            referencedRelation: "item"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "demandForecastSource_itemId_fkey"
+            columns: ["itemId"]
+            isOneToOne: false
+            referencedRelation: "materials"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "demandForecastSource_itemId_fkey"
+            columns: ["itemId"]
+            isOneToOne: false
+            referencedRelation: "parts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "demandForecastSource_itemId_fkey"
+            columns: ["itemId"]
+            isOneToOne: false
+            referencedRelation: "services"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "demandForecastSource_itemId_fkey"
+            columns: ["itemId"]
+            isOneToOne: false
+            referencedRelation: "tools"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "demandForecastSource_jobId_fkey"
+            columns: ["jobId"]
+            isOneToOne: false
+            referencedRelation: "job"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "demandForecastSource_jobId_fkey"
+            columns: ["jobId"]
+            isOneToOne: false
+            referencedRelation: "jobs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "demandForecastSource_jobId_fkey"
+            columns: ["jobId"]
+            isOneToOne: false
+            referencedRelation: "openProductionOrders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "demandForecastSource_locationId_fkey"
+            columns: ["locationId"]
+            isOneToOne: false
+            referencedRelation: "location"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "demandForecastSource_parentItemId_fkey"
+            columns: ["parentItemId"]
+            isOneToOne: false
+            referencedRelation: "consumables"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "demandForecastSource_parentItemId_fkey"
+            columns: ["parentItemId"]
+            isOneToOne: false
+            referencedRelation: "item"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "demandForecastSource_parentItemId_fkey"
+            columns: ["parentItemId"]
+            isOneToOne: false
+            referencedRelation: "materials"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "demandForecastSource_parentItemId_fkey"
+            columns: ["parentItemId"]
+            isOneToOne: false
+            referencedRelation: "parts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "demandForecastSource_parentItemId_fkey"
+            columns: ["parentItemId"]
+            isOneToOne: false
+            referencedRelation: "services"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "demandForecastSource_parentItemId_fkey"
+            columns: ["parentItemId"]
+            isOneToOne: false
+            referencedRelation: "tools"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "demandForecastSource_periodId_fkey"
+            columns: ["periodId"]
+            isOneToOne: false
+            referencedRelation: "period"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "demandForecastSource_salesOrderLineId_fkey"
+            columns: ["salesOrderLineId"]
+            isOneToOne: false
+            referencedRelation: "openSalesOrderLines"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "demandForecastSource_salesOrderLineId_fkey"
+            columns: ["salesOrderLineId"]
+            isOneToOne: false
+            referencedRelation: "salesOrderLine"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "demandForecastSource_salesOrderLineId_fkey"
+            columns: ["salesOrderLineId"]
+            isOneToOne: false
+            referencedRelation: "salesOrderLines"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       demandProjection: {
         Row: {
           companyId: string
@@ -7529,6 +7750,7 @@ export type Database = {
           createdBy: string
           forecastMethod: string | null
           forecastQuantity: number
+          id: string
           itemId: string
           locationId: string
           notes: string | null
@@ -7543,6 +7765,7 @@ export type Database = {
           createdBy: string
           forecastMethod?: string | null
           forecastQuantity?: number
+          id?: string
           itemId: string
           locationId: string
           notes?: string | null
@@ -7557,6 +7780,7 @@ export type Database = {
           createdBy?: string
           forecastMethod?: string | null
           forecastQuantity?: number
+          id?: string
           itemId?: string
           locationId?: string
           notes?: string | null
@@ -38290,7 +38514,49 @@ export type Database = {
           },
         ]
       }
-      searchIndex_LPwQiGPcoBnievXwSmP5Nz: {
+      searchIndex_PAoZnxZFhuiaaU6EsvyrVS: {
+        Row: {
+          createdAt: string
+          description: string | null
+          entityId: string
+          entityType: string
+          id: number
+          link: string
+          metadata: Json | null
+          searchVector: unknown
+          tags: string[] | null
+          title: string
+          updatedAt: string | null
+        }
+        Insert: {
+          createdAt?: string
+          description?: string | null
+          entityId: string
+          entityType: string
+          id?: number
+          link: string
+          metadata?: Json | null
+          searchVector?: unknown
+          tags?: string[] | null
+          title: string
+          updatedAt?: string | null
+        }
+        Update: {
+          createdAt?: string
+          description?: string | null
+          entityId?: string
+          entityType?: string
+          id?: number
+          link?: string
+          metadata?: Json | null
+          searchVector?: unknown
+          tags?: string[] | null
+          title?: string
+          updatedAt?: string | null
+        }
+        Relationships: []
+      }
+      searchIndex_WbvVgr1aYFZjGDegRYLAqe: {
         Row: {
           createdAt: string
           description: string | null
@@ -55414,14 +55680,14 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "address_countryCode_fkey"
-            columns: ["customerCountryCode"]
+            columns: ["supplierCountryCode"]
             isOneToOne: false
             referencedRelation: "country"
             referencedColumns: ["alpha2"]
           },
           {
             foreignKeyName: "address_countryCode_fkey"
-            columns: ["supplierCountryCode"]
+            columns: ["customerCountryCode"]
             isOneToOne: false
             referencedRelation: "country"
             referencedColumns: ["alpha2"]
@@ -58847,7 +59113,7 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "address_countryCode_fkey"
-            columns: ["shipmentCountryCode"]
+            columns: ["customerCountryCode"]
             isOneToOne: false
             referencedRelation: "country"
             referencedColumns: ["alpha2"]
@@ -58861,7 +59127,7 @@ export type Database = {
           },
           {
             foreignKeyName: "address_countryCode_fkey"
-            columns: ["customerCountryCode"]
+            columns: ["shipmentCountryCode"]
             isOneToOne: false
             referencedRelation: "country"
             referencedColumns: ["alpha2"]
@@ -64933,6 +65199,10 @@ export type Database = {
         | "Total"
       customRuleTargetType: "item" | "storageUnit" | "workCenter"
       deadlineType: "No Deadline" | "ASAP" | "Soft Deadline" | "Hard Deadline"
+      demandForecastSourceType:
+        | "Job Material"
+        | "Sales Order"
+        | "Demand Projection"
       demandSourceType: "Sales Order" | "Job Material"
       depreciationMethod:
         | "Straight Line"
@@ -66201,6 +66471,11 @@ export const Constants = {
       ],
       customRuleTargetType: ["item", "storageUnit", "workCenter"],
       deadlineType: ["No Deadline", "ASAP", "Soft Deadline", "Hard Deadline"],
+      demandForecastSourceType: [
+        "Job Material",
+        "Sales Order",
+        "Demand Projection",
+      ],
       demandSourceType: ["Sales Order", "Job Material"],
       depreciationMethod: [
         "Straight Line",

@@ -106,7 +106,21 @@ export const plannedOrderValidator = z.object({
   supplierId: zfd.text(z.string().optional()),
   itemReadableId: zfd.text(z.string().optional()),
   unitPrice: zfd.numeric(z.number().optional()),
-  unitOfMeasureCode: zfd.text(z.string().optional())
+  unitOfMeasureCode: zfd.text(z.string().optional()),
+  // ── Reorder-policy attribution (populated by calculateOrders for
+  // MRP-suggested orders; absent for user-added "Add Order" rows). ──
+  policyName: zfd.text(z.string().optional()),
+  reason: zfd.text(z.string().optional()),
+  triggerValues: z
+    .object({
+      projectedStock: z.number().optional(),
+      safetyStock: z.number().optional(),
+      reorderPoint: z.number().optional(),
+      reorderQuantity: z.number().optional(),
+      lotSize: z.number().optional(),
+      leadTime: z.number().optional()
+    })
+    .optional()
 });
 
 export type PlannedOrder = z.infer<typeof plannedOrderValidator>;

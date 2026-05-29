@@ -110,7 +110,8 @@ export default function MaterialRoute() {
                       quoteMaterials,
                       salesOrderLines,
                       shipmentLines,
-                      supplierQuotes
+                      supplierQuotes,
+                      jobMaterialUsage
                     } = resolvedUsedIn;
 
                     const tree: UsedInNode[] = [
@@ -202,6 +203,7 @@ export default function MaterialRoute() {
                           materialData.materialSummary
                             ?.readableIdWithRevision ?? ""
                         }
+                        jobMaterialUsage={jobMaterialUsage}
                       />
                     );
                   }}

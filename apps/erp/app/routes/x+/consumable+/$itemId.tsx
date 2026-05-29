@@ -107,7 +107,8 @@ export default function ConsumableRoute() {
                       quoteMaterials,
                       salesOrderLines,
                       shipmentLines,
-                      supplierQuotes
+                      supplierQuotes,
+                      jobMaterialUsage
                     } = resolvedUsedIn;
 
                     const tree: UsedInNode[] = [
@@ -198,6 +199,7 @@ export default function ConsumableRoute() {
                           consumableData.consumableSummary
                             ?.readableIdWithRevision ?? ""
                         }
+                        jobMaterialUsage={jobMaterialUsage}
                       />
                     );
                   }}

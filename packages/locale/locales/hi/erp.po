@@ -4034,6 +4034,9 @@ msgstr "इन्वेंटरी माप की इकाई"
 msgid "Invite"
 msgstr "आमंत्रित करें"
 
+msgid "Invited"
+msgstr ""
+
 msgid "Invoice"
 msgstr "चालान"
 

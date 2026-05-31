@@ -196,7 +196,7 @@ export function ReworkModal({
             {trackedEntityIdsValue && (
               <Hidden name="trackedEntityIds" value={trackedEntityIdsValue} />
             )}
-            <VStack spacing={0}>
+            <VStack spacing={2}>
               <Select
                 name="targetJobOperationId"
                 label={t`Go back to operation`}
@@ -217,9 +217,9 @@ export function ReworkModal({
               />
 
               {parentIsSerial ? (
-                <>
+                <div>
                   <Hidden name="quantity" value={String(serialQuantity || 1)} />
-                  <div className="w-full mb-2 space-y-2">
+                  <div className="w-full flex flex-col gap-2">
                     <label className="text-xs font-medium text-muted-foreground">
                       <Trans>Serial numbers</Trans>
                       {serialQuantity > 0 && (
@@ -272,7 +272,7 @@ export function ReworkModal({
                       )}
                     </div>
                   </div>
-                </>
+                </div>
               ) : parentIsBatch ? (
                 <>
                   <Select

@@ -250,7 +250,8 @@ export function QuantityModal({
                       onClick={() =>
                         setQuantity(
                           operation.operationQuantity -
-                            operation.quantityComplete
+                            operation.quantityComplete -
+                            (operation.quantityReworked ?? 0)
                         )
                       }
                     >

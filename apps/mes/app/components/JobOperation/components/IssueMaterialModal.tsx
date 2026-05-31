@@ -1023,12 +1023,13 @@ export function IssueMaterialModal({
                 </div>
               </ModalBody>
               <ModalFooter>
-                <Button variant="secondary" onClick={onClose}>
+                <Button variant="secondary" size="lg" onClick={onClose}>
                   Cancel
                 </Button>
                 <Button
                   type="submit"
                   variant="primary"
+                  size="lg"
                   isLoading={inventoryFetcher.state !== "idle"}
                   isDisabled={
                     inventoryFetcher.state !== "idle" ||
@@ -1590,17 +1591,18 @@ export function IssueMaterialModal({
               </ModalBody>
               <ModalFooter>
                 {splitEntitiesResult.length > 0 ? (
-                  <Button variant="primary" onClick={onClose}>
+                  <Button variant="primary" size="lg" onClick={onClose}>
                     Close
                   </Button>
                 ) : (
                   <>
-                    <Button variant="secondary" onClick={onClose}>
+                    <Button variant="secondary" size="lg" onClick={onClose}>
                       Cancel
                     </Button>
                     {activeTab === "unconsume" ? (
                       <Button
                         variant="destructive"
+                        size="lg"
                         onClick={
                           trackingType === "Serial"
                             ? handleUnconsumeSerial
@@ -1619,6 +1621,7 @@ export function IssueMaterialModal({
                     ) : (
                       <Button
                         variant="primary"
+                        size="lg"
                         onClick={
                           trackingType === "Serial"
                             ? handleSubmitSerial
@@ -1643,7 +1646,7 @@ export function IssueMaterialModal({
           {/* Footer for split entities result */}
           {splitEntitiesResult.length > 0 && (
             <ModalFooter>
-              <Button variant="primary" onClick={onClose}>
+              <Button variant="primary" size="lg" onClick={onClose}>
                 Close
               </Button>
             </ModalFooter>
@@ -1772,13 +1775,14 @@ function ConvertSplitModal({
             </div>
           </ModalBody>
           <ModalFooter>
-            <Button variant="secondary" onClick={onCancel}>
+            <Button variant="secondary" size="lg" onClick={onCancel}>
               Cancel
             </Button>
             <Button
               isLoading={fetcher.state !== "idle"}
               isDisabled={fetcher.state !== "idle"}
               type="submit"
+              size="lg"
               variant="primary"
             >
               Convert
@@ -1825,7 +1829,7 @@ function ScrapSplitModal({
           </ModalDescription>
         </ModalHeader>
         <ModalFooter>
-          <Button variant="secondary" onClick={onCancel}>
+          <Button variant="secondary" size="lg" onClick={onCancel}>
             Cancel
           </Button>
           <fetcher.Form
@@ -1840,6 +1844,7 @@ function ScrapSplitModal({
               isLoading={fetcher.state !== "idle"}
               isDisabled={fetcher.state !== "idle"}
               type="submit"
+              size="lg"
               variant="destructive"
             >
               Scrap

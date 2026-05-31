@@ -163,6 +163,19 @@ export const scrapQuantityValidator = baseQuantityValidator.extend({
   notes: zfd.text(z.string().optional())
 });
 
+export const triggerReworkValidator = z.object({
+  jobId: z.string().min(1),
+  triggeredAtJobOperationId: z.string().min(1),
+  targetJobOperationId: z
+    .string()
+    .min(1, { message: "Target operation is required" }),
+  reason: z.string().min(1, { message: "Reason is required" }),
+  quantity: zfd.numeric(
+    z.number().positive({ message: "Quantity must be greater than 0" })
+  ),
+  trackedEntityId: zfd.text(z.string().optional())
+});
+
 export const maintenanceDispatchValidator = z.object({
   workCenterId: z.string().min(1, { message: "Work Center is required" }),
   priority: z.enum(maintenanceDispatchPriority, {

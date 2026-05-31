@@ -234,7 +234,8 @@ export default function PartRoute() {
                                 quoteMaterials,
                                 salesOrderLines,
                                 shipmentLines,
-                                supplierQuotes
+                                supplierQuotes,
+                                jobMaterialUsage
                               } = resolvedUsedIn;
 
                               const tree: UsedInNode[] = [
@@ -340,6 +341,7 @@ export default function PartRoute() {
                                     partData.partSummary
                                       ?.readableIdWithRevision ?? ""
                                   }
+                                  jobMaterialUsage={jobMaterialUsage}
                                   filterText={filterText}
                                   hideSearch
                                 />
@@ -380,7 +382,8 @@ export default function PartRoute() {
                               quoteMaterials,
                               salesOrderLines,
                               shipmentLines,
-                              supplierQuotes
+                              supplierQuotes,
+                              jobMaterialUsage
                             } = resolvedUsedIn;
 
                             const tree: UsedInNode[] = [
@@ -486,6 +489,7 @@ export default function PartRoute() {
                                   partData.partSummary
                                     ?.readableIdWithRevision ?? ""
                                 }
+                                jobMaterialUsage={jobMaterialUsage}
                                 filterText={filterText}
                                 hideSearch
                               />

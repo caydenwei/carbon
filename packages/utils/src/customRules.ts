@@ -507,7 +507,8 @@ export type ValueOptionsLoader =
   | "storageTypes"
   | "itemTypes"
   | "replenishmentSystems"
-  | "itemTrackingTypes";
+  | "itemTrackingTypes"
+  | "itemPostingGroups";
 
 export type FieldContext =
   | "item"
@@ -628,11 +629,14 @@ const fields = {
 // `isSet`/`isNotSet` and authors can guard explicitly.
 //
 // Dropped vs. earlier drafts (kept here as audit trail):
-//   - item.itemPostingGroupId  → evaluator SELECT doesn't include the join
 //   - shelf.locationId         → `shelf` is not a RuleContext root key
 //   - transaction.locationId   → sometimes null per surface
 //   - operation.itemId         → null at operationStart (no item bound yet)
 //   - operation.workInstructionId → may be null on operations
+//
+// Re-added: `item.itemPostingGroupId` — the evaluator now embeds the 1:1
+// `itemCost` row and flattens its `itemPostingGroupId` onto the item ctx, so
+// the value is guaranteed for every item-target surface (all carry an itemId).
 export const FIELD_REGISTRY: FieldDef[] = [
   // ── Item context (item + storageUnit targets) ─────────────────────────────
   // All storageUnit-target surfaces (place, pick, stockTransfer,
@@ -671,6 +675,20 @@ export const FIELD_REGISTRY: FieldDef[] = [
     context: "item",
     targetType: ["item", "storageUnit"],
     valueOptionsLoader: "itemTrackingTypes"
+  }),
+  // Posting group lives on the 1:1 `itemCost` row, not `item`. The evaluator
+  // embeds it (see server.ts item SELECT) and flattens it onto the item ctx.
+  // Nullable because an item may have no posting group assigned.
+  fields.synthetic({
+    path: "item.itemPostingGroupId",
+    derivedFrom: "The item's posting group (from its itemCost row).",
+    nullable: true,
+    label: "Item posting group",
+    type: "id",
+    operators: ID_OPS,
+    context: "item",
+    targetType: ["item", "storageUnit"],
+    valueOptionsLoader: "itemPostingGroups"
   }),
 
   // ── StorageUnit context (item + storageUnit targets) ──────────────────────

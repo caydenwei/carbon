@@ -185,6 +185,13 @@ const LOADERS: Record<ValueOptionsLoader, LoaderFn | null> = {
       .eq("companyId", id);
     return (data ?? []) as { id: string; name: string }[];
   },
+  itemPostingGroups: async (c, id) => {
+    const { data } = await c
+      .from("itemPostingGroup")
+      .select("id, name")
+      .eq("companyId", id);
+    return (data ?? []) as { id: string; name: string }[];
+  },
   // Static enums — value is already the label.
   itemTypes: null,
   replenishmentSystems: null,
@@ -429,8 +436,10 @@ export async function evaluateLinesForSurface({
       itemIds.size > 0
         ? client
             .from("item")
+            // `itemPostingGroupId` lives on the 1:1 `itemCost` row — embed it
+            // so the `item.itemPostingGroupId` rule field resolves.
             .select(
-              "id, type, replenishmentSystem, itemTrackingType, name, readableId, customFields"
+              "id, type, replenishmentSystem, itemTrackingType, name, readableId, itemCost(itemPostingGroupId)"
             )
             .in("id", Array.from(itemIds))
         : Promise.resolve({ data: [], error: null }),
@@ -464,9 +473,17 @@ export async function evaluateLinesForSurface({
   for (const it of itemsRes.data ?? []) {
     const row = it as unknown as Record<string, unknown>;
     const readable = row.readableId as string | undefined;
+    // `itemCost` embeds as an array (typed one-to-many even though it's 1:1).
+    // Flatten its `itemPostingGroupId` onto the item ctx; drop the nested obj.
+    const { itemCost, ...rest } = row;
+    const cost = Array.isArray(itemCost) ? itemCost[0] : itemCost;
+    const itemPostingGroupId =
+      (cost as { itemPostingGroupId?: string | null } | undefined)
+        ?.itemPostingGroupId ?? undefined;
     itemsById.set(row.id as string, {
-      ...row,
-      id: readable ?? (row.id as string)
+      ...rest,
+      id: readable ?? (row.id as string),
+      itemPostingGroupId
     });
   }
 

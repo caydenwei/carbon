@@ -105,7 +105,9 @@ export async function action({ request, params }: ActionFunctionArgs) {
     const flashMessage =
       itemLedger.error === "Insufficient quantity for negative adjustment"
         ? "Insufficient quantity for negative adjustment"
-        : "Failed to create manual inventory adjustment";
+        : itemLedger.error === "Serial number not found"
+          ? "Serial number not found"
+          : "Failed to create manual inventory adjustment";
 
     throw redirect(
       path.to.inventoryItem(itemId),

@@ -73,9 +73,6 @@ msgstr "Agregar repuesto"
 msgid "All"
 msgstr "Todos"
 
-msgid "Are you sure you want to close out this operation? This will end all active production events for this operation."
-msgstr "¿Está seguro de que desea cerrar esta operación? Esto finalizará todos los eventos de producción activos para esta operación."
-
 msgid "Are you sure you want to delete this step?"
 msgstr "¿Está seguro de que desea eliminar este paso?"
 
@@ -84,6 +81,9 @@ msgstr "¿Está seguro de que desea eliminar esta tarjeta de tiempo? Esta acció
 
 msgid "Are you sure you want to end all production events? This will end all active operations without completing or finishing them."
 msgstr "¿Está seguro de que desea finalizar todos los eventos de producción? Esto terminará todas las operaciones activas sin completarlas ni finalizarlas."
+
+msgid "Are you sure you want to finish this operation? This will end all active production events for this operation."
+msgstr ""
 
 msgid "Are you sure you want to leave this page?"
 msgstr "¿Estás seguro de que quieres salir de esta página?"
@@ -165,19 +165,6 @@ msgstr "Registrar salida"
 msgid "Clocked in since {0}"
 msgstr "Registrado desde {0}"
 
-msgid "Close"
-msgstr "Cerrar"
-
-msgid "Close Anyways"
-msgstr "Cerrar de todos modos"
-
-msgid "Close Out"
-msgstr "Cerrar"
-
-#. placeholder {0}: operation.itemReadableId
-msgid "Close out {0}"
-msgstr "Cerrar {0}"
-
 #. placeholder {0}: active.data.current.column.title
 #. placeholder {1}: overColumnPosition + 1
 #. placeholder {2}: columnOrder.length
@@ -230,6 +217,9 @@ msgstr "Crear Problema"
 msgid "Create Quality Issue"
 msgstr "Crear Problema de Calidad"
 
+msgid "Create Rework"
+msgstr ""
+
 msgid "Customer"
 msgstr "Cliente"
 
@@ -258,6 +248,9 @@ msgstr "Eliminar tarjeta de tiempo ({0})"
 msgid "Describe the problem..."
 msgstr "Describe el problema..."
 
+msgid "Describe what needs to be reworked..."
+msgstr ""
+
 msgid "Description"
 msgstr "Descripción"
 
@@ -284,8 +277,8 @@ msgid "Dragging {0} cancelled."
 msgstr "Se canceló el arrastre de {0}."
 
 #. placeholder {0}: formatRelativeTime( convertDateStringToIsoString( operation.operationDueDate ) )
+#. placeholder {0}: formatRelativeTime( convertDateStringToIsoString( operation.operationDueDate ) )
 #. placeholder {0}: formatRelativeTime( convertDateStringToIsoString(operation.jobDueDate) )
-#. placeholder {0}: formatRelativeTime( convertDateStringToIsoString(item.dueDate) )
 msgid "Due {0}"
 msgstr "Vence {0}"
 
@@ -357,8 +350,21 @@ msgstr "Archivos relacionados con el trabajo y la línea de oportunidad."
 msgid "Filter"
 msgstr "Filtrar"
 
+msgid "Finish"
+msgstr ""
+
+#. placeholder {0}: operation.itemReadableId
+msgid "Finish {0}"
+msgstr ""
+
+msgid "Finish Anyways"
+msgstr ""
+
 msgid "Forgot to Clock Out?"
 msgstr "¿Olvidó registrar la salida?"
+
+msgid "Go back to operation"
+msgstr ""
 
 msgid "Have a technical issue? Contact <0>Carbon Support.</0>"
 msgstr "¿Tiene un problema técnico? Contacte al <0>Soporte de Carbon.</0>"
@@ -494,6 +500,9 @@ msgstr "Se alcanzó el número máximo de registros"
 
 msgid "Model"
 msgstr "Modelo"
+
+msgid "More Actions"
+msgstr ""
 
 msgid "More options"
 msgstr "Más opciones"
@@ -698,6 +707,9 @@ msgstr "Cantidad"
 msgid "Quantity must be greater than 0"
 msgstr "La cantidad debe ser mayor que 0"
 
+msgid "Reason for rework"
+msgstr ""
+
 msgid "Recent"
 msgstr "Recientes"
 
@@ -720,6 +732,12 @@ msgstr "Eliminar inventario"
 msgid "Remove part"
 msgstr "Eliminar pieza"
 
+msgid "Rework"
+msgstr ""
+
+msgid "Rework created successfully"
+msgstr ""
+
 msgid "Sales Order"
 msgstr "Orden de venta"
 
@@ -734,6 +752,9 @@ msgstr "Escanee o ingrese el número de serie"
 
 msgid "Schedule"
 msgstr "Programación"
+
+msgid "Scrap"
+msgstr ""
 
 msgid "Scrap Reason"
 msgstr "Motivo de desperdicio"
@@ -784,6 +805,9 @@ msgstr "Seleccionar serie {0}"
 
 msgid "Select Serial Number"
 msgstr "Seleccionar número de serie"
+
+msgid "Select the operation to go back to. All operations from that point to the current operation will be redone."
+msgstr ""
 
 msgid "Send"
 msgstr "Enviar"

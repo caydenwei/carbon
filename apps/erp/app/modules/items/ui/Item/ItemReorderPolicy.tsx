@@ -111,6 +111,15 @@ function calculateOrders({ itemPlanning, periods }: BaseOrderParams): {
   quantity: number;
   periodId: string;
   isASAP: boolean;
+  policyName?: string;
+  triggerValues?: {
+    projectedStock?: number;
+    safetyStock?: number;
+    reorderPoint?: number;
+    reorderQuantity?: number;
+    lotSize?: number;
+    leadTime?: number;
+  };
 }[] {
   // Check cache first
   const cacheKey = getCacheKey(itemPlanning, periods);
@@ -125,6 +134,15 @@ function calculateOrders({ itemPlanning, periods }: BaseOrderParams): {
       quantity: number;
       periodId: string;
       isASAP: boolean;
+      policyName?: string;
+      triggerValues?: {
+        projectedStock?: number;
+        safetyStock?: number;
+        reorderPoint?: number;
+        reorderQuantity?: number;
+        lotSize?: number;
+        leadTime?: number;
+      };
     }[] = [];
     ordersCache.set(cacheKey, emptyOrders);
     return emptyOrders;
@@ -136,6 +154,15 @@ function calculateOrders({ itemPlanning, periods }: BaseOrderParams): {
     quantity: number;
     periodId: string;
     isASAP: boolean;
+    policyName?: string;
+    triggerValues?: {
+      projectedStock?: number;
+      safetyStock?: number;
+      reorderPoint?: number;
+      reorderQuantity?: number;
+      lotSize?: number;
+      leadTime?: number;
+    };
   }[] = [];
 
   const {
@@ -156,26 +183,56 @@ function calculateOrders({ itemPlanning, periods }: BaseOrderParams): {
 
   switch (itemPlanning.reorderingPolicy) {
     case "Demand-Based Reorder":
-      // Process periods in chunks of demandAccumulationPeriod
+      // Process periods in chunks of demandAccumulationPeriod.
+      //
+      // For each window we want two things:
+      //  1. Trigger date = the FIRST period in the window where the running
+      //     projected balance dips below safety stock. The order has to
+      //     arrive by then.
+      //  2. Order size = enough to lift the WORST dip (the minimum balance
+      //     anywhere in the window) back to safety stock. Sizing against
+      //     end-of-window alone is incorrect when demand is lumpy and the
+      //     balance dips mid-window but recovers via scheduled supply.
+      //
+      // If no period in the window dips below safety stock, skip the window
+      // entirely (no order needed).
       for (let i = 0; i < periods.length; i += demandAccumulationPeriod) {
-        const currentPeriod = periods[i];
+        const windowEnd = Math.min(
+          i + demandAccumulationPeriod,
+          periods.length
+        );
 
-        // Calculate total demand for accumulation period
-        let projectedStock = 0;
-        for (
-          let j = i;
-          j < Math.min(i + demandAccumulationPeriod, periods.length);
-          j++
-        ) {
+        let firstDipIndex = -1;
+        let minProjection = Number.POSITIVE_INFINITY;
+
+        for (let j = i; j < windowEnd; j++) {
           const periodKey = `week${j + 1}` as "week1";
           const periodProjection = (itemPlanning[periodKey] as number) || 0;
-          projectedStock = periodProjection + orderedQuantity;
+          if (
+            firstDipIndex === -1 &&
+            periodProjection + orderedQuantity < demandAccumulationSafetyStock
+          ) {
+            firstDipIndex = j;
+          }
+          if (periodProjection < minProjection) {
+            minProjection = periodProjection;
+          }
         }
 
-        // If projected stock is below safety stock, create order
-        if (projectedStock < demandAccumulationSafetyStock) {
-          let totalOrderQuantity =
-            demandAccumulationSafetyStock - projectedStock;
+        // Window is fully safe — no period dips below safety stock.
+        if (firstDipIndex === -1) continue;
+
+        const currentPeriod = periods[firstDipIndex];
+        const effectiveMinBalance = minProjection + orderedQuantity;
+
+        // Size so the worst dip in the window is brought up to safety stock.
+        // Clamp to >= 0 — if effectiveMinBalance happens to already be at
+        // safety stock (edge case), no qty needed before MOQ kicks in.
+        {
+          let totalOrderQuantity = Math.max(
+            0,
+            demandAccumulationSafetyStock - effectiveMinBalance
+          );
 
           // Apply lot sizing rules
           if (maximumOrderQuantity > 0) {
@@ -219,7 +276,14 @@ function calculateOrders({ itemPlanning, periods }: BaseOrderParams): {
                 dueDate: dueDate.toString(),
                 quantity: batchQuantity,
                 periodId: currentPeriod.id,
-                isASAP: startDate.compare(todaysDate) < 0
+                isASAP: startDate.compare(todaysDate) < 0,
+                policyName: "Demand-Based Reorder",
+                triggerValues: {
+                  projectedStock: effectiveMinBalance,
+                  safetyStock: demandAccumulationSafetyStock,
+                  lotSize,
+                  leadTime
+                }
               });
             }
           } else {
@@ -237,7 +301,14 @@ function calculateOrders({ itemPlanning, periods }: BaseOrderParams): {
               dueDate: dueDate.toString(),
               quantity: orderQuantity,
               periodId: currentPeriod.id,
-              isASAP: startDate.compare(todaysDate) < 0
+              isASAP: startDate.compare(todaysDate) < 0,
+              policyName: "Demand-Based Reorder",
+              triggerValues: {
+                projectedStock: effectiveMinBalance,
+                safetyStock: demandAccumulationSafetyStock,
+                lotSize,
+                leadTime
+              }
             });
           }
 
@@ -274,7 +345,14 @@ function calculateOrders({ itemPlanning, periods }: BaseOrderParams): {
             dueDate: dueDate.toString(),
             quantity: orderQuantity,
             periodId: period.id,
-            isASAP: startDate.compare(todaysDate) < 0
+            isASAP: startDate.compare(todaysDate) < 0,
+            policyName: "Fixed Reorder Quantity",
+            triggerValues: {
+              projectedStock: projectedQuantity + orderedQuantity,
+              reorderPoint,
+              reorderQuantity,
+              leadTime
+            }
           });
           day++;
           orderedQuantity += orderQuantity;
@@ -341,7 +419,14 @@ function calculateOrders({ itemPlanning, periods }: BaseOrderParams): {
             periodId: period.id,
             isASAP:
               startDate.compare(todaysDate) < 0 &&
-              projectedQuantity + orderedQuantity < 0
+              projectedQuantity + orderedQuantity < 0,
+            policyName: "Maximum Quantity",
+            triggerValues: {
+              projectedStock: projectedQuantity + orderedQuantity,
+              reorderPoint,
+              leadTime,
+              reorderQuantity
+            }
           });
           day++;
           orderedQuantity += orderQuantity;

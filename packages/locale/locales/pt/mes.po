@@ -73,9 +73,6 @@ msgstr "Adicionar Peça Sobressalente"
 msgid "All"
 msgstr "Todos"
 
-msgid "Are you sure you want to close out this operation? This will end all active production events for this operation."
-msgstr "Tem certeza de que deseja encerrar esta operação? Isso encerrará todos os eventos de produção ativos desta operação."
-
 msgid "Are you sure you want to delete this step?"
 msgstr "Tem certeza de que deseja excluir esta etapa?"
 
@@ -84,6 +81,9 @@ msgstr "Tem certeza de que deseja excluir este cartão de ponto? Esta ação nã
 
 msgid "Are you sure you want to end all production events? This will end all active operations without completing or finishing them."
 msgstr "Tem certeza de que deseja encerrar todos os eventos de produção? Isso encerrará todas as operações ativas sem concluí-las ou finalizá-las."
+
+msgid "Are you sure you want to finish this operation? This will end all active production events for this operation."
+msgstr ""
 
 msgid "Are you sure you want to leave this page?"
 msgstr "Tem certeza que deseja sair desta página?"
@@ -165,19 +165,6 @@ msgstr "Registrar Saída"
 msgid "Clocked in since {0}"
 msgstr "Registrado desde {0}"
 
-msgid "Close"
-msgstr "Fechar"
-
-msgid "Close Anyways"
-msgstr "Fechar Mesmo Assim"
-
-msgid "Close Out"
-msgstr "Encerrar"
-
-#. placeholder {0}: operation.itemReadableId
-msgid "Close out {0}"
-msgstr "Encerrar {0}"
-
 #. placeholder {0}: active.data.current.column.title
 #. placeholder {1}: overColumnPosition + 1
 #. placeholder {2}: columnOrder.length
@@ -230,6 +217,9 @@ msgstr "Criar Problema"
 msgid "Create Quality Issue"
 msgstr "Criar Problema de Qualidade"
 
+msgid "Create Rework"
+msgstr ""
+
 msgid "Customer"
 msgstr "Cliente"
 
@@ -258,6 +248,9 @@ msgstr "Excluir Cartão de Ponto ({0})"
 msgid "Describe the problem..."
 msgstr "Descreva o problema..."
 
+msgid "Describe what needs to be reworked..."
+msgstr ""
+
 msgid "Description"
 msgstr "Descrição"
 
@@ -284,8 +277,8 @@ msgid "Dragging {0} cancelled."
 msgstr "Arraste de {0} cancelado."
 
 #. placeholder {0}: formatRelativeTime( convertDateStringToIsoString( operation.operationDueDate ) )
+#. placeholder {0}: formatRelativeTime( convertDateStringToIsoString( operation.operationDueDate ) )
 #. placeholder {0}: formatRelativeTime( convertDateStringToIsoString(operation.jobDueDate) )
-#. placeholder {0}: formatRelativeTime( convertDateStringToIsoString(item.dueDate) )
 msgid "Due {0}"
 msgstr "Vencimento {0}"
 
@@ -357,8 +350,21 @@ msgstr "Arquivos relacionados ao trabalho e à linha de oportunidade."
 msgid "Filter"
 msgstr "Filtro"
 
+msgid "Finish"
+msgstr ""
+
+#. placeholder {0}: operation.itemReadableId
+msgid "Finish {0}"
+msgstr ""
+
+msgid "Finish Anyways"
+msgstr ""
+
 msgid "Forgot to Clock Out?"
 msgstr "Esqueceu de Registrar Saída?"
+
+msgid "Go back to operation"
+msgstr ""
 
 msgid "Have a technical issue? Contact <0>Carbon Support.</0>"
 msgstr "Tem um problema técnico? Entre em contato com o <0>Suporte Carbon.</0>"
@@ -494,6 +500,9 @@ msgstr "Número máximo de registros atingido"
 
 msgid "Model"
 msgstr "Modelo"
+
+msgid "More Actions"
+msgstr ""
 
 msgid "More options"
 msgstr "Mais opções"
@@ -698,6 +707,9 @@ msgstr "Quantidade"
 msgid "Quantity must be greater than 0"
 msgstr "Quantidade deve ser maior que 0"
 
+msgid "Reason for rework"
+msgstr ""
+
 msgid "Recent"
 msgstr "Recente"
 
@@ -720,6 +732,12 @@ msgstr "Remover Estoque"
 msgid "Remove part"
 msgstr "Remover peça"
 
+msgid "Rework"
+msgstr ""
+
+msgid "Rework created successfully"
+msgstr ""
+
 msgid "Sales Order"
 msgstr "Pedido de Venda"
 
@@ -734,6 +752,9 @@ msgstr "Escanear ou inserir número de série"
 
 msgid "Schedule"
 msgstr "Cronograma"
+
+msgid "Scrap"
+msgstr ""
 
 msgid "Scrap Reason"
 msgstr "Motivo do Refugo"
@@ -784,6 +805,9 @@ msgstr "Selecionar Série {0}"
 
 msgid "Select Serial Number"
 msgstr "Selecionar Número de Série"
+
+msgid "Select the operation to go back to. All operations from that point to the current operation will be redone."
+msgstr ""
 
 msgid "Send"
 msgstr "Enviar"

@@ -136,6 +136,9 @@ export const path = {
     refreshSession: "/refresh-session",
     requestAccess: "/request-access",
     rework: `${x}/rework`,
+    reworkTargets: (operationId: string) =>
+      generatePath(`${x}/rework-targets/${operationId}`),
+    triggerRework: `${x}/trigger-rework`,
     root: "/",
     scrap: `${x}/scrap`,
     scrapReasons: `${api}/scrap-reasons`,

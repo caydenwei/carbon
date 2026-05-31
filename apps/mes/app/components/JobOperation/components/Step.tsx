@@ -131,6 +131,7 @@ export function StepsListItem({
                   <IconButton
                     aria-label="Update step"
                     variant="secondary"
+                    size="lg"
                     icon={<LuCircleCheck />}
                     isDisabled={record?.createdBy !== user?.id}
                     onClick={() => onRecord(step)}
@@ -149,6 +150,7 @@ export function StepsListItem({
                 ) : (
                   <Button
                     variant="secondary"
+                    size="lg"
                     rightIcon={<LuCircleCheck />}
                     onClick={() => onRecord(step)}
                   >
@@ -158,6 +160,7 @@ export function StepsListItem({
               <IconButton
                 aria-label="Delete step"
                 variant="secondary"
+                size="lg"
                 icon={<LuTrash />}
                 isDisabled={record?.createdBy !== user?.id}
                 onClick={() => onDelete(step)}
@@ -173,6 +176,7 @@ export function StepsListItem({
                 <IconButton
                   aria-label="Record step"
                   variant="secondary"
+                  size="lg"
                   icon={<LuCircleCheck />}
                   type="submit"
                   isLoading={fetcher.state !== "idle"}
@@ -182,6 +186,7 @@ export function StepsListItem({
                 <Button
                   type="submit"
                   variant="secondary"
+                  size="lg"
                   rightIcon={<LuCircleCheck />}
                   isLoading={fetcher.state !== "idle"}
                   isDisabled={fetcher.state !== "idle"}
@@ -194,12 +199,14 @@ export function StepsListItem({
             <IconButton
               aria-label="Record step"
               variant="secondary"
+              size="lg"
               icon={<LuCircleCheck />}
               onClick={() => onRecord(step)}
             />
           ) : (
             <Button
               variant="secondary"
+              size="lg"
               rightIcon={<LuCircleCheck />}
               onClick={() => onRecord(step)}
             >
@@ -212,6 +219,7 @@ export function StepsListItem({
                 disclosure.isOpen ? "Hide description" : "Show description"
               }
               variant="ghost"
+              size="lg"
               isDisabled={!hasDescription}
               icon={disclosure.isOpen ? <LuChevronDown /> : <LuChevronRight />}
               onClick={disclosure.onToggle}
@@ -468,13 +476,13 @@ export function RecordModal({
                 />
               )}
               {attribute.type === "Value" && (
-                <InputField name="value" label="" />
+                <InputField name="value" label="" size="lg" />
               )}
               {attribute.type === "Measurement" && (
-                <Number name="numericValue" label="" />
+                <Number name="numericValue" label="" size="lg" />
               )}
               {attribute.type === "Timestamp" && (
-                <DateTimePicker name="value" label="" />
+                <DateTimePicker name="value" label="" size="lg" />
               )}
               {attribute.type === "Checkbox" && (
                 <Switch
@@ -483,12 +491,18 @@ export function RecordModal({
                 />
               )}
               {attribute.type === "Person" && (
-                <Combobox name="userValue" label="" options={employeeOptions} />
+                <Combobox
+                  name="userValue"
+                  label=""
+                  options={employeeOptions}
+                  size="lg"
+                />
               )}
               {attribute.type === "List" && (
                 <Select
                   name="value"
                   label=""
+                  size="lg"
                   options={(attribute.listValues ?? []).map((value) => ({
                     label: value,
                     value
@@ -552,10 +566,11 @@ export function RecordModal({
             </VStack>
           </ModalBody>
           <ModalFooter>
-            <Button variant="secondary" onClick={onClose}>
+            <Button variant="secondary" size="lg" onClick={onClose}>
               <Trans>Cancel</Trans>
             </Button>
             <Submit
+              size="lg"
               isLoading={fetcher.state !== "idle"}
               isDisabled={
                 fetcher.state !== "idle" ||
@@ -600,11 +615,12 @@ export function DeleteStepRecordModal({
           <ModalDescription>{description}</ModalDescription>
         </ModalHeader>
         <ModalFooter>
-          <Button variant="secondary" onClick={onClose}>
+          <Button variant="secondary" size="lg" onClick={onClose}>
             <Trans>Cancel</Trans>
           </Button>
           <fetcher.Form method="post" action={path.to.recordDelete(id)}>
             <Button
+              size="lg"
               isLoading={fetcher.state !== "idle"}
               isDisabled={fetcher.state !== "idle"}
               type="submit"

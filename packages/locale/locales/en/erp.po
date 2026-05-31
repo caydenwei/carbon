@@ -2473,6 +2473,12 @@ msgstr "Demand"
 msgid "Demand Forecast"
 msgstr "Demand Forecast"
 
+msgid "Demand Forecast — Driven by"
+msgstr "Demand Forecast — Driven by"
+
+msgid "Demand forecast = BOM-exploded demand from open sales orders, active jobs, and production projections."
+msgstr "Demand forecast = BOM-exploded demand from open sales orders, active jobs, and production projections."
+
 msgid "Demand Projections"
 msgstr "Demand Projections"
 
@@ -2631,6 +2637,9 @@ msgstr "Drop Shipment Statuses"
 
 msgid "Drop your file here, or click to browse."
 msgstr "Drop your file here, or click to browse."
+
+msgid "Due"
+msgstr "Due"
 
 #. placeholder {0}: formatRelativeTime( convertDateStringToIsoString(dueDate) )
 msgid "Due {0}"
@@ -3679,6 +3688,10 @@ msgstr "For growing businesses that need support"
 msgid "For US companies handling ITAR data"
 msgstr "For US companies handling ITAR data"
 
+#. placeholder {0}: forecastMethod ?? "unknown"
+msgid "Forecast method: <0>{0}</0>. This row was not derived from active jobs, so no parent sources are available."
+msgstr "Forecast method: <0>{0}</0>. This row was not derived from active jobs, so no parent sources are available."
+
 msgid "Forgot to Clock Out?"
 msgstr "Forgot to Clock Out?"
 
@@ -3819,6 +3832,9 @@ msgstr "Hours/Piece"
 
 msgid "How the resolved price was calculated."
 msgstr "How the resolved price was calculated."
+
+msgid "How this price was calculated"
+msgstr "How this price was calculated"
 
 msgid "Humidity"
 msgstr "Humidity"
@@ -3984,6 +4000,9 @@ msgstr "Internal"
 
 msgid "Internal Notes"
 msgstr "Internal Notes"
+
+msgid "inv"
+msgstr "inv"
 
 msgid "Invalid Invite"
 msgstr "Invalid Invite"
@@ -4264,6 +4283,9 @@ msgstr "Last updated: {formattedDate}"
 msgid "Lead Time"
 msgstr "Lead Time"
 
+msgid "Lead time (days)"
+msgstr "Lead time (days)"
+
 msgid "Lead Time (Days)"
 msgstr "Lead Time (Days)"
 
@@ -4344,6 +4366,9 @@ msgstr "Link Linear Issue"
 msgid "Linked entity quantity ({0}) does not match row quantity ({1})."
 msgstr "Linked entity quantity ({0}) does not match row quantity ({1})."
 
+msgid "Linked PO"
+msgstr "Linked PO"
+
 msgid "List Options"
 msgstr "List Options"
 
@@ -4410,6 +4435,9 @@ msgstr "Lost"
 
 msgid "Lot"
 msgstr "Lot"
+
+msgid "Lot size"
+msgstr "Lot size"
 
 msgid "Lot Size"
 msgstr "Lot Size"
@@ -4813,6 +4841,9 @@ msgstr "Navigate"
 
 msgid "NCRs by Type"
 msgstr "NCRs by Type"
+
+msgid "Need by"
+msgstr "Need by"
 
 msgid "Negative Adjustment"
 msgstr "Negative Adjustment"
@@ -5224,6 +5255,9 @@ msgstr "No outstanding trainings"
 msgid "No overtime scheduled"
 msgstr "No overtime scheduled"
 
+msgid "No parent sources recorded yet. Click Recalculate on the planning page to refresh attribution."
+msgstr "No parent sources recorded yet. Click Recalculate on the planning page to refresh attribution."
+
 msgid "No part ID"
 msgstr "No part ID"
 
@@ -5473,6 +5507,9 @@ msgstr "Options"
 msgid "Order"
 msgstr "Order"
 
+msgid "Order by"
+msgstr "Order by"
+
 msgid "Order Date"
 msgstr "Order Date"
 
@@ -5577,6 +5614,9 @@ msgstr "Parent Department"
 
 msgid "Parent Group"
 msgstr "Parent Group"
+
+msgid "Parent Item"
+msgstr "Parent Item"
 
 msgid "Parent Storage Unit"
 msgstr "Parent Storage Unit"
@@ -5719,6 +5759,12 @@ msgstr "Planned End"
 msgid "Planned End Time"
 msgstr "Planned End Time"
 
+msgid "Planned Order"
+msgstr "Planned Order"
+
+msgid "Planned order = MRP suggestion to cover projected demand based on the item's reorder policy (or manually added)."
+msgstr "Planned order = MRP suggestion to cover projected demand based on the item's reorder policy (or manually added)."
+
 msgid "Planned Start"
 msgstr "Planned Start"
 
@@ -5763,6 +5809,9 @@ msgstr "PO Number"
 
 msgid "PO PDF"
 msgstr "PO PDF"
+
+msgid "Policy"
+msgstr "Policy"
 
 msgid "Policy & Procedure"
 msgstr "Policy & Procedure"
@@ -5932,6 +5981,12 @@ msgstr "Progress"
 msgid "Project"
 msgstr "Project"
 
+msgid "Projected stock"
+msgstr "Projected stock"
+
+msgid "Projection"
+msgstr "Projection"
+
 msgid "Projections"
 msgstr "Projections"
 
@@ -6038,6 +6093,9 @@ msgstr "QR Code to create a {0} for this kanban"
 msgid "QR Code to start the next operation for this kanban"
 msgstr "QR Code to start the next operation for this kanban"
 
+msgid "Qty"
+msgstr "Qty"
+
 msgid "Qty to Order"
 msgstr "Qty to Order"
 
@@ -6100,6 +6158,10 @@ msgstr "Quantity per Parent"
 
 msgid "Quantity Type"
 msgstr "Quantity Type"
+
+#. placeholder {0}: numberFormatter.format(forecastQuantity)
+msgid "Quantity: {0}"
+msgstr "Quantity: {0}"
 
 msgid "Question"
 msgstr "Question"
@@ -6567,6 +6629,9 @@ msgstr "Run Test"
 
 msgid "Running Total"
 msgstr "Running Total"
+
+msgid "Safety stock"
+msgstr "Safety stock"
 
 msgid "Safety Stock"
 msgstr "Safety Stock"
@@ -7653,6 +7718,9 @@ msgstr "The billing address used on quotes, sales orders, invoices, and other sa
 msgid "The date the customer expects to receive the goods"
 msgstr "The date the customer expects to receive the goods"
 
+msgid "The date the item is required on-site to cover the period's projected demand."
+msgstr "The date the item is required on-site to cover the period's projected demand."
+
 msgid "The endpoint that receives a POST request with the updated data when the table is updated"
 msgstr "The endpoint that receives a POST request with the updated data when the table is updated"
 
@@ -7661,6 +7729,9 @@ msgstr "The following assemblies have no operations. Please assign an operation 
 
 msgid "The following line items are missing prices or lead times:"
 msgstr "The following line items are missing prices or lead times:"
+
+msgid "The latest date to place this PO so it arrives by the need-by date, given the supplier's lead time."
+msgstr "The latest date to place this PO so it arrives by the need-by date, given the supplier's lead time."
 
 msgid "The lot will still be rejected, but an NCR cannot be auto-created until at least one Issue Type is configured."
 msgstr "The lot will still be rejected, but an NCR cannot be auto-created until at least one Issue Type is configured."
@@ -8066,6 +8137,9 @@ msgstr "Unit of Measure"
 
 msgid "Unit of Measures"
 msgstr "Unit of Measures"
+
+msgid "Unit price"
+msgstr "Unit price"
 
 msgid "Unit Price"
 msgstr "Unit Price"
@@ -8573,6 +8647,9 @@ msgstr "Who should receive notifications when an inventory job is completed?"
 
 msgid "Why is the expiration being changed?"
 msgstr "Why is the expiration being changed?"
+
+msgid "Why is this included?"
+msgstr "Why is this included?"
 
 msgid "WIP"
 msgstr "WIP"

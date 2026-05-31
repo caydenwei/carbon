@@ -2473,6 +2473,12 @@ msgstr "需求"
 msgid "Demand Forecast"
 msgstr "需求预测"
 
+msgid "Demand Forecast — Driven by"
+msgstr "需求预测 — 驱动因素"
+
+msgid "Demand forecast = BOM-exploded demand from open sales orders, active jobs, and production projections."
+msgstr "需求预测 = 来自未结销售订单、活跃工作和生产预测的物料清单展开需求。"
+
 msgid "Demand Projections"
 msgstr "需求预测"
 
@@ -2631,6 +2637,9 @@ msgstr "直运状态"
 
 msgid "Drop your file here, or click to browse."
 msgstr "将文件拖放到此处，或点击浏览。"
+
+msgid "Due"
+msgstr "到期"
 
 #. placeholder {0}: formatRelativeTime( convertDateStringToIsoString(dueDate) )
 msgid "Due {0}"
@@ -3679,6 +3688,10 @@ msgstr "适合需要支持的成长型企业"
 msgid "For US companies handling ITAR data"
 msgstr "适用于处理ITAR数据的美国公司"
 
+#. placeholder {0}: forecastMethod ?? "unknown"
+msgid "Forecast method: <0>{0}</0>. This row was not derived from active jobs, so no parent sources are available."
+msgstr "预测方法：<0>{0}</0>。此行不是从活跃工作派生的，因此没有可用的父源。"
+
 msgid "Forgot to Clock Out?"
 msgstr "忘记打卡下班了？"
 
@@ -3819,6 +3832,9 @@ msgstr "小时/件"
 
 msgid "How the resolved price was calculated."
 msgstr "已解决价格的计算方式。"
+
+msgid "How this price was calculated"
+msgstr "此价格是如何计算的"
 
 msgid "Humidity"
 msgstr "湿度"
@@ -3984,6 +4000,9 @@ msgstr "内部"
 
 msgid "Internal Notes"
 msgstr "内部备注"
+
+msgid "inv"
+msgstr "库存"
 
 msgid "Invalid Invite"
 msgstr "无效邀请"
@@ -4264,6 +4283,9 @@ msgstr "最后更新: {formattedDate}"
 msgid "Lead Time"
 msgstr "提前期"
 
+msgid "Lead time (days)"
+msgstr "提前期（天）"
+
 msgid "Lead Time (Days)"
 msgstr "交期（天）"
 
@@ -4344,6 +4366,9 @@ msgstr "关联 Linear 问题"
 msgid "Linked entity quantity ({0}) does not match row quantity ({1})."
 msgstr "关联实体数量 ({0}) 与行数量 ({1}) 不匹配。"
 
+msgid "Linked PO"
+msgstr "关联采购订单"
+
 msgid "List Options"
 msgstr "列表选项"
 
@@ -4410,6 +4435,9 @@ msgstr "已失败"
 
 msgid "Lot"
 msgstr "批次"
+
+msgid "Lot size"
+msgstr "批量大小"
 
 msgid "Lot Size"
 msgstr "批量大小"
@@ -4813,6 +4841,9 @@ msgstr "导航"
 
 msgid "NCRs by Type"
 msgstr "按类型分类的不符合项"
+
+msgid "Need by"
+msgstr "需要日期"
 
 msgid "Negative Adjustment"
 msgstr "负调整"
@@ -5224,6 +5255,9 @@ msgstr "没有未完成的培训"
 msgid "No overtime scheduled"
 msgstr "没有安排加班"
 
+msgid "No parent sources recorded yet. Click Recalculate on the planning page to refresh attribution."
+msgstr "尚未记录任何父源。点击计划页面上的\"重新计算\"以刷新归因。"
+
 msgid "No part ID"
 msgstr "无零件ID"
 
@@ -5473,6 +5507,9 @@ msgstr "选项"
 msgid "Order"
 msgstr "订单"
 
+msgid "Order by"
+msgstr "订购截止日期"
+
 msgid "Order Date"
 msgstr "订单日期"
 
@@ -5577,6 +5614,9 @@ msgstr "上级部门"
 
 msgid "Parent Group"
 msgstr "上级组"
+
+msgid "Parent Item"
+msgstr "父项目"
 
 msgid "Parent Storage Unit"
 msgstr "父存储单元"
@@ -5719,6 +5759,12 @@ msgstr "计划结束"
 msgid "Planned End Time"
 msgstr "计划结束时间"
 
+msgid "Planned Order"
+msgstr "计划订单"
+
+msgid "Planned order = MRP suggestion to cover projected demand based on the item's reorder policy (or manually added)."
+msgstr "计划订单 = MRP 建议，用于根据物品的重新订购政策（或手动添加）覆盖预计需求。"
+
 msgid "Planned Start"
 msgstr "计划开始"
 
@@ -5763,6 +5809,9 @@ msgstr "采购订单号"
 
 msgid "PO PDF"
 msgstr "采购订单 PDF"
+
+msgid "Policy"
+msgstr "政策"
 
 msgid "Policy & Procedure"
 msgstr "政策与程序"
@@ -5932,6 +5981,12 @@ msgstr "进度"
 msgid "Project"
 msgstr "项目"
 
+msgid "Projected stock"
+msgstr "预计库存"
+
+msgid "Projection"
+msgstr "预测"
+
 msgid "Projections"
 msgstr "预测"
 
@@ -6038,6 +6093,9 @@ msgstr "二维码以为此看板创建{0}"
 msgid "QR Code to start the next operation for this kanban"
 msgstr "二维码用于启动此看板的下一个操作"
 
+msgid "Qty"
+msgstr "数量"
+
 msgid "Qty to Order"
 msgstr "订购数量"
 
@@ -6100,6 +6158,10 @@ msgstr "每个父项的数量"
 
 msgid "Quantity Type"
 msgstr "数量类型"
+
+#. placeholder {0}: numberFormatter.format(forecastQuantity)
+msgid "Quantity: {0}"
+msgstr "数量：{0}"
 
 msgid "Question"
 msgstr "问题"
@@ -6567,6 +6629,9 @@ msgstr "运行测试"
 
 msgid "Running Total"
 msgstr "运行总计"
+
+msgid "Safety stock"
+msgstr "安全库存"
 
 msgid "Safety Stock"
 msgstr "安全库存"
@@ -7653,6 +7718,9 @@ msgstr "用于报价单、销售订单、发票和其他销售文件的账单地
 msgid "The date the customer expects to receive the goods"
 msgstr "客户期望收到货物的日期"
 
+msgid "The date the item is required on-site to cover the period's projected demand."
+msgstr "该项目需要在现场到达的日期，以满足该期间的预计需求。"
+
 msgid "The endpoint that receives a POST request with the updated data when the table is updated"
 msgstr "接收表格更新时包含更新数据的POST请求的端点"
 
@@ -7661,6 +7729,9 @@ msgstr "以下装配体没有操作。请在发布前为每个装配体分配一
 
 msgid "The following line items are missing prices or lead times:"
 msgstr "以下行项目缺少价格或交货期："
+
+msgid "The latest date to place this PO so it arrives by the need-by date, given the supplier's lead time."
+msgstr "最迟下达此采购订单的日期，以便在考虑供应商交货期的情况下按需求日期前送达。"
 
 msgid "The lot will still be rejected, but an NCR cannot be auto-created until at least one Issue Type is configured."
 msgstr "该批次仍将被拒收，但在至少配置一个问题类型之前，无法自动创建NCR。"
@@ -8066,6 +8137,9 @@ msgstr "计量单位"
 
 msgid "Unit of Measures"
 msgstr "计量单位"
+
+msgid "Unit price"
+msgstr "单价"
 
 msgid "Unit Price"
 msgstr "单价"
@@ -8573,6 +8647,9 @@ msgstr "当库存工作完成时，谁应该收到通知？"
 
 msgid "Why is the expiration being changed?"
 msgstr "为什么要更改过期日期？"
+
+msgid "Why is this included?"
+msgstr "为什么包括这个？"
 
 msgid "WIP"
 msgstr "在制品"

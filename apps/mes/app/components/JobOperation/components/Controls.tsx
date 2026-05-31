@@ -41,7 +41,7 @@ export function Controls({
   return (
     <div
       className={cn(
-        "flex flex-col relative z-[60] md:absolute p-2 md:top-[calc(var(--header-height)*2-2px)] md:right-0 w-full md:w-[var(--controls-width)] md:min-h-[180px] bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 md:border-l border-y md:rounded-bl-lg",
+        "flex flex-col relative z-[40] md:absolute p-2 md:top-[calc(var(--header-height)*2-2px)] md:right-0 w-full md:w-[var(--controls-width)] md:min-h-[180px] bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 md:border-l border-y md:rounded-bl-lg",
         className
       )}
     >

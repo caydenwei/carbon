@@ -106,13 +106,20 @@ export const PurchasingPlanningOrderDrawer = memo(
         ?.from("openPurchaseOrderLines")
         .select("*")
         .eq("itemId", selectedItem.id)
-        .in("status", ["Draft", "Planned"]);
+        .in("status", [
+          "To Review",
+          "Needs Approval",
+          "Planned",
+          "To Receive",
+          "To Receive and Invoice",
+          "To Invoice"
+        ]);
 
       if (existingOrderData) {
         const existingOrders: PlannedOrder[] = existingOrderData
           .filter(
             (order) =>
-              !orders.some((existing) => existing.existingId === order.id)
+              !orders.some((existing) => existing.existingLineId === order.id)
           )
           .map((order) => {
             const dueDate = order.dueDate;
@@ -228,7 +235,17 @@ export const PurchasingPlanningOrderDrawer = memo(
 
     const onSubmit = useCallback(
       (id: string, orders: PlannedOrder[]) => {
-        const ordersWithPeriods = orders.map((order) => {
+        // Skip existing PO lines that are past the Planned stage — their
+        // quantity/due-date inputs are disabled in the UI, so the user can't
+        // have edited them, and we don't want the action to issue UPDATEs
+        // against already-shipped lines.
+        const editableOrders = orders.filter(
+          (order) =>
+            !order.existingLineId ||
+            order.existingStatus === "Draft" ||
+            order.existingStatus === "Planned"
+        );
+        const ordersWithPeriods = editableOrders.map((order) => {
           if (
             !order.dueDate ||
             parseDate(order.dueDate) < parseDate(periods[0].startDate)
@@ -643,9 +660,20 @@ export const PurchasingPlanningOrderDrawer = memo(
                     </Thead>
                     <Tbody>
                       {orders.map((order, index) => {
+                        // Lock the row when (a) the selected supplier differs
+                        // from the order's supplier, or (b) the existing PO
+                        // line is past the Planned stage (already shipped /
+                        // being received / being invoiced). Once committed
+                        // to the supplier, mutating quantity or due date
+                        // would desync the receiving workflow.
+                        const isPostPlannedExisting =
+                          !!order.existingLineId &&
+                          order.existingStatus !== "Draft" &&
+                          order.existingStatus !== "Planned";
                         const isDisabled =
-                          selectedSupplier !== order.supplierId &&
-                          !!order.existingId;
+                          (selectedSupplier !== order.supplierId &&
+                            !!order.existingId) ||
+                          isPostPlannedExisting;
 
                         return (
                           <Tr key={index}>
@@ -704,6 +732,7 @@ export const PurchasingPlanningOrderDrawer = memo(
                                       ? parseDate(order.dueDate)
                                       : null
                                   }
+                                  isDisabled={isDisabled}
                                   onChange={(date) => {
                                     onOrderUpdate(index, {
                                       dueDate: date ? date.toString() : null
@@ -770,6 +799,7 @@ export const PurchasingPlanningOrderDrawer = memo(
                   }
                   onSubmit(selectedItem.id, orders);
                 }}
+                disabled={fetcher.state !== "idle"}
                 isDisabled={fetcher.state !== "idle"}
                 isLoading={fetcher.state !== "idle"}
               >

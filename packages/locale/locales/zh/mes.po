@@ -73,9 +73,6 @@ msgstr "添加备件"
 msgid "All"
 msgstr "全部"
 
-msgid "Are you sure you want to close out this operation? This will end all active production events for this operation."
-msgstr "确定要结束此工序吗？这将终止此工序的所有活跃生产事件。"
-
 msgid "Are you sure you want to delete this step?"
 msgstr "确定要删除此步骤吗？"
 
@@ -84,6 +81,9 @@ msgstr "确定要删除此考勤记录吗？此操作无法撤销。"
 
 msgid "Are you sure you want to end all production events? This will end all active operations without completing or finishing them."
 msgstr "确定要结束所有生产事件吗？这将终止所有活跃工序，而不会完成它们。"
+
+msgid "Are you sure you want to finish this operation? This will end all active production events for this operation."
+msgstr ""
 
 msgid "Are you sure you want to leave this page?"
 msgstr "您确定要离开此页面吗？"
@@ -165,19 +165,6 @@ msgstr "下班打卡"
 msgid "Clocked in since {0}"
 msgstr "自 {0} 起已打卡上班"
 
-msgid "Close"
-msgstr "关闭"
-
-msgid "Close Anyways"
-msgstr "仍然关闭"
-
-msgid "Close Out"
-msgstr "结束"
-
-#. placeholder {0}: operation.itemReadableId
-msgid "Close out {0}"
-msgstr "结束 {0}"
-
 #. placeholder {0}: active.data.current.column.title
 #. placeholder {1}: overColumnPosition + 1
 #. placeholder {2}: columnOrder.length
@@ -230,6 +217,9 @@ msgstr "创建问题"
 msgid "Create Quality Issue"
 msgstr "创建质量问题"
 
+msgid "Create Rework"
+msgstr ""
+
 msgid "Customer"
 msgstr "客户"
 
@@ -258,6 +248,9 @@ msgstr "删除考勤记录 ({0})"
 msgid "Describe the problem..."
 msgstr "描述问题..."
 
+msgid "Describe what needs to be reworked..."
+msgstr ""
+
 msgid "Description"
 msgstr "描述"
 
@@ -284,8 +277,8 @@ msgid "Dragging {0} cancelled."
 msgstr "拖拽 {0} 已取消。"
 
 #. placeholder {0}: formatRelativeTime( convertDateStringToIsoString( operation.operationDueDate ) )
+#. placeholder {0}: formatRelativeTime( convertDateStringToIsoString( operation.operationDueDate ) )
 #. placeholder {0}: formatRelativeTime( convertDateStringToIsoString(operation.jobDueDate) )
-#. placeholder {0}: formatRelativeTime( convertDateStringToIsoString(item.dueDate) )
 msgid "Due {0}"
 msgstr "截止 {0}"
 
@@ -357,8 +350,21 @@ msgstr "与工单和商机行相关的文件。"
 msgid "Filter"
 msgstr "筛选"
 
+msgid "Finish"
+msgstr ""
+
+#. placeholder {0}: operation.itemReadableId
+msgid "Finish {0}"
+msgstr ""
+
+msgid "Finish Anyways"
+msgstr ""
+
 msgid "Forgot to Clock Out?"
 msgstr "忘记打卡下班了？"
+
+msgid "Go back to operation"
+msgstr ""
 
 msgid "Have a technical issue? Contact <0>Carbon Support.</0>"
 msgstr "遇到技术问题？联系<0>Carbon 支持。</0>"
@@ -494,6 +500,9 @@ msgstr "已达到最大记录数"
 
 msgid "Model"
 msgstr "模型"
+
+msgid "More Actions"
+msgstr ""
 
 msgid "More options"
 msgstr "更多选项"
@@ -698,6 +707,9 @@ msgstr "数量"
 msgid "Quantity must be greater than 0"
 msgstr "数量必须大于 0"
 
+msgid "Reason for rework"
+msgstr ""
+
 msgid "Recent"
 msgstr "最近"
 
@@ -720,6 +732,12 @@ msgstr "移除库存"
 msgid "Remove part"
 msgstr "移除零件"
 
+msgid "Rework"
+msgstr ""
+
+msgid "Rework created successfully"
+msgstr ""
+
 msgid "Sales Order"
 msgstr "销售订单"
 
@@ -734,6 +752,9 @@ msgstr "扫描或输入序列号"
 
 msgid "Schedule"
 msgstr "排程"
+
+msgid "Scrap"
+msgstr ""
 
 msgid "Scrap Reason"
 msgstr "报废原因"
@@ -784,6 +805,9 @@ msgstr "选择序列号 {0}"
 
 msgid "Select Serial Number"
 msgstr "选择序列号"
+
+msgid "Select the operation to go back to. All operations from that point to the current operation will be redone."
+msgstr ""
 
 msgid "Send"
 msgstr "发送"

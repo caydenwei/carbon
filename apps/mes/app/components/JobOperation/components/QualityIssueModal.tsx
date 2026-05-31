@@ -89,6 +89,7 @@ export function QualityIssueModal({
               <Select
                 name="nonConformanceTypeId"
                 label={t`Issue Type`}
+                size="lg"
                 options={issueTypes.map((type) => ({
                   value: type.id,
                   label: type.name
@@ -97,6 +98,7 @@ export function QualityIssueModal({
               <Select
                 name="priority"
                 label={t`Priority`}
+                size="lg"
                 options={qualityIssuePriority.map((p) => ({
                   value: p,
                   label: p
@@ -106,15 +108,16 @@ export function QualityIssueModal({
                 name="description"
                 label={t`Description`}
                 placeholder={t`Describe the problem...`}
+                size="lg"
               />
             </VStack>
           </ModalBody>
           <ModalFooter>
             <HStack>
-              <Button variant="secondary" onClick={onClose}>
+              <Button variant="secondary" size="lg" onClick={onClose}>
                 <Trans>Cancel</Trans>
               </Button>
-              <Submit isLoading={fetcher.state !== "idle"}>
+              <Submit size="lg" isLoading={fetcher.state !== "idle"}>
                 <Trans>Create Issue</Trans>
               </Submit>
             </HStack>

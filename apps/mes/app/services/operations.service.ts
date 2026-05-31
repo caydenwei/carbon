@@ -82,6 +82,55 @@ export async function getJobOperationDependencies(
     .eq("jobId", jobId);
 }
 
+export async function getUpstreamOperations(
+  client: SupabaseClient<Database>,
+  operationId: string
+) {
+  const operation = await client
+    .from("jobOperation")
+    .select("jobId")
+    .eq("id", operationId)
+    .single();
+
+  if (operation.error) return { data: [], error: operation.error };
+
+  const deps = await client
+    .from("jobOperationDependency")
+    .select("operationId, dependsOnId")
+    .eq("jobId", operation.data.jobId);
+
+  if (deps.error) return { data: [], error: deps.error };
+
+  // Build adjacency list: operationId → [operations it depends on]
+  const dependsOn = new Map<string, string[]>();
+  for (const dep of deps.data) {
+    const existing = dependsOn.get(dep.operationId) ?? [];
+    existing.push(dep.dependsOnId);
+    dependsOn.set(dep.operationId, existing);
+  }
+
+  // BFS backwards from operationId to find all ancestors
+  const ancestors = new Set<string>();
+  const queue: string[] = [...(dependsOn.get(operationId) ?? [])];
+  while (queue.length > 0) {
+    const current = queue.shift()!;
+    if (ancestors.has(current)) continue;
+    ancestors.add(current);
+    for (const predecessor of dependsOn.get(current) ?? []) {
+      queue.push(predecessor);
+    }
+  }
+
+  if (ancestors.size === 0) return { data: [], error: null };
+
+  return client
+    .from("jobOperation")
+    .select("id, processId, description, order, status, reworkId")
+    .in("id", Array.from(ancestors))
+    .is("reworkId", null)
+    .order("order", { ascending: true });
+}
+
 export async function deleteAttributeRecord(
   client: SupabaseClient<Database>,
   args: { id: string; companyId: string; userId: string }

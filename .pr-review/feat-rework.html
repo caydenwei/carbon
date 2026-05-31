@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PR Review: feat/rework</title>
+<style>
+  :root {
+    --bg: #0d1117; --surface: #161b22; --border: #30363d;
+    --text: #e6edf3; --muted: #8b949e; --accent: #58a6ff;
+    --green: #3fb950; --red: #f85149; --yellow: #d29922;
+    --orange: #db6d28; --purple: #bc8cff;
+    --green-bg: #12261e; --red-bg: #2d1214;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+    background: var(--bg); color: var(--text); line-height: 1.6; padding: 2rem; max-width: 960px; margin: 0 auto; }
+  h1, h2, h3 { font-weight: 600; }
+  h1 { font-size: 1.8rem; margin-bottom: 0.5rem; }
+  h2 { font-size: 1.3rem; margin: 2.5rem 0 1rem; padding-bottom: 0.5rem; border-bottom: 1px solid var(--border); }
+  h3 { font-size: 1.05rem; margin: 1.5rem 0 0.5rem; }
+  p, li { color: var(--text); }
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  code { font-family: 'SF Mono', Consolas, 'Liberation Mono', Menlo, monospace;
+    font-size: 0.85em; background: var(--surface); padding: 0.15em 0.4em; border-radius: 4px; }
+  ul, ol { padding-left: 1.5rem; margin: 0.5rem 0; }
+  li { margin: 0.3rem 0; }
+
+  .hero { background: var(--surface); border: 1px solid var(--border); border-radius: 8px;
+    padding: 1.5rem 2rem; margin-bottom: 2rem; }
+  .hero h1 { color: var(--accent); }
+  .hero .summary { font-size: 1.05rem; color: var(--muted); margin: 0.5rem 0 1rem; }
+  .metrics { display: flex; gap: 1.5rem; flex-wrap: wrap; }
+  .metric { background: var(--bg); border: 1px solid var(--border); border-radius: 6px;
+    padding: 0.5rem 1rem; font-size: 0.85rem; }
+  .metric strong { color: var(--accent); display: block; font-size: 1.3rem; }
+  .badge { display: inline-block; font-size: 0.75rem; font-weight: 600; padding: 0.15rem 0.5rem;
+    border-radius: 10px; margin-left: 0.5rem; vertical-align: middle; }
+  .badge-branch { background: #1f3a5f; color: var(--accent); }
+
+  .callout { border-left: 3px solid var(--accent); background: var(--surface);
+    padding: 0.8rem 1.2rem; border-radius: 0 6px 6px 0; margin: 1rem 0; font-size: 0.9rem; }
+  .callout.warn { border-left-color: var(--yellow); }
+  .callout.ok { border-left-color: var(--green); }
+
+  .diff { background: var(--surface); border: 1px solid var(--border); border-radius: 6px;
+    margin: 1rem 0; overflow: hidden; font-size: 0.82rem; }
+  .diff-title { background: var(--bg); padding: 0.5rem 1rem; font-family: monospace;
+    font-size: 0.8rem; color: var(--muted); border-bottom: 1px solid var(--border); }
+  .diff pre { padding: 0.8rem 1rem; margin: 0; overflow-x: auto; white-space: pre; line-height: 1.5; }
+  .diff .add { color: var(--green); background: var(--green-bg); display: block; }
+  .diff .del { color: var(--red); background: var(--red-bg); display: block; }
+  .diff .ctx { color: var(--muted); display: block; }
+
+  .diagram { background: var(--surface); border: 1px solid var(--border); border-radius: 8px;
+    padding: 1.5rem; margin: 1rem 0; overflow-x: auto; }
+  .diagram pre { color: var(--text); font-size: 0.8rem; line-height: 1.6; }
+  .diagram .label { color: var(--accent); font-weight: 600; }
+  .diagram .arrow { color: var(--muted); }
+  .diagram .highlight { color: var(--green); font-weight: 600; }
+  .diagram .warn-text { color: var(--yellow); }
+
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin: 1rem 0; }
+  .grid-2 > div { background: var(--surface); border: 1px solid var(--border); border-radius: 6px; padding: 1rem; }
+  .grid-2 h4 { font-size: 0.9rem; margin-bottom: 0.5rem; color: var(--muted); }
+  @media (max-width: 700px) { .grid-2 { grid-template-columns: 1fr; } }
+
+  table { border-collapse: collapse; width: 100%; margin: 1rem 0; font-size: 0.85rem; }
+  th, td { border: 1px solid var(--border); padding: 0.5rem 0.8rem; text-align: left; }
+  th { background: var(--surface); color: var(--muted); font-weight: 600; }
+  td { background: var(--bg); }
+  td code { font-size: 0.8rem; }
+
+  .file-list { columns: 2; column-gap: 2rem; font-size: 0.82rem; }
+  .file-list li { break-inside: avoid; }
+  @media (max-width: 700px) { .file-list { columns: 1; } }
+
+  .tag { display: inline-block; font-size: 0.7rem; padding: 0.1rem 0.4rem; border-radius: 4px;
+    margin-right: 0.3rem; font-weight: 600; }
+  .tag-core { background: #1f3a5f; color: var(--accent); }
+  .tag-ui { background: #2d1f4e; color: var(--purple); }
+  .tag-db { background: #2d2a10; color: var(--yellow); }
+  .tag-infra { background: #1a2d1e; color: var(--green); }
+  .tag-pkg { background: #2d1e16; color: var(--orange); }
+
+  .section-nav { position: sticky; top: 0; background: var(--bg); padding: 0.8rem 0;
+    border-bottom: 1px solid var(--border); margin-bottom: 1rem; z-index: 10;
+    display: flex; gap: 1rem; flex-wrap: wrap; font-size: 0.82rem; }
+  .section-nav a { color: var(--muted); }
+  .section-nav a:hover { color: var(--accent); }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════ HERO ═══════════════ -->
+<div class="hero">
+  <h1>feat/rework <span class="badge badge-branch">feat/rework &rarr; main</span></h1>
+  <p class="summary">Production rework workflows, MRP demand-forecast lineage, and purchasing planning improvements.</p>
+  <div class="metrics">
+    <div class="metric"><strong>~140</strong>files changed</div>
+    <div class="metric"><strong>4</strong>migrations</div>
+    <div class="metric"><strong>1</strong>new edge function</div>
+    <div class="metric"><strong>1</strong>new npm package</div>
+    <div class="metric"><strong>22</strong>new unit tests</div>
+    <div class="metric"><strong>5</strong>apps/packages</div>
+  </div>
+</div>
+
+<nav class="section-nav">
+  <a href="#problem">Problem</a>
+  <a href="#context">System Context</a>
+  <a href="#rework-flow">Rework Flow</a>
+  <a href="#mrp">MRP Engine</a>
+  <a href="#purchasing">Purchasing Planning</a>
+  <a href="#ui">UI Components</a>
+  <a href="#migrations">Migrations</a>
+  <a href="#file-map">File Map</a>
+  <a href="#verification">Verification</a>
+  <a href="#takeaway">Takeaway</a>
+</nav>
+
+<!-- ═══════════════ PROBLEM ═══════════════ -->
+<h2 id="problem">1. Problem</h2>
+
+<p>Three gaps existed in Carbon's production and planning pipeline:</p>
+
+<ol>
+  <li><strong>No rework path.</strong> When a job operation failed quality checks, there was no way to loop back to an earlier operation, clone the relevant steps, and re-execute them. Operators had to manually create new operations or work around the system.</li>
+  <li><strong>No demand-forecast lineage.</strong> MRP generated demand forecasts, but there was no way to trace <em>why</em> a forecast existed&mdash;which parent job, sales order, or demand projection caused it. Planning decisions lacked auditability.</li>
+  <li><strong>Purchasing planning friction.</strong> The purchasing planning flow needed improvements to handle supplier&ndash;period grouping, MOQ enforcement, existing PO reuse, and supply forecast deduplication.</li>
+</ol>
+
+<!-- ═══════════════ SYSTEM CONTEXT ═══════════════ -->
+<h2 id="context">2. System Context</h2>
+
+<div class="diagram">
+<pre>
+<span class="label">MES App</span> (shop floor)                  <span class="label">ERP App</span> (planning)
+  │                                       │
+  ├─ JobOperation UI                      ├─ Item Planning Charts
+  │   └─ <span class="highlight">ReworkModal (NEW)</span>                │   ├─ <span class="highlight">DemandForecastSourcesPopover (NEW)</span>
+  │       │                               │   └─ <span class="highlight">PlannedOrderDetailsPopover (NEW)</span>
+  │       ▼                               │
+  │  POST /trigger-rework                 ├─ Purchasing Planning
+  │       │                               │   └─ planning.update.tsx (refactored)
+  │       ▼                               │
+  <span class="label">Supabase Edge Functions</span>                │
+  ├─ <span class="highlight">trigger-rework (NEW)</span>                │
+  │   ├─ BFS path finding                │
+  │   ├─ Operation cloning               │
+  │   ├─ DAG wiring                      │
+  │   └─ Reschedule call ─────────┐      │
+  │                                │      │
+  ├─ reschedule                    ◄──────┘
+  │   └─ scheduling-engine.ts (updated)
+  │
+  ├─ mrp (updated)
+  │   └─ <span class="highlight">lib/mrp-engine.ts (NEW)</span> ─── shared BOM explosion algorithm
+  │
+  └─ recalculate
+</pre>
+</div>
+
+<div class="callout">
+  <strong>What didn't change:</strong> The scheduling engine's forward-scheduling algorithm, the MRP edge function's data-fetching phases, and all existing job/operation CRUD flows are untouched. Rework operations are invisible to the scheduler's dependency builder (filtered by <code>reworkId</code>).
+</div>
+
+<!-- ═══════════════ REWORK FLOW ═══════════════ -->
+<h2 id="rework-flow">3. Rework Flow (the headline feature)</h2>
+
+<h3>3.1 User Journey</h3>
+
+<div class="diagram">
+<pre>
+<span class="label">Operator on MES</span>
+
+  1. Working on operation "Inspect"
+  2. Finds defect &rarr; opens Rework action
+  3. <span class="highlight">ReworkModal</span> loads upstream operations via BFS
+  4. Selects target: "go back to Weld"
+  5. Sets quantity: 2 units, enters reason
+  6. Submits
+
+<span class="label">Backend (single transaction)</span>
+
+  7. <span class="highlight">findReworkPath()</span>: BFS finds path Weld &rarr; Paint &rarr; Inspect
+  8. Creates <code>rework</code> record (reason, qty, traceability)
+  9. Clones 3 operations: Weld(R), Paint(R), Inspect(R)
+     &bull; First op: status = "Ready", operationOrder = "With Previous"
+     &bull; Remaining: status = "Waiting"
+  10. Clones steps, tools, parameters for each
+  11. Wires DAG: Weld(R) &rarr; Paint(R) &rarr; Inspect(R)
+  12. Convergence: downstream ops now also depend on Inspect(R)
+  13. Records productionQuantity type = "Rework"
+
+<span class="label">Post-transaction</span>
+
+  14. Triggers reschedule for date recalculation
+  15. Operator sees new operations on their board
+</pre>
+</div>
+
+<h3>3.2 Before / After DAG</h3>
+
+<div class="grid-2">
+  <div>
+    <h4>Before: linear</h4>
+<pre style="font-size: 0.8rem; color: var(--text); line-height: 1.8;">
+Weld &rarr; Paint &rarr; Inspect &rarr; Pack
+                      <span style="color:var(--red)">&#x2718; defect found</span>
+</pre>
+  </div>
+  <div>
+    <h4>After: branch &amp; converge</h4>
+<pre style="font-size: 0.8rem; color: var(--text); line-height: 1.8;">
+Weld &rarr; Paint &rarr; Inspect &rarr;&rarr;&rarr;&rarr; Pack
+                  <span style="color:var(--green)">&#x2514; Weld(R) &rarr; Paint(R) &rarr; Inspect(R) &#x2518;</span>
+</pre>
+  </div>
+</div>
+
+<h3>3.3 Key Code: Batch Operation Cloning</h3>
+
+<p>Operations are cloned in a single batch <code>INSERT ... RETURNING</code> instead of sequential inserts:</p>
+
+<div class="diff">
+  <div class="diff-title">packages/database/supabase/functions/trigger-rework/index.ts</div>
+  <pre>
+<span class="ctx">  // 5. Clone operations (batch insert)</span>
+<span class="add">+ const clonedOps = await trx</span>
+<span class="add">+   .insertInto("jobOperation")</span>
+<span class="add">+   .values(</span>
+<span class="add">+     sourceOperations.map((sourceOp, i) => ({</span>
+<span class="add">+       ...cloneFields,</span>
+<span class="add">+       order: triggerOrder + increment * (i + 1),</span>
+<span class="add">+       reworkId: rework.id,</span>
+<span class="add">+       status: i === 0 ? "Ready" : "Waiting",</span>
+<span class="add">+     }))</span>
+<span class="add">+   )</span>
+<span class="add">+   .returning(["id"])</span>
+<span class="add">+   .execute();</span></pre>
+</div>
+
+<p>Steps, tools, and parameters are also fetched in 3 parallel queries and inserted in 3 parallel batches:</p>
+
+<div class="diff">
+  <div class="diff-title">packages/database/supabase/functions/trigger-rework/index.ts</div>
+  <pre>
+<span class="ctx">  // 6. Clone steps, tools, and parameters (batch fetch + batch insert)</span>
+<span class="add">+ const [allSteps, allTools, allParams] = await Promise.all([</span>
+<span class="add">+   trx.selectFrom("jobOperationStep").selectAll()</span>
+<span class="add">+     .where("operationId", "in", operationPath).execute(),</span>
+<span class="add">+   trx.selectFrom("jobOperationTool").selectAll()</span>
+<span class="add">+     .where("operationId", "in", operationPath).execute(),</span>
+<span class="add">+   trx.selectFrom("jobOperationParameter").selectAll()</span>
+<span class="add">+     .where("operationId", "in", operationPath).execute(),</span>
+<span class="add">+ ]);</span></pre>
+</div>
+
+<p>DAG edges (inter-rework + convergence) are collected into a single array and inserted once:</p>
+
+<div class="diff">
+  <div class="diff-title">packages/database/supabase/functions/trigger-rework/index.ts</div>
+  <pre>
+<span class="ctx">  // 7. Wire the rework operations into the DAG</span>
+<span class="add">+ const dagEdges = [];</span>
+<span class="add">+ // 7a. Sequential: each rework op depends on the previous</span>
+<span class="add">+ for (let i = 1; i < clonedOperationIds.length; i++) {</span>
+<span class="add">+   dagEdges.push({ operationId: clonedOperationIds[i],</span>
+<span class="add">+     dependsOnId: clonedOperationIds[i - 1], jobId, companyId });</span>
+<span class="add">+ }</span>
+<span class="add">+ // 7b. Convergence: downstream ops also depend on last rework op</span>
+<span class="add">+ for (const dep of downstreamDeps) {</span>
+<span class="add">+   dagEdges.push({ operationId: dep.operationId,</span>
+<span class="add">+     dependsOnId: lastReworkOpId, jobId, companyId });</span>
+<span class="add">+ }</span>
+<span class="add">+ if (dagEdges.length > 0) {</span>
+<span class="add">+   await trx.insertInto("jobOperationDependency").values(dagEdges).execute();</span>
+<span class="add">+ }</span></pre>
+</div>
+
+<h3>3.4 Auto-Completion Trigger</h3>
+
+<p>The <code>complete_rework_trigger</code> in the migration fires when any <code>jobOperation</code> status changes to <code>'Done'</code>. It checks if ALL operations sharing the same <code>reworkId</code> are Done, and if so, sets <code>rework.completedAt</code>.</p>
+
+<div class="diff">
+  <div class="diff-title">migrations/20260527142837_rework.sql</div>
+  <pre>
+<span class="add">+ CREATE OR REPLACE FUNCTION complete_rework()</span>
+<span class="add">+   RETURNS TRIGGER AS $$</span>
+<span class="add">+ BEGIN</span>
+<span class="add">+   IF NEW.status = 'Done' AND NEW."reworkId" IS NOT NULL THEN</span>
+<span class="add">+     IF NOT EXISTS (</span>
+<span class="add">+       SELECT 1 FROM "jobOperation"</span>
+<span class="add">+       WHERE "reworkId" = NEW."reworkId" AND status != 'Done'</span>
+<span class="add">+     ) THEN</span>
+<span class="add">+       UPDATE rework SET "completedAt" = now()</span>
+<span class="add">+       WHERE id = NEW."reworkId";</span>
+<span class="add">+     END IF;</span>
+<span class="add">+   END IF;</span>
+<span class="add">+   RETURN NEW;</span>
+<span class="add">+ END; $$ LANGUAGE plpgsql;</span></pre>
+</div>
+
+<!-- ═══════════════ MRP ENGINE ═══════════════ -->
+<h2 id="mrp">4. MRP Engine &amp; Demand Forecast Lineage</h2>
+
+<h3>4.1 New Package: <code>@carbon/mrp</code></h3>
+
+<p>A new standalone package (<code>packages/mrp/</code>) extracts the pure BOM explosion algorithm into a testable, dependency-free module.</p>
+
+<table>
+  <tr><th>Export</th><th>Purpose</th></tr>
+  <tr><td><code>explodeBom(input)</code></td><td>Level-by-level BOM explosion with inventory netting, lead-time offsetting, and contributor propagation</td></tr>
+  <tr><td><code>computeLowLevelCodes(bom)</code></td><td>Assigns low-level codes to determine processing order</td></tr>
+  <tr><td><code>splitKey(key)</code> / <code>makeKey(...)</code></td><td>Encode/decode <code>locationId-periodId-itemId</code> composite keys</td></tr>
+</table>
+
+<p>22 unit tests cover demand propagation, inventory netting, Make vs Buy handling, inline production coercion, and contributor scaling.</p>
+
+<h3>4.2 Shared Engine for Edge Functions</h3>
+
+<p>The MRP edge function previously had the BOM explosion algorithm inlined (~100 lines). A shared copy now lives at <code>lib/mrp-engine.ts</code> and the edge function calls <code>explodeBom()</code>:</p>
+
+<div class="diff">
+  <div class="diff-title">packages/database/supabase/functions/mrp/index.ts</div>
+  <pre>
+<span class="del">- const llc = computeLowLevelCodes(bomByItem);</span>
+<span class="del">- const maxLevel = llc.size > 0 ? Math.max(...llc.values()) : 0;</span>
+<span class="del">- const onHandByLocationItem = new Map(baseInventoryByLocationItem);</span>
+<span class="del">- const bomDerivedDemand = new Map&lt;string, number&gt;();</span>
+<span class="del">- for (let level = 0; level &lt;= maxLevel; level++) {</span>
+<span class="del">-   // ... 100 lines of BOM explosion ...</span>
+<span class="del">- }</span>
+<span class="add">+ const { bomDerivedDemand, demandContributors } = explodeBom({</span>
+<span class="add">+   grossDemand, bomByItem, replenishmentSystemByItem,</span>
+<span class="add">+   leadTimeByItem,</span>
+<span class="add">+   periods: periods.map((p) => ({ id: p.id ?? "" })),</span>
+<span class="add">+   onHandByLocationItem: new Map(baseInventoryByLocationItem),</span>
+<span class="add">+   jobSupplyByLocationPeriodItem, topLevelContributors,</span>
+<span class="add">+ });</span></pre>
+</div>
+
+<div class="callout ok">
+  <strong>Zero behavioral change.</strong> The algorithm is character-for-character identical. The only mechanical differences: <code>effectiveReplenishment()</code> extracted to a helper, <code>makeKey()</code> replaces template literals, <code>p.id ?? ""</code> coercion moved to the call site. No downstream maps (<code>grossDemand</code>, <code>onHandByLocationItem</code>) are read after the explosion, so the copy-vs-mutate change is invisible.
+</div>
+
+<h3>4.3 Demand Forecast Source Lineage</h3>
+
+<p>New <code>demandForecastSource</code> table tracks which parent entity caused each MRP-generated forecast row:</p>
+
+<div class="diagram">
+<pre>
+  <span class="label">demandForecastSource</span>
+  ┌─────────────────────────────────────────────────────────┐
+  │ itemId, locationId, periodId                            │
+  │ sourceType: 'Job Material' | 'Sales Order' | 'Demand Projection' │
+  │ jobId | salesOrderLineId | demandProjectionId  (exactly one set)  │
+  │ parentItemId, quantity                                  │
+  └─────────────────────────────────────────────────────────┘
+         <span class="arrow">▲</span>
+         <span class="arrow">│</span> populated during BOM explosion via contributor propagation
+         <span class="arrow">│</span>
+  <span class="label">explodeBom()</span> &rarr; demandContributors map &rarr; batch insert
+</pre>
+</div>
+
+<p>The ERP app surfaces this via <code>DemandForecastSourcesPopover</code>: users click a forecast row and see exactly which jobs, sales orders, or projections contributed to it.</p>
+
+<!-- ═══════════════ PURCHASING PLANNING ═══════════════ -->
+<h2 id="purchasing">5. Purchasing Planning Improvements</h2>
+
+<p>The <code>planning.update.tsx</code> route handler was refactored for the Purchasing Planning 2.0 workflow. Key changes:</p>
+
+<table>
+  <tr><th>Area</th><th>What changed</th></tr>
+  <tr><td>Order grouping</td><td>Orders grouped by <code>supplier+period</code> key; each group gets one PO</td></tr>
+  <tr><td>PO reuse</td><td>Finds existing Draft/Planned POs for the same supplier+period before creating new ones</td></tr>
+  <tr><td>Existing lines</td><td>Separates existing-line updates from new orders upfront</td></tr>
+  <tr><td>MOQ enforcement</td><td>Adjusts quantity up to supplier part's minimum order quantity</td></tr>
+  <tr><td>Line dedup</td><td>If PO already has a line for the same item, adds quantity instead of duplicating</td></tr>
+  <tr><td>Supply forecasts</td><td>Extracted <code>deduplicateForecasts()</code> helper for clean grouping</td></tr>
+</table>
+
+<div class="diff">
+  <div class="diff-title">apps/erp/app/routes/x+/purchasing+/planning.update.tsx</div>
+  <pre>
+<span class="del">- const forecastMap = new Map&lt;string, ...&gt;();</span>
+<span class="del">- for (const forecast of allSupplyForecasts) {</span>
+<span class="del">-   const key = `${forecast.itemId}-${forecast.locationId}-${forecast.periodId}`;</span>
+<span class="del">-   const existing = forecastMap.get(key);</span>
+<span class="del">-   if (existing) { existing.forecastQuantity += forecast.forecastQuantity; }</span>
+<span class="del">-   else { forecastMap.set(key, { ...forecast }); }</span>
+<span class="del">- }</span>
+<span class="del">- const uniqueSupplyForecasts = Array.from(forecastMap.values());</span>
+<span class="add">+ const uniqueSupplyForecasts = deduplicateForecasts(allSupplyForecasts);</span></pre>
+</div>
+
+<!-- ═══════════════ UI COMPONENTS ═══════════════ -->
+<h2 id="ui">6. UI Components</h2>
+
+<h3>6.1 New Components</h3>
+
+<table>
+  <tr><th>Component</th><th>Package</th><th>Purpose</th></tr>
+  <tr><td><code>BottomSheet</code></td><td><code>@carbon/react</code></td><td>Bottom-sliding modal (Radix Dialog wrapper) for MES mobile actions</td></tr>
+  <tr><td><code>ReworkModal</code></td><td>MES app</td><td>Rework creation form: loads upstream ops, validates, submits</td></tr>
+  <tr><td><code>DemandForecastSourcesPopover</code></td><td>ERP app</td><td>Traces forecast to parent jobs/sales orders/projections</td></tr>
+  <tr><td><code>PlannedOrderDetailsPopover</code></td><td>ERP app</td><td>Shows planned order details: supplier, policy, linked PO</td></tr>
+</table>
+
+<h3>6.2 Updated Components</h3>
+
+<table>
+  <tr><th>Component</th><th>Change</th></tr>
+  <tr><td><code>BarProgress</code></td><td>Refactored gradient interpolation, added segment support for multi-color bars</td></tr>
+  <tr><td><code>JobOperation</code> (MES)</td><td>Added rework badge, BottomSheet actions, ReworkModal integration (+130 / -78 lines)</td></tr>
+  <tr><td><code>ItemPlanningChart</code></td><td>Added forecast source popover integration</td></tr>
+  <tr><td><code>ItemReorderPolicy</code></td><td>Extended to show policy details in planned order popover</td></tr>
+  <tr><td><code>Select</code>, <code>Textarea</code>, <code>DateTimePicker</code></td><td>Minor prop additions (disabled states, controlled values)</td></tr>
+  <tr><td>Kanban <code>ItemCard</code> (ERP + MES)</td><td>Added rework indicator to kanban cards</td></tr>
+</table>
+
+<!-- ═══════════════ MIGRATIONS ═══════════════ -->
+<h2 id="migrations">7. Migrations</h2>
+
+<table>
+  <tr><th>Migration</th><th>What</th><th>Lines</th></tr>
+  <tr>
+    <td><code>20260527110002</code></td>
+    <td><strong>demandForecastSource</strong> &mdash; new table + enum + surrogate <code>id</code> on <code>demandProjection</code></td>
+    <td>128</td>
+  </tr>
+  <tr>
+    <td><code>20260527142837</code></td>
+    <td><strong>rework</strong> &mdash; new table, <code>reworkId</code> column on <code>jobOperation</code>, auto-completion trigger, updated views</td>
+    <td>119</td>
+  </tr>
+  <tr>
+    <td><code>20260529074512</code></td>
+    <td><strong>openPurchaseOrderLines</strong> &mdash; new view for open PO lines with unit conversion and date coalescing</td>
+    <td>28</td>
+  </tr>
+  <tr>
+    <td><code>20260529163847</code></td>
+    <td><strong>reworkId in RPCs</strong> &mdash; updates <code>get_job_operation_by_id</code>, <code>sync_update_job_operation_quantities</code>, <code>sync_finish_job_operation</code> to handle rework quantities and terminal-op sums</td>
+    <td>411</td>
+  </tr>
+</table>
+
+<div class="callout">
+  <strong>RPC update detail:</strong> The <code>sync_update_job_operation_quantities</code> function now sums quantities across ALL terminal operations (not just the last one). This is critical for branch-and-converge: if Inspect completes 1 unit and Inspect(R) reworks 2 units, the job's total is 3.
+</div>
+
+<!-- ═══════════════ SCHEDULING ═══════════════ -->
+<h3>7.1 Scheduling Engine Awareness</h3>
+
+<p>The scheduling engine was updated to be rework-aware:</p>
+
+<div class="diff">
+  <div class="diff-title">packages/database/supabase/functions/lib/scheduling/scheduling-engine.ts</div>
+  <pre>
+<span class="ctx">  // Group non-rework operations by jobMakeMethodId</span>
+<span class="del">- for (const op of this.operations) {</span>
+<span class="del">-   if (op.jobMakeMethodId) {</span>
+<span class="add">+ for (const op of allOperations) {</span>
+<span class="add">+   if (op.jobMakeMethodId && !op.reworkId) {</span>
+
+<span class="ctx">  // Delete existing dependencies, preserving rework operation dependencies</span>
+<span class="add">+ const reworkOpIds = allOperations.filter(op => op.reworkId).map(op => op.id!);</span>
+<span class="add">+ let deleteQuery = this.db.deleteFrom("jobOperationDependency")</span>
+<span class="add">+   .where("jobId", "=", this.jobId);</span>
+<span class="add">+ if (reworkOpIds.length > 0) {</span>
+<span class="add">+   deleteQuery = deleteQuery</span>
+<span class="add">+     .where("operationId", "not in", reworkOpIds)</span>
+<span class="add">+     .where("dependsOnId", "not in", reworkOpIds);</span>
+<span class="add">+ }</span></pre>
+</div>
+
+<p>Rework operations are excluded from the dependency builder and their DAG edges are preserved during reschedule.</p>
+
+<!-- ═══════════════ FILE MAP ═══════════════ -->
+<h2 id="file-map">8. File Map</h2>
+
+<h3>Core Behavior</h3>
+<ul class="file-list">
+  <li><span class="tag tag-core">core</span> <code>trigger-rework/index.ts</code> &mdash; rework edge function</li>
+  <li><span class="tag tag-core">core</span> <code>lib/mrp-engine.ts</code> &mdash; shared BOM explosion</li>
+  <li><span class="tag tag-core">core</span> <code>mrp/index.ts</code> &mdash; MRP edge function (refactored)</li>
+  <li><span class="tag tag-core">core</span> <code>scheduling-engine.ts</code> &mdash; rework-aware scheduling</li>
+  <li><span class="tag tag-core">core</span> <code>planning.update.tsx</code> &mdash; purchasing PO creation</li>
+  <li><span class="tag tag-core">core</span> <code>operations.service.ts</code> &mdash; upstream BFS for rework targets</li>
+</ul>
+
+<h3>UI &amp; Frontend</h3>
+<ul class="file-list">
+  <li><span class="tag tag-ui">ui</span> <code>ReworkModal.tsx</code> &mdash; rework creation form</li>
+  <li><span class="tag tag-ui">ui</span> <code>JobOperation.tsx</code> &mdash; MES operation page</li>
+  <li><span class="tag tag-ui">ui</span> <code>DemandForecastSourcesPopover.tsx</code></li>
+  <li><span class="tag tag-ui">ui</span> <code>PlannedOrderDetailsPopover.tsx</code></li>
+  <li><span class="tag tag-ui">ui</span> <code>BottomSheet.tsx</code> &mdash; new shared component</li>
+  <li><span class="tag tag-ui">ui</span> <code>BarProgress.tsx</code> &mdash; refactored gradient</li>
+  <li><span class="tag tag-ui">ui</span> <code>ItemPlanningChart.tsx</code>, <code>ItemReorderPolicy.tsx</code></li>
+  <li><span class="tag tag-ui">ui</span> <code>PurchasingPlanningOrderDrawer.tsx</code></li>
+</ul>
+
+<h3>Database</h3>
+<ul class="file-list">
+  <li><span class="tag tag-db">db</span> 4 migrations (rework, forecast source, open PO view, RPC updates)</li>
+  <li><span class="tag tag-db">db</span> <code>types.ts</code> (x2) &mdash; auto-generated schema types</li>
+</ul>
+
+<h3>Package</h3>
+<ul class="file-list">
+  <li><span class="tag tag-pkg">pkg</span> <code>packages/mrp/</code> &mdash; new MRP engine package with 22 tests</li>
+</ul>
+
+<h3>Infrastructure / Noise (safe to skim)</h3>
+<ul class="file-list">
+  <li><span class="tag tag-infra">infra</span> <code>.github/workflows/</code> &mdash; labeler, complexity scoring</li>
+  <li><span class="tag tag-infra">infra</span> <code>scripts/pr-complexity/</code> &mdash; PR scoring tool</li>
+  <li><span class="tag tag-infra">infra</span> <code>packages/locale/</code> &mdash; 12 locale files with new strings</li>
+  <li><span class="tag tag-infra">infra</span> <code>pnpm-lock.yaml</code>, <code>turbo.json</code></li>
+</ul>
+
+<!-- ═══════════════ VERIFICATION ═══════════════ -->
+<h2 id="verification">9. Verification</h2>
+
+<h3>Tests</h3>
+
+<div class="diff">
+  <div class="diff-title">MRP engine tests: 22 passing</div>
+  <pre>
+<span class="add">$ cd packages/mrp && npx vitest run</span>
+<span class="add"> Test Files  1 passed (1)</span>
+<span class="add">      Tests  22 passed (22)</span>
+<span class="add">   Duration  140ms</span></pre>
+</div>
+
+<h3>Recommended Commands</h3>
+<pre style="background:var(--surface); padding:1rem; border-radius:6px; font-size:0.82rem; overflow-x:auto;">
+# MRP engine unit tests
+cd packages/mrp && npx vitest run
+
+# Full build (check for type errors)
+pnpm turbo build --filter ./packages/mrp
+
+# Manual verification: trigger rework on a running job
+# 1. Open MES, find a job with multiple operations
+# 2. Start and complete an early operation
+# 3. On a later operation, open the rework action
+# 4. Select a target operation, set quantity, enter reason
+# 5. Verify: cloned operations appear in the DAG
+# 6. Verify: completing all rework ops marks the rework as complete
+# 7. Verify: MRP re-run includes rework quantities in forecasts
+</pre>
+
+<div class="callout warn">
+  <strong>Not yet verified:</strong> The full rework flow requires a running database with the migrations applied. The MRP engine tests validate the pure algorithm. Integration testing of the edge function, scheduling engine rework awareness, and the auto-completion trigger should be done against a dev environment.
+</div>
+
+<!-- ═══════════════ TAKEAWAY ═══════════════ -->
+<h2 id="takeaway">10. Reviewer Takeaway</h2>
+
+<p><strong>Mental model:</strong> This PR adds a "branch and reconverge" primitive to job operations. When something goes wrong mid-production, the system clones the relevant operation path, runs it as a parallel branch in the DAG, and merges back downstream. Everything else&mdash;scheduling, MRP, quantity tracking&mdash;is made rework-aware without changing its core logic.</p>
+
+<h3>Where to focus your review</h3>
+
+<ol>
+  <li><strong><code>trigger-rework/index.ts</code></strong> &mdash; the core transaction. Verify the DAG wiring logic: do rework ops converge correctly? Is the sort-order interpolation correct for edge cases (e.g., no downstream operations)?</li>
+  <li><strong>Migration <code>20260529163847</code></strong> &mdash; the RPC updates. The terminal-op quantity summing is the most complex logic. Verify it handles: single terminal, multiple terminals, rework + non-rework terminals.</li>
+  <li><strong><code>scheduling-engine.ts</code></strong> &mdash; the <code>!op.reworkId</code> filter. Verify rework ops are truly invisible to the dependency builder and their edges survive reschedule.</li>
+  <li><strong><code>mrp/index.ts</code> refactoring</strong> &mdash; the <code>explodeBom()</code> call. Confirmed zero behavioral change; reviewable by diffing the removed loop against <code>lib/mrp-engine.ts</code>.</li>
+  <li><strong><code>ReworkModal.tsx</code></strong> &mdash; the user-facing form. Check validation, quantity defaults, error handling.</li>
+</ol>
+
+<div class="callout ok">
+  <strong>What you can skim:</strong> Locale files (auto-generated translations), <code>.github/workflows/</code> (CI tooling), <code>packages/database/src/types.ts</code> (auto-generated), <code>scripts/pr-complexity/</code> (separate tooling feature), UI prop additions on Select/Textarea/DateTimePicker (minor controlled-value wiring).
+</div>
+
+<p style="color:var(--muted); font-size:0.8rem; margin-top:3rem; text-align:center;">
+  Generated by PR Explainer &bull; feat/rework &bull; 2026-05-30
+</p>
+
+</body>
+</html>

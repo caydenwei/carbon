@@ -73,9 +73,6 @@ msgstr "Ajouter une pièce de rechange"
 msgid "All"
 msgstr "Tout"
 
-msgid "Are you sure you want to close out this operation? This will end all active production events for this operation."
-msgstr "Êtes-vous sûr de vouloir clôturer cette opération ? Cela mettra fin à tous les événements de production actifs pour cette opération."
-
 msgid "Are you sure you want to delete this step?"
 msgstr "Êtes-vous sûr de vouloir supprimer cette étape ?"
 
@@ -84,6 +81,9 @@ msgstr "Êtes-vous sûr de vouloir supprimer cette fiche de temps ? Cette action
 
 msgid "Are you sure you want to end all production events? This will end all active operations without completing or finishing them."
 msgstr "Êtes-vous sûr de vouloir mettre fin à tous les événements de production ? Cela arrêtera toutes les opérations actives sans les terminer ni les achever."
+
+msgid "Are you sure you want to finish this operation? This will end all active production events for this operation."
+msgstr ""
 
 msgid "Are you sure you want to leave this page?"
 msgstr "Êtes-vous sûr de vouloir quitter cette page ?"
@@ -165,19 +165,6 @@ msgstr "Pointer la sortie"
 msgid "Clocked in since {0}"
 msgstr "Pointé depuis {0}"
 
-msgid "Close"
-msgstr "Fermer"
-
-msgid "Close Anyways"
-msgstr "Fermer quand même"
-
-msgid "Close Out"
-msgstr "Clôturer"
-
-#. placeholder {0}: operation.itemReadableId
-msgid "Close out {0}"
-msgstr "Clôturer {0}"
-
 #. placeholder {0}: active.data.current.column.title
 #. placeholder {1}: overColumnPosition + 1
 #. placeholder {2}: columnOrder.length
@@ -230,6 +217,9 @@ msgstr "Créer un problème"
 msgid "Create Quality Issue"
 msgstr "Créer un problème de qualité"
 
+msgid "Create Rework"
+msgstr ""
+
 msgid "Customer"
 msgstr "Client"
 
@@ -258,6 +248,9 @@ msgstr "Supprimer la fiche de temps ({0})"
 msgid "Describe the problem..."
 msgstr "Décrivez le problème..."
 
+msgid "Describe what needs to be reworked..."
+msgstr ""
+
 msgid "Description"
 msgstr "Description"
 
@@ -284,8 +277,8 @@ msgid "Dragging {0} cancelled."
 msgstr "Déplacement de {0} annulé."
 
 #. placeholder {0}: formatRelativeTime( convertDateStringToIsoString( operation.operationDueDate ) )
+#. placeholder {0}: formatRelativeTime( convertDateStringToIsoString( operation.operationDueDate ) )
 #. placeholder {0}: formatRelativeTime( convertDateStringToIsoString(operation.jobDueDate) )
-#. placeholder {0}: formatRelativeTime( convertDateStringToIsoString(item.dueDate) )
 msgid "Due {0}"
 msgstr "Échéance {0}"
 
@@ -357,8 +350,21 @@ msgstr "Fichiers liés à l'ordre de fabrication et à la ligne d'opportunité."
 msgid "Filter"
 msgstr "Filtre"
 
+msgid "Finish"
+msgstr ""
+
+#. placeholder {0}: operation.itemReadableId
+msgid "Finish {0}"
+msgstr ""
+
+msgid "Finish Anyways"
+msgstr ""
+
 msgid "Forgot to Clock Out?"
 msgstr "Oubli de pointer la sortie ?"
+
+msgid "Go back to operation"
+msgstr ""
 
 msgid "Have a technical issue? Contact <0>Carbon Support.</0>"
 msgstr "Vous avez un problème technique ? Contactez le <0>Support Carbon.</0>"
@@ -494,6 +500,9 @@ msgstr "Nombre maximum d'enregistrements atteint"
 
 msgid "Model"
 msgstr "Modèle"
+
+msgid "More Actions"
+msgstr ""
 
 msgid "More options"
 msgstr "Plus d'options"
@@ -698,6 +707,9 @@ msgstr "Quantité"
 msgid "Quantity must be greater than 0"
 msgstr "La quantité doit être supérieure à 0"
 
+msgid "Reason for rework"
+msgstr ""
+
 msgid "Recent"
 msgstr "Récent"
 
@@ -720,6 +732,12 @@ msgstr "Retirer du stock"
 msgid "Remove part"
 msgstr "Retirer la pièce"
 
+msgid "Rework"
+msgstr ""
+
+msgid "Rework created successfully"
+msgstr ""
+
 msgid "Sales Order"
 msgstr "Commande client"
 
@@ -734,6 +752,9 @@ msgstr "Scanner ou saisir le numéro de série"
 
 msgid "Schedule"
 msgstr "Planification"
+
+msgid "Scrap"
+msgstr ""
 
 msgid "Scrap Reason"
 msgstr "Motif de rebut"
@@ -784,6 +805,9 @@ msgstr "Sélectionner le numéro de série {0}"
 
 msgid "Select Serial Number"
 msgstr "Sélectionner le numéro de série"
+
+msgid "Select the operation to go back to. All operations from that point to the current operation will be redone."
+msgstr ""
 
 msgid "Send"
 msgstr "Envoyer"

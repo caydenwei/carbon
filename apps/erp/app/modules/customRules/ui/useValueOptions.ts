@@ -1,5 +1,6 @@
 import type { ValueOptionsLoader } from "@carbon/utils";
 import { useMemo } from "react";
+import { useItemPostingGroups } from "~/components/Form/ItemPostingGroup";
 import { useLocations } from "~/components/Form/Location";
 import { useStorageTypes } from "~/components/Form/StorageTypes";
 import { itemTypes } from "~/modules/inventory/inventory.models";
@@ -22,15 +23,17 @@ const REPLENISHMENT_SYSTEMS_OPTIONS = enumOptions(itemReplenishmentSystems);
 export function useValueOptions(): ValueOptionsByLoader {
   const locations = useLocations();
   const storageTypes = useStorageTypes();
+  const itemPostingGroups = useItemPostingGroups();
 
   return useMemo<ValueOptionsByLoader>(
     () => ({
       locations,
       storageTypes,
+      itemPostingGroups,
       itemTypes: ITEM_TYPES_OPTIONS,
       itemTrackingTypes: ITEM_TRACKING_TYPES_OPTIONS,
       replenishmentSystems: REPLENISHMENT_SYSTEMS_OPTIONS
     }),
-    [locations, storageTypes]
+    [locations, storageTypes, itemPostingGroups]
   );
 }

@@ -5,6 +5,9 @@ import type { JSONContent } from "@carbon/react";
 import {
   Badge,
   BarProgress,
+  BottomSheet,
+  BottomSheetBody,
+  BottomSheetContent,
   Button,
   Card,
   CardContent,
@@ -116,8 +119,6 @@ import ItemThumbnail from "../ItemThumbnail";
 import { OperationChat } from "./components/Chat";
 import {
   Controls,
-  type FABItem,
-  FloatingActionMenu,
   IconButtonWithTooltip,
   StartStopButton,
   Times,
@@ -128,6 +129,7 @@ import { MaintenanceDispatch } from "./components/MaintenanceDispatch";
 import { ParametersListItem } from "./components/Parameter";
 import { QualityIssueModal } from "./components/QualityIssueModal";
 import { QuantityModal } from "./components/QuantityModal";
+import { ReworkModal } from "./components/ReworkModal";
 import { SerialSelectorModal } from "./components/SerialSelectorModal";
 import {
   DeleteStepRecordModal,
@@ -233,6 +235,7 @@ export const JobOperation = ({
     attributeRecordModal.isOpen || attributeRecordDeleteModal.isOpen;
 
   const {
+    actionsSheet,
     availableEntities,
     active,
     activeTab,
@@ -965,6 +968,7 @@ export const JobOperation = ({
                     aria-label="Issue Material"
                     leftIcon={<LuGitBranchPlus />}
                     variant="secondary"
+                    size="lg"
                     onClick={() => {
                       flushSync(() => {
                         setSelectedMaterial(null);
@@ -1583,6 +1587,7 @@ export const JobOperation = ({
                         <HStack>
                           <SplitButton
                             leftIcon={<LuQrCode />}
+                            size="lg"
                             dropdownItems={labelSizes.map((size) => ({
                               label: size.name,
                               onClick: () =>
@@ -1595,7 +1600,11 @@ export const JobOperation = ({
                           >
                             <Trans>Tracking Labels</Trans>
                           </SplitButton>
-                          <Button variant="secondary" leftIcon={<LuBarcode />}>
+                          <Button
+                            variant="secondary"
+                            size="lg"
+                            leftIcon={<LuBarcode />}
+                          >
                             <Trans>Scan</Trans>
                           </Button>
                         </HStack>
@@ -2087,63 +2096,13 @@ export const JobOperation = ({
                   tooltip={t`Log Completed`}
                   onClick={completeModal.onOpen}
                 />
-                <Suspense key={`fab-${operationId}`}>
-                  <Await resolve={workCenter}>
-                    {(resolvedWorkCenter) => {
-                      const isEntityCompleted =
-                        parentIsSerial &&
-                        trackedEntities.some(
-                          (entity) =>
-                            entity.id === trackedEntityId &&
-                            `Operation ${operationId}` in
-                              (entity.attributes as TrackedEntityAttributes)
-                        );
-
-                      const fabItems: FABItem[] = [
-                        {
-                          icon: (
-                            <FaTrash className="text-accent-foreground group-hover:text-accent-foreground/80" />
-                          ),
-                          label: t`Log Scrap`,
-                          onClick: scrapModal.onOpen,
-                          disabled: isEntityCompleted
-                        },
-                        {
-                          icon: <FaCheck />,
-                          label: t`Close Out`,
-                          onClick: finishModal.onOpen,
-                          variant:
-                            operation.quantityComplete ===
-                            operation.operationQuantity
-                              ? "success"
-                              : "default"
-                        },
-                        {
-                          icon: (
-                            <LuTriangleAlert className="text-accent-foreground group-hover:text-accent-foreground/80" />
-                          ),
-                          label: t`Quality Issue`,
-                          onClick: qualityIssueModal.onOpen
-                        }
-                      ];
-
-                      if (
-                        resolvedWorkCenter.data &&
-                        !resolvedWorkCenter.data.isBlocked
-                      ) {
-                        fabItems.push({
-                          icon: (
-                            <LuWrench className="text-accent-foreground group-hover:text-accent-foreground/80" />
-                          ),
-                          label: t`Maintenance`,
-                          onClick: maintenanceModal.onOpen
-                        });
-                      }
-
-                      return <FloatingActionMenu items={fabItems} />;
-                    }}
-                  </Await>
-                </Suspense>
+                <IconButtonWithTooltip
+                  icon={
+                    <LuEllipsisVertical className="text-accent-foreground group-hover:text-accent-foreground/80" />
+                  }
+                  tooltip={t`More Actions`}
+                  onClick={actionsSheet.onOpen}
+                />
               </div>
             </div>
           </Controls>
@@ -2281,16 +2240,98 @@ export const JobOperation = ({
           </Times>
         )}
       </Tabs>
+      <BottomSheet
+        open={actionsSheet.isOpen}
+        onOpenChange={(open) => {
+          if (!open) actionsSheet.onClose();
+        }}
+      >
+        <BottomSheetContent className="max-w-md mx-auto">
+          <BottomSheetBody>
+            <div className="flex flex-col gap-2 pb-2">
+              <button
+                type="button"
+                className="flex items-center gap-3 rounded-lg bg-accent px-4 py-4 text-accent-foreground ring-1 ring-black/5 active:scale-[0.98] transition-transform"
+                onClick={() => {
+                  actionsSheet.onClose();
+                  scrapModal.onOpen();
+                }}
+              >
+                <FaTrash className="size-4 shrink-0 fill-muted-foreground" />
+                <span className="text-base/6 font-medium">
+                  <Trans>Scrap</Trans>
+                </span>
+              </button>
+              <button
+                type="button"
+                className="flex items-center gap-3 rounded-lg bg-accent px-4 py-4 text-accent-foreground ring-1 ring-black/5 active:scale-[0.98] transition-transform"
+                onClick={() => {
+                  actionsSheet.onClose();
+                  reworkModal.onOpen();
+                }}
+              >
+                <LuGitPullRequest className="size-4 shrink-0 stroke-muted-foreground" />
+                <span className="text-base/6 font-medium">
+                  <Trans>Rework</Trans>
+                </span>
+              </button>
+              <button
+                type="button"
+                className="flex items-center gap-3 rounded-lg bg-accent px-4 py-4 text-accent-foreground ring-1 ring-black/5 active:scale-[0.98] transition-transform"
+                onClick={() => {
+                  actionsSheet.onClose();
+                  finishModal.onOpen();
+                }}
+              >
+                <LuCheck className="size-4 shrink-0 stroke-muted-foreground" />
+                <span className="text-base/6 font-medium">
+                  <Trans>Finish</Trans>
+                </span>
+              </button>
+              <Suspense>
+                <Await resolve={workCenter}>
+                  {(resolvedWorkCenter) =>
+                    resolvedWorkCenter.data &&
+                    !resolvedWorkCenter.data.isBlocked ? (
+                      <button
+                        type="button"
+                        className="flex items-center gap-3 rounded-lg bg-accent px-4 py-4 text-accent-foreground ring-1 ring-black/5 active:scale-[0.98] transition-transform"
+                        onClick={() => {
+                          actionsSheet.onClose();
+                          maintenanceModal.onOpen();
+                        }}
+                      >
+                        <LuWrench className="size-4 shrink-0 stroke-muted-foreground" />
+                        <span className="text-base/6 font-medium">
+                          <Trans>Maintenance</Trans>
+                        </span>
+                      </button>
+                    ) : null
+                  }
+                </Await>
+              </Suspense>
+              <button
+                type="button"
+                className="flex items-center gap-3 rounded-lg bg-accent px-4 py-4 text-accent-foreground ring-1 ring-black/5 active:scale-[0.98] transition-transform"
+                onClick={() => {
+                  actionsSheet.onClose();
+                  qualityIssueModal.onOpen();
+                }}
+              >
+                <LuTriangleAlert className="size-4 shrink-0 stroke-muted-foreground" />
+                <span className="text-base/6 font-medium">
+                  <Trans>Quality Issue</Trans>
+                </span>
+              </button>
+            </div>
+          </BottomSheetBody>
+        </BottomSheetContent>
+      </BottomSheet>
       {reworkModal.isOpen && (
-        <QuantityModal
-          type="rework"
-          laborProductionEvent={laborProductionEvent}
-          machineProductionEvent={machineProductionEvent}
+        <ReworkModal
           operation={operation}
-          parentIsSerial={parentIsSerial}
-          parentIsBatch={parentIsBatch}
-          setupProductionEvent={setupProductionEvent}
-          trackedEntityId={trackedEntityId}
+          jobId={job.id!}
+          isOpen={reworkModal.isOpen}
           onClose={reworkModal.onClose}
         />
       )}

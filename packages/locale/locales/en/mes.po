@@ -73,9 +73,6 @@ msgstr "Add Spare Part"
 msgid "All"
 msgstr "All"
 
-msgid "Are you sure you want to close out this operation? This will end all active production events for this operation."
-msgstr "Are you sure you want to close out this operation? This will end all active production events for this operation."
-
 msgid "Are you sure you want to delete this step?"
 msgstr "Are you sure you want to delete this step?"
 
@@ -84,6 +81,9 @@ msgstr "Are you sure you want to delete this timecard? This cannot be undone."
 
 msgid "Are you sure you want to end all production events? This will end all active operations without completing or finishing them."
 msgstr "Are you sure you want to end all production events? This will end all active operations without completing or finishing them."
+
+msgid "Are you sure you want to finish this operation? This will end all active production events for this operation."
+msgstr "Are you sure you want to finish this operation? This will end all active production events for this operation."
 
 msgid "Are you sure you want to leave this page?"
 msgstr "Are you sure you want to leave this page?"
@@ -165,19 +165,6 @@ msgstr "Clock Out"
 msgid "Clocked in since {0}"
 msgstr "Clocked in since {0}"
 
-msgid "Close"
-msgstr "Close"
-
-msgid "Close Anyways"
-msgstr "Close Anyways"
-
-msgid "Close Out"
-msgstr "Close Out"
-
-#. placeholder {0}: operation.itemReadableId
-msgid "Close out {0}"
-msgstr "Close out {0}"
-
 #. placeholder {0}: active.data.current.column.title
 #. placeholder {1}: overColumnPosition + 1
 #. placeholder {2}: columnOrder.length
@@ -230,6 +217,9 @@ msgstr "Create Issue"
 msgid "Create Quality Issue"
 msgstr "Create Quality Issue"
 
+msgid "Create Rework"
+msgstr "Create Rework"
+
 msgid "Customer"
 msgstr "Customer"
 
@@ -258,6 +248,9 @@ msgstr "Delete Timecard ({0})"
 msgid "Describe the problem..."
 msgstr "Describe the problem..."
 
+msgid "Describe what needs to be reworked..."
+msgstr "Describe what needs to be reworked..."
+
 msgid "Description"
 msgstr "Description"
 
@@ -284,8 +277,8 @@ msgid "Dragging {0} cancelled."
 msgstr "Dragging {0} cancelled."
 
 #. placeholder {0}: formatRelativeTime( convertDateStringToIsoString( operation.operationDueDate ) )
+#. placeholder {0}: formatRelativeTime( convertDateStringToIsoString( operation.operationDueDate ) )
 #. placeholder {0}: formatRelativeTime( convertDateStringToIsoString(operation.jobDueDate) )
-#. placeholder {0}: formatRelativeTime( convertDateStringToIsoString(item.dueDate) )
 msgid "Due {0}"
 msgstr "Due {0}"
 
@@ -357,8 +350,21 @@ msgstr "Files related to the job and the opportunity line."
 msgid "Filter"
 msgstr "Filter"
 
+msgid "Finish"
+msgstr "Finish"
+
+#. placeholder {0}: operation.itemReadableId
+msgid "Finish {0}"
+msgstr "Finish {0}"
+
+msgid "Finish Anyways"
+msgstr "Finish Anyways"
+
 msgid "Forgot to Clock Out?"
 msgstr "Forgot to Clock Out?"
+
+msgid "Go back to operation"
+msgstr "Go back to operation"
 
 msgid "Have a technical issue? Contact <0>Carbon Support.</0>"
 msgstr "Have a technical issue? Contact <0>Carbon Support.</0>"
@@ -494,6 +500,9 @@ msgstr "Maximum number of records reached"
 
 msgid "Model"
 msgstr "Model"
+
+msgid "More Actions"
+msgstr "More Actions"
 
 msgid "More options"
 msgstr "More options"
@@ -698,6 +707,9 @@ msgstr "Quantity"
 msgid "Quantity must be greater than 0"
 msgstr "Quantity must be greater than 0"
 
+msgid "Reason for rework"
+msgstr "Reason for rework"
+
 msgid "Recent"
 msgstr "Recent"
 
@@ -720,6 +732,12 @@ msgstr "Remove Inventory"
 msgid "Remove part"
 msgstr "Remove part"
 
+msgid "Rework"
+msgstr "Rework"
+
+msgid "Rework created successfully"
+msgstr "Rework created successfully"
+
 msgid "Sales Order"
 msgstr "Sales Order"
 
@@ -734,6 +752,9 @@ msgstr "Scan or enter serial number"
 
 msgid "Schedule"
 msgstr "Schedule"
+
+msgid "Scrap"
+msgstr "Scrap"
 
 msgid "Scrap Reason"
 msgstr "Scrap Reason"
@@ -784,6 +805,9 @@ msgstr "Select Serial {0}"
 
 msgid "Select Serial Number"
 msgstr "Select Serial Number"
+
+msgid "Select the operation to go back to. All operations from that point to the current operation will be redone."
+msgstr "Select the operation to go back to. All operations from that point to the current operation will be redone."
 
 msgid "Send"
 msgstr "Send"

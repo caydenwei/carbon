@@ -71,7 +71,7 @@ export function QuantityModal({
     scrap: t`Log scrap for ${operation.itemReadableId}`,
     rework: t`Log rework for ${operation.itemReadableId}`,
     complete: t`Log completed for ${operation.itemReadableId}`,
-    finish: t`Close out ${operation.itemReadableId}`
+    finish: t`Finish ${operation.itemReadableId}`
   };
 
   const isOperationComplete =
@@ -81,7 +81,7 @@ export function QuantityModal({
     scrap: t`Select a scrap quantity and reason`,
     rework: t`Select a rework quantity`,
     complete: t`Select a completion quantity`,
-    finish: t`Are you sure you want to close out this operation? This will end all active production events for this operation.`
+    finish: t`Are you sure you want to finish this operation? This will end all active production events for this operation.`
   };
 
   const actionMap = {
@@ -95,7 +95,7 @@ export function QuantityModal({
     scrap: t`Log Scrap`,
     rework: t`Log Rework`,
     complete: t`Log Completed`,
-    finish: isOperationComplete ? t`Close` : t`Close Anyways`
+    finish: isOperationComplete ? t`Finish` : t`Finish Anyways`
   };
 
   const validatorMap = {
@@ -239,13 +239,14 @@ export function QuantityModal({
                       onChange={setQuantity}
                       isReadOnly={parentIsSerial}
                       minValue={0}
+                      size="lg"
                     />
                   </div>
                   {type === "complete" && !parentIsSerial && (
                     <Button
                       variant="secondary"
-                      size="md"
-                      className="h-10"
+                      size="lg"
+                      className="h-12"
                       onClick={() =>
                         setQuantity(
                           operation.operationQuantity -
@@ -260,14 +261,19 @@ export function QuantityModal({
               )}
               {type === "scrap" ? (
                 <>
-                  <ScrapReason name="scrapReasonId" label={t`Scrap Reason`} />
-                  <TextArea label={t`Notes`} name="notes" />
+                  <ScrapReason
+                    name="scrapReasonId"
+                    label={t`Scrap Reason`}
+                    size="lg"
+                  />
+                  <TextArea label={t`Notes`} name="notes" size="lg" />
                 </>
               ) : (
                 <>
                   <NumberControlled
                     name="totalQuantity"
                     label={t`Total Quantity`}
+                    size="lg"
                     value={
                       quantity +
                       (type === "rework"
@@ -281,11 +287,12 @@ export function QuantityModal({
             </VStack>
           </ModalBody>
           <ModalFooter>
-            <Button variant="secondary" onClick={onClose}>
+            <Button variant="secondary" size="lg" onClick={onClose}>
               <Trans>Cancel</Trans>
             </Button>
 
             <Button
+              size="lg"
               variant={
                 type === "scrap" || (!isOperationComplete && type === "finish")
                   ? "destructive"

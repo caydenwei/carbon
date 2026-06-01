@@ -191,12 +191,6 @@ msgstr "会计已启用"
 msgid "Accounts"
 msgstr "账户"
 
-msgid "Accounts Payable Billing Address"
-msgstr "应付账款账单地址"
-
-msgid "Accounts Receivable Billing Address"
-msgstr "应收账款账单地址"
-
 msgid "Accumulation Period (Weeks)"
 msgstr "累积期（周）"
 
@@ -1012,6 +1006,15 @@ msgstr "自动启动作业"
 msgid "Auto-generated QR Code"
 msgstr "自动生成的二维码"
 
+msgid "Automatic Cost Updates"
+msgstr ""
+
+msgid "Automatic Lead Time Updates"
+msgstr ""
+
+msgid "Automatic Updates"
+msgstr ""
+
 msgid "Automatically release the job when the kanban is scanned"
 msgstr "当扫描看板时自动释放作业"
 
@@ -1259,6 +1262,9 @@ msgstr "分类名称"
 msgid "CC"
 msgstr "抄送"
 
+msgid "Centralized Billing Address"
+msgstr ""
+
 msgid "Change"
 msgstr "更改"
 
@@ -1503,8 +1509,8 @@ msgstr "配置用于系统中各种交易类型的默认账户"
 msgid "Configure the start months for your fiscal and tax years"
 msgstr "配置您的财政年度和税务年度的开始月份"
 
-msgid "Configure when purchased item prices should be updated from supplier transactions."
-msgstr "配置何时应从供应商交易更新采购物品价格。"
+msgid "Configure when purchased item costs should be updated from supplier transactions."
+msgstr ""
 
 msgid "Configure who should receive notifications when a supplier submits a quote."
 msgstr "配置供应商提交报价时谁应该收到通知。"
@@ -3014,12 +3020,6 @@ msgstr "启用以为原材料生成ID和描述。"
 msgid "Enable to include work instructions on job traveler PDFs."
 msgstr "启用以在工作单据 PDF 上包含工作说明。"
 
-msgid "Enable to show part thumbnails on purchase order PDFs."
-msgstr "启用以在采购订单 PDF 上显示零件缩略图。"
-
-msgid "Enable to show part thumbnails on sales PDFs."
-msgstr "启用以在销售 PDF 上显示零件缩略图。"
-
 msgid "Enable to start tracking changes to your data."
 msgstr "启用以开始跟踪您的数据变化。"
 
@@ -3920,6 +3920,12 @@ msgstr "在发货中包含额外零件"
 msgid "Include Inactive"
 msgstr "包括不活跃"
 
+msgid "Include Thumbnails on Purchasing Documents"
+msgstr ""
+
+msgid "Include Thumbnails on Sales Documents"
+msgstr ""
+
 msgid "Includes tax and shipping costs"
 msgstr "包括税费和运费"
 
@@ -4297,9 +4303,6 @@ msgstr "提前期（天）"
 
 msgid "Lead Time (Days)"
 msgstr "交期（天）"
-
-msgid "Lead Time Updates"
-msgstr "提前期更新"
 
 msgid "Lead Time:"
 msgstr "交货时间："
@@ -5648,12 +5651,6 @@ msgstr "零件ID"
 msgid "Part is configured for manufacturing"
 msgstr "零件已配置用于制造"
 
-msgid "Part thumbnails are shown on purchase order PDFs."
-msgstr "部件缩略图显示在采购订单 PDF 上。"
-
-msgid "Part thumbnails are shown on sales PDFs."
-msgstr "零件缩略图显示在销售 PDF 上。"
-
 msgid "Partial"
 msgstr "部分"
 
@@ -5695,9 +5692,6 @@ msgstr "PDF 页面"
 
 msgid "PDF Watermark"
 msgstr "PDF 水印"
-
-msgid "PDFs"
-msgstr "PDF"
 
 msgid "Pending"
 msgstr "待处理"
@@ -6065,9 +6059,6 @@ msgstr "采购订单"
 msgid "Purchase orders required"
 msgstr "采购订单必需"
 
-msgid "Purchase Price Updates"
-msgstr "采购价格更新"
-
 msgid "Purchase Qty"
 msgstr "采购数量"
 
@@ -6216,6 +6207,9 @@ msgstr "报价日期"
 
 msgid "Quotes"
 msgstr "报价"
+
+msgid "Quoting"
+msgstr ""
 
 msgid "Rate Limit"
 msgstr "速率限制"
@@ -6617,6 +6611,12 @@ msgstr "角色"
 
 msgid "Role:"
 msgstr "角色："
+
+msgid "Route all AP invoices to one address (e.g. corporate headquarters) instead of individual purchasers."
+msgstr ""
+
+msgid "Route all AR invoices to one address (e.g. corporate headquarters) instead of individual locations."
+msgstr ""
 
 msgid "rows"
 msgstr "行"
@@ -7210,11 +7210,11 @@ msgstr "显示时长"
 msgid "Show parent items"
 msgstr "显示父项"
 
-msgid "Show part thumbnails on purchase orders."
-msgstr "在采购订单上显示零件缩略图。"
+msgid "Show part thumbnails on purchase order PDFs."
+msgstr ""
 
-msgid "Show part thumbnails on quotes, sales orders, sales invoices, and shipments."
-msgstr "在报价单、销售订单、销售发票和发货单上显示零件缩略图。"
+msgid "Show part thumbnails on quotes, sales orders, invoices, and shipments."
+msgstr ""
 
 msgid "Show Supplier IDs"
 msgstr "显示供应商ID"
@@ -7736,12 +7736,6 @@ msgstr "计算方法后可用现金折扣的天数"
 msgid "The amount of days after the calculation method that the payment is due"
 msgstr "计算方法后的天数，在该天数后付款到期"
 
-msgid "The billing address used on purchase orders and other purchasing documents."
-msgstr "用于采购订单和其他采购文件的账单地址。"
-
-msgid "The billing address used on quotes, sales orders, invoices, and other sales documents."
-msgstr "用于报价单、销售订单、发票和其他销售文件的账单地址。"
-
 msgid "The date the customer expects to receive the goods"
 msgstr "客户期望收到货物的日期"
 
@@ -7885,12 +7879,6 @@ msgstr "缩略图已移除"
 
 msgid "Thumbnail uploaded"
 msgstr "缩略图已上传"
-
-msgid "Thumbnails are included"
-msgstr "缩略图已包含"
-
-msgid "Thumbnails are not included"
-msgstr "缩略图未包含"
 
 msgid "Thursday"
 msgstr "星期四"
@@ -8207,6 +8195,9 @@ msgstr "计量单位"
 msgid "Update"
 msgstr "更新"
 
+msgid "Update costs on"
+msgstr ""
+
 msgid "Update Inventory"
 msgstr "更新库存"
 
@@ -8227,9 +8218,6 @@ msgstr "更新密码"
 
 msgid "Update Permissions"
 msgstr "更新权限"
-
-msgid "Update prices on"
-msgstr "在以下时间更新价格"
 
 msgid "Update Quantity"
 msgstr "更新数量"

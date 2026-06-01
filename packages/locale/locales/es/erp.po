@@ -191,12 +191,6 @@ msgstr "La contabilidad está habilitada"
 msgid "Accounts"
 msgstr "Cuentas"
 
-msgid "Accounts Payable Billing Address"
-msgstr "Dirección de Facturación de Cuentas por Pagar"
-
-msgid "Accounts Receivable Billing Address"
-msgstr "Dirección de Facturación de Cuentas por Cobrar"
-
 msgid "Accumulation Period (Weeks)"
 msgstr "Período de Acumulación (Semanas)"
 
@@ -1012,6 +1006,15 @@ msgstr "Iniciar Trabajo Automáticamente"
 msgid "Auto-generated QR Code"
 msgstr "Código QR generado automáticamente"
 
+msgid "Automatic Cost Updates"
+msgstr ""
+
+msgid "Automatic Lead Time Updates"
+msgstr ""
+
+msgid "Automatic Updates"
+msgstr ""
+
 msgid "Automatically release the job when the kanban is scanned"
 msgstr "Liberar automáticamente el trabajo cuando se escanea el kanban"
 
@@ -1259,6 +1262,9 @@ msgstr "Nombre de Categoría"
 msgid "CC"
 msgstr "CC"
 
+msgid "Centralized Billing Address"
+msgstr ""
+
 msgid "Change"
 msgstr "Cambiar"
 
@@ -1503,8 +1509,8 @@ msgstr "Configura las cuentas predeterminadas utilizadas para varios tipos de tr
 msgid "Configure the start months for your fiscal and tax years"
 msgstr "Configura los meses de inicio para tus años fiscales y tributarios"
 
-msgid "Configure when purchased item prices should be updated from supplier transactions."
-msgstr "Configura cuándo deben actualizarse los precios de los artículos comprados a partir de las transacciones de proveedores."
+msgid "Configure when purchased item costs should be updated from supplier transactions."
+msgstr ""
 
 msgid "Configure who should receive notifications when a supplier submits a quote."
 msgstr "Configura quién debe recibir notificaciones cuando un proveedor envía una cotización."
@@ -3014,12 +3020,6 @@ msgstr "Habilitar para generar IDs y descripciones para materias primas."
 msgid "Enable to include work instructions on job traveler PDFs."
 msgstr "Habilitar para incluir instrucciones de trabajo en los PDF del viajero de trabajo."
 
-msgid "Enable to show part thumbnails on purchase order PDFs."
-msgstr "Habilitar para mostrar miniaturas de piezas en los PDF de órdenes de compra."
-
-msgid "Enable to show part thumbnails on sales PDFs."
-msgstr "Habilitar para mostrar miniaturas de piezas en PDF de ventas."
-
 msgid "Enable to start tracking changes to your data."
 msgstr "Habilita para comenzar a rastrear cambios en tus datos."
 
@@ -3920,6 +3920,12 @@ msgstr "Incluir piezas adicionales en el envío"
 msgid "Include Inactive"
 msgstr "Incluir Inactivos"
 
+msgid "Include Thumbnails on Purchasing Documents"
+msgstr ""
+
+msgid "Include Thumbnails on Sales Documents"
+msgstr ""
+
 msgid "Includes tax and shipping costs"
 msgstr "Incluye impuestos y costos de envío"
 
@@ -4297,9 +4303,6 @@ msgstr "Tiempo de entrega (días)"
 
 msgid "Lead Time (Days)"
 msgstr "Tiempo de Entrega (Días)"
-
-msgid "Lead Time Updates"
-msgstr "Actualizaciones de Tiempo de Entrega"
 
 msgid "Lead Time:"
 msgstr "Tiempo de entrega:"
@@ -5648,12 +5651,6 @@ msgstr "ID de Pieza"
 msgid "Part is configured for manufacturing"
 msgstr "La pieza está configurada para fabricación"
 
-msgid "Part thumbnails are shown on purchase order PDFs."
-msgstr "Las miniaturas de piezas se muestran en los PDF de órdenes de compra."
-
-msgid "Part thumbnails are shown on sales PDFs."
-msgstr "Las miniaturas de piezas se muestran en los PDF de ventas."
-
 msgid "Partial"
 msgstr "Parcial"
 
@@ -5695,9 +5692,6 @@ msgstr "Páginas PDF"
 
 msgid "PDF Watermark"
 msgstr "Marca de agua PDF"
-
-msgid "PDFs"
-msgstr "PDFs"
 
 msgid "Pending"
 msgstr "Pendiente"
@@ -6065,9 +6059,6 @@ msgstr "Órdenes de Compra"
 msgid "Purchase orders required"
 msgstr "Órdenes de compra requeridas"
 
-msgid "Purchase Price Updates"
-msgstr "Actualizaciones de Precio de Compra"
-
 msgid "Purchase Qty"
 msgstr "Cantidad de Compra"
 
@@ -6216,6 +6207,9 @@ msgstr "Fecha de Cotización"
 
 msgid "Quotes"
 msgstr "Cotizaciones"
+
+msgid "Quoting"
+msgstr ""
 
 msgid "Rate Limit"
 msgstr "Límite de Velocidad"
@@ -6617,6 +6611,12 @@ msgstr "Rol"
 
 msgid "Role:"
 msgstr "Rol:"
+
+msgid "Route all AP invoices to one address (e.g. corporate headquarters) instead of individual purchasers."
+msgstr ""
+
+msgid "Route all AR invoices to one address (e.g. corporate headquarters) instead of individual locations."
+msgstr ""
 
 msgid "rows"
 msgstr "filas"
@@ -7210,11 +7210,11 @@ msgstr "Mostrar duraciones"
 msgid "Show parent items"
 msgstr "Mostrar elementos principales"
 
-msgid "Show part thumbnails on purchase orders."
-msgstr "Mostrar miniaturas de piezas en órdenes de compra."
+msgid "Show part thumbnails on purchase order PDFs."
+msgstr ""
 
-msgid "Show part thumbnails on quotes, sales orders, sales invoices, and shipments."
-msgstr "Mostrar miniaturas de piezas en cotizaciones, órdenes de venta, facturas de venta y envíos."
+msgid "Show part thumbnails on quotes, sales orders, invoices, and shipments."
+msgstr ""
 
 msgid "Show Supplier IDs"
 msgstr "Mostrar IDs de Proveedores"
@@ -7736,12 +7736,6 @@ msgstr "La cantidad de días después del método de cálculo en que el descuent
 msgid "The amount of days after the calculation method that the payment is due"
 msgstr "La cantidad de días después del método de cálculo en que vence el pago"
 
-msgid "The billing address used on purchase orders and other purchasing documents."
-msgstr "La dirección de facturación utilizada en órdenes de compra y otros documentos de compra."
-
-msgid "The billing address used on quotes, sales orders, invoices, and other sales documents."
-msgstr "La dirección de facturación utilizada en cotizaciones, órdenes de venta, facturas y otros documentos de ventas."
-
 msgid "The date the customer expects to receive the goods"
 msgstr "La fecha en que el cliente espera recibir los bienes"
 
@@ -7885,12 +7879,6 @@ msgstr "Miniatura eliminada"
 
 msgid "Thumbnail uploaded"
 msgstr "Miniatura cargada"
-
-msgid "Thumbnails are included"
-msgstr "Las miniaturas están incluidas"
-
-msgid "Thumbnails are not included"
-msgstr "Las miniaturas no están incluidas"
 
 msgid "Thursday"
 msgstr "Jueves"
@@ -8207,6 +8195,9 @@ msgstr "UoM"
 msgid "Update"
 msgstr "Actualizar"
 
+msgid "Update costs on"
+msgstr ""
+
 msgid "Update Inventory"
 msgstr "Actualizar Inventario"
 
@@ -8227,9 +8218,6 @@ msgstr "Actualizar Contraseña"
 
 msgid "Update Permissions"
 msgstr "Actualizar Permisos"
-
-msgid "Update prices on"
-msgstr "Actualizar precios en"
 
 msgid "Update Quantity"
 msgstr "Actualizar Cantidad"

@@ -2019,6 +2019,9 @@ msgstr "Kundendetails"
 msgid "Customer ID"
 msgstr "Kunden-ID"
 
+msgid "Customer ID cannot be changed after creation"
+msgstr "Kundennummer kann nach der Erstellung nicht geändert werden"
+
 msgid "Customer Invoice Number"
 msgstr "Kundenrechnungsnummer"
 
@@ -2598,6 +2601,9 @@ msgstr "CSV herunterladen"
 
 msgid "Download PDF"
 msgstr "PDF herunterladen"
+
+msgid "Download template"
+msgstr "Vorlage herunterladen"
 
 msgid "Draft"
 msgstr "Entwurf"
@@ -3803,6 +3809,9 @@ msgstr "Spalten ausblenden, fixieren und neu anordnen"
 msgid "Higher priority wins ties and applies first for markups"
 msgstr "Höhere Priorität gewinnt bei Gleichständen und wird zuerst für Aufschläge angewendet"
 
+msgid "Hints in the first row"
+msgstr "Hinweise in der ersten Zeile"
+
 msgid "History"
 msgstr "Verlauf"
 
@@ -4844,6 +4853,9 @@ msgstr "NCRs nach Typ"
 
 msgid "Need by"
 msgstr "Benötigt bis"
+
+msgid "Need the right columns?"
+msgstr "Benötigen Sie die richtigen Spalten?"
 
 msgid "Negative Adjustment"
 msgstr "Negative Anpassung"
@@ -7183,6 +7195,15 @@ msgstr "Kurzbeschreibung"
 msgid "Shortcuts"
 msgstr "Tastenkombinationen"
 
+msgid "Show a readable Customer ID column on the customer list, customer forms, and dropdowns. Customers are still identified internally either way."
+msgstr "Zeigen Sie eine lesbare Kundennummern-Spalte in der Kundenliste, Kundenformularen und Dropdowns an. Kunden werden intern in jedem Fall identifiziert."
+
+msgid "Show a readable Supplier ID column on the supplier list, supplier forms, and dropdowns. Suppliers are still identified internally either way."
+msgstr "Zeigen Sie eine lesbare Lieferanten-ID-Spalte in der Lieferantenliste, Lieferantenformularen und Dropdowns an. Lieferanten werden intern in jedem Fall identifiziert."
+
+msgid "Show Customer IDs"
+msgstr "Kundenkennung anzeigen"
+
 msgid "Show Durations"
 msgstr "Dauern anzeigen"
 
@@ -7194,6 +7215,9 @@ msgstr "Zeige Teilminiaturen auf Bestellungen an."
 
 msgid "Show part thumbnails on quotes, sales orders, sales invoices, and shipments."
 msgstr "Zeigen Sie Teilminiaturen auf Angeboten, Verkaufsaufträgen, Verkaufsrechnungen und Lieferungen an."
+
+msgid "Show Supplier IDs"
+msgstr "Lieferanten-IDs anzeigen"
 
 msgid "Show sync options"
 msgstr "Synchronisierungsoptionen anzeigen"
@@ -7524,6 +7548,9 @@ msgstr "Lieferantenkontakt"
 
 msgid "Supplier ID"
 msgstr "Lieferanten-ID"
+
+msgid "Supplier ID cannot be changed after creation"
+msgstr "Lieferanten-ID kann nach der Erstellung nicht geändert werden"
 
 msgid "Supplier Invoice Number"
 msgstr "Lieferantenrechnungsnummer"

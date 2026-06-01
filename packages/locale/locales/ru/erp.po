@@ -2019,6 +2019,9 @@ msgstr "Детали клиента"
 msgid "Customer ID"
 msgstr "ID клиента"
 
+msgid "Customer ID cannot be changed after creation"
+msgstr "ID клиента не может быть изменен после создания"
+
 msgid "Customer Invoice Number"
 msgstr "Номер счета клиента"
 
@@ -2598,6 +2601,9 @@ msgstr "Загрузить CSV"
 
 msgid "Download PDF"
 msgstr "Скачать PDF"
+
+msgid "Download template"
+msgstr "Скачать шаблон"
 
 msgid "Draft"
 msgstr "Черновик"
@@ -3803,6 +3809,9 @@ msgstr "Скрывать, закреплять и переупорядочива
 msgid "Higher priority wins ties and applies first for markups"
 msgstr "Более высокий приоритет выигрывает при равенстве и применяется первым для наценок"
 
+msgid "Hints in the first row"
+msgstr "Подсказки в первой строке"
+
 msgid "History"
 msgstr "История"
 
@@ -4844,6 +4853,9 @@ msgstr "NCRs по типам"
 
 msgid "Need by"
 msgstr "Требуется к"
+
+msgid "Need the right columns?"
+msgstr "Нужны правильные столбцы?"
 
 msgid "Negative Adjustment"
 msgstr "Отрицательная корректировка"
@@ -7183,6 +7195,15 @@ msgstr "Краткое описание"
 msgid "Shortcuts"
 msgstr "Сочетания клавиш"
 
+msgid "Show a readable Customer ID column on the customer list, customer forms, and dropdowns. Customers are still identified internally either way."
+msgstr "Показывать столбец с читаемым ID клиента в списке клиентов, формах клиентов и раскрывающихся списках. Клиенты по-прежнему идентифицируются внутри системы в любом случае."
+
+msgid "Show a readable Supplier ID column on the supplier list, supplier forms, and dropdowns. Suppliers are still identified internally either way."
+msgstr "Показать читаемый столбец ID поставщика в списке поставщиков, формах поставщиков и раскрывающихся списках. Поставщики по-прежнему идентифицируются внутри системы в любом случае."
+
+msgid "Show Customer IDs"
+msgstr "Показать ID клиентов"
+
 msgid "Show Durations"
 msgstr "Показать длительность"
 
@@ -7194,6 +7215,9 @@ msgstr "Показывать миниатюры деталей в заказах
 
 msgid "Show part thumbnails on quotes, sales orders, sales invoices, and shipments."
 msgstr "Показывать миниатюры деталей на предложениях, заказах на продажу, счетах-фактурах продаж и отправках."
+
+msgid "Show Supplier IDs"
+msgstr "Показать ID поставщиков"
 
 msgid "Show sync options"
 msgstr "Показать параметры синхронизации"
@@ -7524,6 +7548,9 @@ msgstr "Контакт поставщика"
 
 msgid "Supplier ID"
 msgstr "ID поставщика"
+
+msgid "Supplier ID cannot be changed after creation"
+msgstr "ID поставщика не может быть изменен после создания"
 
 msgid "Supplier Invoice Number"
 msgstr "Номер счета поставщика"

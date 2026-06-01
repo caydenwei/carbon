@@ -2019,6 +2019,9 @@ msgstr "Détails du client"
 msgid "Customer ID"
 msgstr "ID Client"
 
+msgid "Customer ID cannot be changed after creation"
+msgstr "L'ID client ne peut pas être modifié après la création"
+
 msgid "Customer Invoice Number"
 msgstr "Numéro de facture client"
 
@@ -2598,6 +2601,9 @@ msgstr "Télécharger CSV"
 
 msgid "Download PDF"
 msgstr "Télécharger le PDF"
+
+msgid "Download template"
+msgstr "Télécharger le modèle"
 
 msgid "Draft"
 msgstr "Brouillon"
@@ -3803,6 +3809,9 @@ msgstr "Masquer, épingler et réorganiser les colonnes"
 msgid "Higher priority wins ties and applies first for markups"
 msgstr "La priorité plus élevée gagne les égalités et s'applique en premier pour les majorations"
 
+msgid "Hints in the first row"
+msgstr "Indices dans la première ligne"
+
 msgid "History"
 msgstr "Historique"
 
@@ -4844,6 +4853,9 @@ msgstr "NCRs par type"
 
 msgid "Need by"
 msgstr "Requis le"
+
+msgid "Need the right columns?"
+msgstr "Besoin des bonnes colonnes ?"
 
 msgid "Negative Adjustment"
 msgstr "Ajustement Négatif"
@@ -7183,6 +7195,15 @@ msgstr "Description courte"
 msgid "Shortcuts"
 msgstr "Raccourcis"
 
+msgid "Show a readable Customer ID column on the customer list, customer forms, and dropdowns. Customers are still identified internally either way."
+msgstr "Afficher une colonne ID client lisible sur la liste des clients, les formulaires clients et les listes déroulantes. Les clients sont toujours identifiés en interne de toute façon."
+
+msgid "Show a readable Supplier ID column on the supplier list, supplier forms, and dropdowns. Suppliers are still identified internally either way."
+msgstr "Afficher une colonne ID Fournisseur lisible sur la liste des fournisseurs, les formulaires de fournisseur et les listes déroulantes. Les fournisseurs sont toujours identifiés en interne de toute façon."
+
+msgid "Show Customer IDs"
+msgstr "Afficher les ID clients"
+
 msgid "Show Durations"
 msgstr "Afficher les durées"
 
@@ -7194,6 +7215,9 @@ msgstr "Afficher les vignettes des pièces sur les bons de commande."
 
 msgid "Show part thumbnails on quotes, sales orders, sales invoices, and shipments."
 msgstr "Afficher les vignettes des pièces sur les devis, les commandes de vente, les factures de vente et les expéditions."
+
+msgid "Show Supplier IDs"
+msgstr "Afficher les ID fournisseur"
 
 msgid "Show sync options"
 msgstr "Afficher les options de synchronisation"
@@ -7524,6 +7548,9 @@ msgstr "Contact Fournisseur"
 
 msgid "Supplier ID"
 msgstr "ID Fournisseur"
+
+msgid "Supplier ID cannot be changed after creation"
+msgstr "L'ID fournisseur ne peut pas être modifié après la création"
 
 msgid "Supplier Invoice Number"
 msgstr "Numéro de facture fournisseur"

@@ -2019,6 +2019,9 @@ msgstr "客户详情"
 msgid "Customer ID"
 msgstr "客户ID"
 
+msgid "Customer ID cannot be changed after creation"
+msgstr "客户ID创建后无法更改"
+
 msgid "Customer Invoice Number"
 msgstr "客户发票号"
 
@@ -2598,6 +2601,9 @@ msgstr "下载 CSV"
 
 msgid "Download PDF"
 msgstr "下载 PDF"
+
+msgid "Download template"
+msgstr "下载模板"
 
 msgid "Draft"
 msgstr "草稿"
@@ -3803,6 +3809,9 @@ msgstr "隐藏、固定和重新排序列"
 msgid "Higher priority wins ties and applies first for markups"
 msgstr "更高的优先级在平局时获胜，并首先应用于加价"
 
+msgid "Hints in the first row"
+msgstr "第一行中的提示"
+
 msgid "History"
 msgstr "历史"
 
@@ -4844,6 +4853,9 @@ msgstr "按类型分类的不符合项"
 
 msgid "Need by"
 msgstr "需要日期"
+
+msgid "Need the right columns?"
+msgstr "需要正确的列吗？"
 
 msgid "Negative Adjustment"
 msgstr "负调整"
@@ -7183,6 +7195,15 @@ msgstr "简短描述"
 msgid "Shortcuts"
 msgstr "快捷键"
 
+msgid "Show a readable Customer ID column on the customer list, customer forms, and dropdowns. Customers are still identified internally either way."
+msgstr "在客户列表、客户表单和下拉菜单上显示可读的客户ID列。无论哪种方式，客户在内部仍然可以被识别。"
+
+msgid "Show a readable Supplier ID column on the supplier list, supplier forms, and dropdowns. Suppliers are still identified internally either way."
+msgstr "在供应商列表、供应商表单和下拉菜单上显示可读的供应商 ID 列。无论哪种方式，供应商在内部仍然可以被识别。"
+
+msgid "Show Customer IDs"
+msgstr "显示客户ID"
+
 msgid "Show Durations"
 msgstr "显示时长"
 
@@ -7194,6 +7215,9 @@ msgstr "在采购订单上显示零件缩略图。"
 
 msgid "Show part thumbnails on quotes, sales orders, sales invoices, and shipments."
 msgstr "在报价单、销售订单、销售发票和发货单上显示零件缩略图。"
+
+msgid "Show Supplier IDs"
+msgstr "显示供应商ID"
 
 msgid "Show sync options"
 msgstr "显示同步选项"
@@ -7524,6 +7548,9 @@ msgstr "供应商联系人"
 
 msgid "Supplier ID"
 msgstr "供应商 ID"
+
+msgid "Supplier ID cannot be changed after creation"
+msgstr "供应商ID创建后无法更改"
 
 msgid "Supplier Invoice Number"
 msgstr "供应商发票号"

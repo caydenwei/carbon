@@ -2019,6 +2019,9 @@ msgstr "顧客詳細"
 msgid "Customer ID"
 msgstr "顧客ID"
 
+msgid "Customer ID cannot be changed after creation"
+msgstr "顧客IDは作成後に変更することはできません"
+
 msgid "Customer Invoice Number"
 msgstr "顧客請求書番号"
 
@@ -2598,6 +2601,9 @@ msgstr "CSVをダウンロード"
 
 msgid "Download PDF"
 msgstr "PDFをダウンロード"
+
+msgid "Download template"
+msgstr "テンプレートをダウンロード"
 
 msgid "Draft"
 msgstr "下書き"
@@ -3803,6 +3809,9 @@ msgstr "列を非表示、ピン留め、並び替え"
 msgid "Higher priority wins ties and applies first for markups"
 msgstr "優先度が高いほど同点を制し、マークアップに最初に適用されます"
 
+msgid "Hints in the first row"
+msgstr "最初の行のヒント"
+
 msgid "History"
 msgstr "履歴"
 
@@ -4844,6 +4853,9 @@ msgstr "タイプ別NCR"
 
 msgid "Need by"
 msgstr "必要日"
+
+msgid "Need the right columns?"
+msgstr "正しい列が必要ですか？"
 
 msgid "Negative Adjustment"
 msgstr "負の調整"
@@ -7183,6 +7195,15 @@ msgstr "短い説明"
 msgid "Shortcuts"
 msgstr "ショートカット"
 
+msgid "Show a readable Customer ID column on the customer list, customer forms, and dropdowns. Customers are still identified internally either way."
+msgstr "顧客リスト、顧客フォーム、ドロップダウンに読みやすい顧客IDカラムを表示します。顧客は内部的にはどちらの方法でも識別されます。"
+
+msgid "Show a readable Supplier ID column on the supplier list, supplier forms, and dropdowns. Suppliers are still identified internally either way."
+msgstr "サプライヤーリスト、サプライヤーフォーム、ドロップダウンに読みやすいサプライヤーID列を表示します。サプライヤーは内部的にはどちらの方法でも識別されます。"
+
+msgid "Show Customer IDs"
+msgstr "顧客IDを表示"
+
 msgid "Show Durations"
 msgstr "期間を表示"
 
@@ -7194,6 +7215,9 @@ msgstr "購買注文に部品のサムネイルを表示します。"
 
 msgid "Show part thumbnails on quotes, sales orders, sales invoices, and shipments."
 msgstr "見積書、販売注文、販売請求書、および出荷に部品のサムネイルを表示します。"
+
+msgid "Show Supplier IDs"
+msgstr "仕入先IDを表示"
 
 msgid "Show sync options"
 msgstr "同期オプションを表示"
@@ -7524,6 +7548,9 @@ msgstr "仕入先連絡先"
 
 msgid "Supplier ID"
 msgstr "サプライヤーID"
+
+msgid "Supplier ID cannot be changed after creation"
+msgstr "サプライヤーIDは作成後に変更することはできません"
 
 msgid "Supplier Invoice Number"
 msgstr "仕入先請求書番号"

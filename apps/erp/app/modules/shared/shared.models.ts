@@ -1,4 +1,5 @@
 import type { Database } from "@carbon/database";
+import { textToTiptap } from "@carbon/utils";
 import { z } from "zod";
 import { zfd } from "zod-form-data";
 
@@ -226,12 +227,18 @@ export const operationStepValidator = z
       .string()
       .min(1, { message: "Description is required" })
       .transform((val) => {
+        let parsed: unknown;
         try {
-          return JSON.parse(val);
-          // biome-ignore lint/correctness/noUnusedVariables: suppressed due to migration
+          parsed = JSON.parse(val);
+          // biome-ignore lint/correctness/noUnusedVariables: raw text is not JSON
         } catch (e) {
-          return {};
+          parsed = val;
         }
+        // Always store a tiptap doc object, never a scalar string (jsonb scalar
+        // strings break method copies) and never silently drop content to {}.
+        if (typeof parsed === "string") return textToTiptap(parsed);
+        if (parsed && typeof parsed === "object") return parsed;
+        return textToTiptap(String(val));
       }),
     type: z.enum(procedureStepType, {
       errorMap: () => ({ message: "Type is required" })

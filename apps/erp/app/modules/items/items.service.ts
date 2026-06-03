@@ -306,6 +306,13 @@ export async function assertMethodOperationIsDraft(
   }
 }
 
+export async function deleteMethodOperation(
+  client: SupabaseClient<Database>,
+  methodOperationId: string
+) {
+  return client.from("methodOperation").delete().eq("id", methodOperationId);
+}
+
 export async function deleteMethodOperationStep(
   client: SupabaseClient<Database>,
   id: string

@@ -87,9 +87,16 @@ const main = defineCommand({
           default: true,
           description:
             "Regenerate db types + swagger after migrations (use --no-regen to skip)"
+        },
+        force: {
+          type: "boolean",
+          default: false,
+          description:
+            "Escalate stale-migration repair via `supabase migration repair --status reverted`"
         }
       },
-      run: ({ args }) => migrate({ regen: args.regen !== false })
+      run: ({ args }) =>
+        migrate({ regen: args.regen !== false, force: !!args.force })
     }),
     new: defineCommand({
       meta: { description: "Interactive: create a worktree on a fresh branch" },

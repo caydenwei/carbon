@@ -7,6 +7,6 @@
 -- otherwise the rule fires on items matching the selected types and/or groups
 -- (`filteredItemMatchAll` chooses OR vs AND between the two dimensions).
 ALTER TABLE "customRule"
-  ADD COLUMN "filteredItemTypes"    TEXT[]  NOT NULL DEFAULT '{}',
-  ADD COLUMN "filteredItemGroupIds" TEXT[]  NOT NULL DEFAULT '{}',
-  ADD COLUMN "filteredItemMatchAll" BOOLEAN NOT NULL DEFAULT false; -- false = OR (any), true = AND (all)
+  ADD COLUMN IF NOT EXISTS "filteredItemTypes"    TEXT[]  NOT NULL DEFAULT '{}',
+  ADD COLUMN IF NOT EXISTS "filteredItemGroupIds" TEXT[]  NOT NULL DEFAULT '{}',
+  ADD COLUMN IF NOT EXISTS "filteredItemMatchAll" BOOLEAN NOT NULL DEFAULT false; -- false = OR (any), true = AND (all)

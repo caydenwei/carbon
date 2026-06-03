@@ -1,6 +1,6 @@
 {
-  "generated": "2026-06-02T15:45:21.146Z",
-  "totalTools": 1083,
+  "generated": "2026-06-03T00:53:36.292Z",
+  "totalTools": 1084,
   "modules": 15,
   "tools": [
     {
@@ -3134,6 +3134,20 @@
       "serviceParams": [
         "client",
         "operationId"
+      ],
+      "injectAuth": [
+        "companyId"
+      ]
+    },
+    {
+      "name": "items_deleteMethodOperation",
+      "module": "items",
+      "classification": "DESTRUCTIVE",
+      "description": "delete method operation",
+      "paramCount": 1,
+      "serviceParams": [
+        "client",
+        "methodOperationId"
       ],
       "injectAuth": [
         "companyId"

@@ -87,9 +87,16 @@ const main = defineCommand({
           default: true,
           description:
             "Regenerate db types + swagger after migrations (use --no-regen to skip)"
+        },
+        force: {
+          type: "boolean",
+          default: false,
+          description:
+            "Schema unreconcilable? Wipe the stack's volumes and re-provision from scratch (prompts to confirm)"
         }
       },
-      run: ({ args }) => migrate({ regen: args.regen !== false })
+      run: ({ args }) =>
+        args.force ? reset() : migrate({ regen: args.regen !== false })
     }),
     new: defineCommand({
       meta: { description: "Interactive: create a worktree on a fresh branch" },

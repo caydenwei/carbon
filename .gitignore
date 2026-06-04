@@ -15,7 +15,8 @@ server/dist
 public/dist
 vite.config.ts.timestamp*
 .claude-flow
-.claude
+.claude/settings.json
+.claude/settings.local.json
 .mcp.json
 opencode.json
 .windsurf

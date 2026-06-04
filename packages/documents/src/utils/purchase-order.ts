@@ -11,7 +11,14 @@ export function getLineDescription(
     case "Comment":
       return line?.description;
     default:
-      return line?.supplierPartId ?? line?.itemReadableId;
+      // Use `||` (not `??`) so an empty-string supplier part number falls
+      // through to the item id. Supplier parts with no part number get
+      // backfilled onto the line as "", and `??` would render a blank line.
+      return (
+        line?.supplierPartId ||
+        line?.supplierPartIdFromSupplier ||
+        line?.itemReadableId
+      );
   }
 }
 

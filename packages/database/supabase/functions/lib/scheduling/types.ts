@@ -40,6 +40,7 @@ export type BaseOperation = {
   processId: string | null;
   setupTime?: number;
   setupUnit?: FactorUnit;
+  reworkId?: string | null;
   status?: JobOperationStatus;
   order?: number;
   workCenterId?: string | null;

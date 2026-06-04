@@ -5,6 +5,7 @@ import { forwardRef, useMemo, useRef, useState } from "react";
 import { LuCheck, LuPlus, LuSettings2, LuX } from "react-icons/lu";
 import {
   Command,
+  CommandEmpty,
   CommandGroup,
   CommandInput,
   CommandItem,
@@ -235,6 +236,7 @@ function VirtualizedCommand({
         placeholder={t`Search...`}
         className="h-9"
       />
+      <CommandEmpty>{t`No option found.`}</CommandEmpty>
       <div
         ref={parentRef}
         className="overflow-auto scrollbar-thin scrollbar-track-transparent scrollbar-thumb-accent pt-1"

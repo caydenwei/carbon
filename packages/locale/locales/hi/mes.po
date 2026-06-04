@@ -83,7 +83,7 @@ msgid "Are you sure you want to end all production events? This will end all act
 msgstr "क्या आप सुनिश्चित हैं कि आप सभी उत्पादन घटनाओं को समाप्त करना चाहते हैं? यह सभी सक्रिय संचालन को पूरा किए बिना या समाप्त किए बिना समाप्त कर देगा।"
 
 msgid "Are you sure you want to finish this operation? This will end all active production events for this operation."
-msgstr ""
+msgstr "क्या आप सुनिश्चित हैं कि आप इस ऑपरेशन को समाप्त करना चाहते हैं? यह इस ऑपरेशन के लिए सभी सक्रिय उत्पादन इवेंट को समाप्त कर देगा।"
 
 msgid "Are you sure you want to leave this page?"
 msgstr "क्या आप वाकई इस पृष्ठ को छोड़ना चाहते हैं?"
@@ -102,6 +102,9 @@ msgstr "फ़ाइल संलग्न करें"
 
 msgid "Authentication Error"
 msgstr "प्रमाणीकरण त्रुटि"
+
+msgid "Batch"
+msgstr "बैच"
 
 #. placeholder {0}: batch.readableId
 #. placeholder {1}: batch.quantity
@@ -218,7 +221,7 @@ msgid "Create Quality Issue"
 msgstr "गुणवत्ता समस्या बनाएं"
 
 msgid "Create Rework"
-msgstr ""
+msgstr "रीवर्क बनाएं"
 
 msgid "Customer"
 msgstr "ग्राहक"
@@ -249,7 +252,7 @@ msgid "Describe the problem..."
 msgstr "समस्या का वर्णन करें..."
 
 msgid "Describe what needs to be reworked..."
-msgstr ""
+msgstr "वर्णन करें कि क्या रीवर्क करने की आवश्यकता है..."
 
 msgid "Description"
 msgstr "विवरण"
@@ -277,8 +280,8 @@ msgid "Dragging {0} cancelled."
 msgstr "\"{0}\" को ड्रैग करना रद्द किया गया।"
 
 #. placeholder {0}: formatRelativeTime( convertDateStringToIsoString( operation.operationDueDate ) )
-#. placeholder {0}: formatRelativeTime( convertDateStringToIsoString( operation.operationDueDate ) )
 #. placeholder {0}: formatRelativeTime( convertDateStringToIsoString(operation.jobDueDate) )
+#. placeholder {0}: formatRelativeTime( convertDateStringToIsoString(item.dueDate) )
 msgid "Due {0}"
 msgstr "Due {0} के लिए"
 
@@ -351,20 +354,20 @@ msgid "Filter"
 msgstr "फ़िल्टर"
 
 msgid "Finish"
-msgstr ""
+msgstr "समाप्त करें"
 
 #. placeholder {0}: operation.itemReadableId
 msgid "Finish {0}"
-msgstr ""
+msgstr "{0} को समाप्त करें"
 
 msgid "Finish Anyways"
-msgstr ""
+msgstr "वैसे भी समाप्त करें"
 
 msgid "Forgot to Clock Out?"
 msgstr "घड़ी से बाहर निकलना भूल गए?"
 
 msgid "Go back to operation"
-msgstr ""
+msgstr "ऑपरेशन पर वापस जाएं"
 
 msgid "Have a technical issue? Contact <0>Carbon Support.</0>"
 msgstr "क्या आपको कोई तकनीकी समस्या है? <0>Carbon Support</0> से संपर्क करें।"
@@ -502,7 +505,7 @@ msgid "Model"
 msgstr "मॉडल"
 
 msgid "More Actions"
-msgstr ""
+msgstr "अधिक क्रियाएं"
 
 msgid "More options"
 msgstr "अधिक विकल्प"
@@ -594,6 +597,9 @@ msgstr "कोई निर्धारित समय नहीं"
 
 msgid "No serial numbers"
 msgstr "कोई सीरियल नंबर नहीं"
+
+msgid "No serial numbers found"
+msgstr "कोई सीरियल नंबर नहीं मिला"
 
 msgid "No spare parts added yet"
 msgstr "अभी तक कोई स्पेयर पार्ट्स नहीं जोड़े गए हैं"
@@ -708,7 +714,7 @@ msgid "Quantity must be greater than 0"
 msgstr "मात्रा 0 से अधिक होनी चाहिए"
 
 msgid "Reason for rework"
-msgstr ""
+msgstr "रीवर्क का कारण"
 
 msgid "Recent"
 msgstr "हाल ही में"
@@ -733,10 +739,10 @@ msgid "Remove part"
 msgstr "भाग हटाएं"
 
 msgid "Rework"
-msgstr ""
+msgstr "रीवर्क"
 
 msgid "Rework created successfully"
-msgstr ""
+msgstr "रीवर्क सफलतापूर्वक बनाया गया"
 
 msgid "Sales Order"
 msgstr "बिक्रय आदेश"
@@ -750,11 +756,14 @@ msgstr "स्कैन करें"
 msgid "Scan or enter serial number"
 msgstr "स्कैन करें या सीरियल नंबर दर्ज करें"
 
+msgid "Scan or search serial number..."
+msgstr "सीरियल नंबर स्कैन या खोजें..."
+
 msgid "Schedule"
 msgstr "शेड्यूल"
 
 msgid "Scrap"
-msgstr ""
+msgstr "स्क्रैप"
 
 msgid "Scrap Reason"
 msgstr "स्क्रैप कारण"
@@ -807,7 +816,7 @@ msgid "Select Serial Number"
 msgstr "सीरियल नंबर चुनें"
 
 msgid "Select the operation to go back to. All operations from that point to the current operation will be redone."
-msgstr ""
+msgstr "उस ऑपरेशन को चुनें जिस पर वापस जाना है। उस बिंदु से वर्तमान ऑपरेशन तक के सभी ऑपरेशन फिर से किए जाएंगे।"
 
 msgid "Send"
 msgstr "भेजें"
@@ -828,6 +837,9 @@ msgstr "सीरियल नंबर उपलब्ध नहीं है"
 
 msgid "Serial number is required"
 msgstr "सीरियल नंबर आवश्यक है"
+
+msgid "Serial numbers"
+msgstr "सीरियल नंबर"
 
 msgid "Serial Numbers"
 msgstr "सीरियल नंबर"

@@ -173,7 +173,7 @@ export const triggerReworkValidator = z.object({
   quantity: zfd.numeric(
     z.number().positive({ message: "Quantity must be greater than 0" })
   ),
-  trackedEntityId: zfd.text(z.string().optional())
+  trackedEntityIds: zfd.text(z.string().optional())
 });
 
 export const maintenanceDispatchValidator = z.object({

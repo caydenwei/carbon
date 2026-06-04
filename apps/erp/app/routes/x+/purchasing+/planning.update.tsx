@@ -434,22 +434,8 @@ export async function action({ request }: ActionFunctionArgs) {
         }
 
         if (allSupplyForecasts.length > 0) {
-          // Group supply forecasts by unique key to avoid duplicate conflicts
-          const forecastMap = new Map<string, (typeof allSupplyForecasts)[0]>();
-
-          for (const forecast of allSupplyForecasts) {
-            const key = `${forecast.itemId}-${forecast.locationId}-${forecast.periodId}`;
-            const existing = forecastMap.get(key);
-
-            if (existing) {
-              // Combine quantities for the same key
-              existing.forecastQuantity += forecast.forecastQuantity;
-            } else {
-              forecastMap.set(key, { ...forecast });
-            }
-          }
-
-          const uniqueSupplyForecasts = Array.from(forecastMap.values());
+          const uniqueSupplyForecasts =
+            deduplicateForecasts(allSupplyForecasts);
 
           const insertForecasts = await client
             .from("supplyForecast")
@@ -518,4 +504,25 @@ export async function action({ request }: ActionFunctionArgs) {
         { status: 500 }
       );
   }
+}
+
+function deduplicateForecasts<
+  T extends {
+    itemId: string;
+    locationId: string;
+    periodId: string;
+    forecastQuantity: number;
+  }
+>(forecasts: T[]): T[] {
+  const map = new Map<string, T>();
+  for (const forecast of forecasts) {
+    const key = `${forecast.itemId}-${forecast.locationId}-${forecast.periodId}`;
+    const existing = map.get(key);
+    if (existing) {
+      existing.forecastQuantity += forecast.forecastQuantity;
+    } else {
+      map.set(key, { ...forecast });
+    }
+  }
+  return Array.from(map.values());
 }

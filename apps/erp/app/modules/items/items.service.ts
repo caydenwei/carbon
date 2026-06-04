@@ -111,7 +111,15 @@ export async function copyMakeMethod(
       sourceId: args.sourceId,
       targetId: args.targetId,
       companyId: args.companyId,
-      userId: args.userId
+      userId: args.userId,
+      parts: {
+        billOfMaterial: args.billOfMaterial,
+        billOfProcess: args.billOfProcess,
+        parameters: args.parameters,
+        tools: args.tools,
+        steps: args.steps,
+        workInstructions: args.workInstructions
+      }
     }
   });
 }
@@ -296,6 +304,13 @@ export async function assertMethodOperationIsDraft(
       `Cannot modify steps on a method version with status "${status}". Only Draft versions can be modified.`
     );
   }
+}
+
+export async function deleteMethodOperation(
+  client: SupabaseClient<Database>,
+  methodOperationId: string
+) {
+  return client.from("methodOperation").delete().eq("id", methodOperationId);
 }
 
 export async function deleteMethodOperationStep(
@@ -2723,6 +2738,7 @@ export async function upsertConsumable(
       .insert({
         readableId: consumable.id,
         name: consumable.name,
+        description: consumable.description,
         type: "Consumable",
         replenishmentSystem: consumable.replenishmentSystem,
         defaultMethodType: consumable.defaultMethodType,
@@ -2864,6 +2880,7 @@ export async function upsertPart(
         readableId: part.id,
         revision: part.revision ?? "0",
         name: part.name,
+        description: part.description,
         type: "Part",
         replenishmentSystem: part.replenishmentSystem,
         defaultMethodType: part.defaultMethodType,
@@ -3495,6 +3512,7 @@ export async function upsertMaterial(
             .insert({
               readableId: material.id,
               name: material.name,
+              description: material.description,
               type: "Material",
               replenishmentSystem: material.replenishmentSystem,
               defaultMethodType: material.defaultMethodType,
@@ -3540,6 +3558,7 @@ export async function upsertMaterial(
         .insert({
           readableId: material.id,
           name: material.name,
+          description: material.description,
           type: "Material",
           replenishmentSystem: material.replenishmentSystem,
           defaultMethodType: material.defaultMethodType,
@@ -4060,6 +4079,7 @@ export async function upsertTool(
         readableId: tool.id,
         revision: tool.revision ?? "0",
         name: tool.name,
+        description: tool.description,
         type: "Tool",
         replenishmentSystem: tool.replenishmentSystem,
         defaultMethodType: tool.defaultMethodType,

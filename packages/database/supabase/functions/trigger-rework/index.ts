@@ -1,5 +1,7 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import type { Transaction } from "kysely";
+import { nanoid } from "https://deno.land/x/nanoid@v3.0.0/nanoid.ts";
+import z from "npm:zod@^3.24.1";
 import { getConnectionPool, getDatabaseClient } from "../lib/database.ts";
 import { corsHeaders } from "../lib/headers.ts";
 import type { DB } from "../lib/types.ts";
@@ -13,7 +15,7 @@ interface TriggerReworkRequest {
   targetJobOperationId: string;
   reason: string;
   quantity: number;
-  trackedEntityId?: string;
+  trackedEntityIds?: string[];
   companyId: string;
   userId: string;
 }
@@ -90,7 +92,7 @@ async function triggerRework(
     targetJobOperationId,
     reason,
     quantity,
-    trackedEntityId,
+    trackedEntityIds,
     companyId,
     userId,
   } = body;
@@ -117,12 +119,48 @@ async function triggerRework(
       targetJobOperationId,
       reason,
       quantity,
-      trackedEntityId: trackedEntityId ?? null,
       requestedById: userId,
       companyId,
     })
     .returning(["id"])
     .execute();
+
+  // 2b. Create tracked activity for traceability
+  if (trackedEntityIds && trackedEntityIds.length > 0) {
+    const activityId = nanoid();
+    await trx
+      .insertInto("trackedActivity")
+      .values({
+        id: activityId,
+        type: "Rework",
+        sourceDocument: "Rework",
+        sourceDocumentId: rework.id,
+        attributes: {
+          Job: jobId,
+          "Triggered At": triggeredAtJobOperationId,
+          Target: targetJobOperationId,
+          Reason: reason,
+          Quantity: quantity,
+        },
+        companyId,
+        createdBy: userId,
+      })
+      .execute();
+
+    const isSerial = trackedEntityIds.length > 1 || quantity === 1;
+    for (const entityId of trackedEntityIds) {
+      await trx
+        .insertInto("trackedActivityInput")
+        .values({
+          trackedActivityId: activityId,
+          trackedEntityId: entityId,
+          quantity: isSerial ? 1 : quantity,
+          companyId,
+          createdBy: userId,
+        })
+        .execute();
+    }
+  }
 
   // 3. Fetch the source operations to clone
   const sourceOperations = await trx
@@ -137,17 +175,44 @@ async function triggerRework(
     (a, b) => (pathIndex.get(a.id) ?? 0) - (pathIndex.get(b.id) ?? 0)
   );
 
-  // 4. Clone operations
-  const clonedOperationIds: string[] = [];
-  const sourceToCloneMap = new Map<string, string>();
+  // 4. Compute sort order: place rework ops after the triggering operation
+  // "With Previous" on the first rework op lets it run in parallel with
+  // the triggering operation's successors until the DAG converges.
+  const [triggerOp, nextOp] = await Promise.all([
+    trx
+      .selectFrom("jobOperation")
+      .select("order")
+      .where("id", "=", triggeredAtJobOperationId)
+      .executeTakeFirstOrThrow(),
+    trx
+      .selectFrom("jobOperation")
+      .select("order")
+      .where("jobId", "=", jobId)
+      .where(
+        "order",
+        ">",
+        trx
+          .selectFrom("jobOperation")
+          .select("order")
+          .where("id", "=", triggeredAtJobOperationId)
+      )
+      .orderBy("order", "asc")
+      .executeTakeFirst(),
+  ]);
 
-  for (const sourceOp of sourceOperations) {
-    const [clonedOp] = await trx
-      .insertInto("jobOperation")
-      .values({
+  const triggerOrder = Number(triggerOp.order);
+  const upperBound = nextOp?.order ? Number(nextOp.order) : triggerOrder + 1;
+  const gap = upperBound - triggerOrder;
+  const increment = gap / (sourceOperations.length + 1);
+
+  // 5. Clone operations (batch insert)
+  const clonedOps = await trx
+    .insertInto("jobOperation")
+    .values(
+      sourceOperations.map((sourceOp, i) => ({
         jobId: sourceOp.jobId,
         jobMakeMethodId: sourceOp.jobMakeMethodId,
-        order: sourceOp.order,
+        order: triggerOrder + increment * (i + 1),
         processId: sourceOp.processId,
         workCenterId: sourceOp.workCenterId,
         description: sourceOp.description,
@@ -157,7 +222,7 @@ async function triggerRework(
         laborUnit: sourceOp.laborUnit,
         machineTime: sourceOp.machineTime,
         machineUnit: sourceOp.machineUnit,
-        operationOrder: sourceOp.operationOrder,
+        operationOrder: i === 0 ? "With Previous" : sourceOp.operationOrder,
         laborRate: sourceOp.laborRate,
         overheadRate: sourceOp.overheadRate,
         machineRate: sourceOp.machineRate,
@@ -169,131 +234,114 @@ async function triggerRework(
         workInstruction: sourceOp.workInstruction,
         procedureId: sourceOp.procedureId,
         operationQuantity: quantity,
+        targetQuantity: quantity,
         tags: sourceOp.tags,
         companyId,
         createdBy: userId,
         // @ts-expect-error - reworkId not in generated types until migration is applied
         reworkId: rework.id,
-        status: "Waiting",
+        status: i === 0 ? "Ready" : "Waiting",
         customFields: sourceOp.customFields,
-      })
-      .returning(["id"])
-      .execute();
+      }))
+    )
+    .returning(["id"])
+    .execute();
 
-    clonedOperationIds.push(clonedOp.id);
-    sourceToCloneMap.set(sourceOp.id, clonedOp.id);
-  }
+  const clonedOperationIds = clonedOps.map((op) => op.id);
+  const sourceToCloneMap = new Map<string, string>();
+  sourceOperations.forEach((sourceOp, i) => {
+    sourceToCloneMap.set(sourceOp.id, clonedOps[i].id);
+  });
 
   console.info(`🔧 Cloned ${clonedOperationIds.length} operations`);
 
-  // 5. Clone steps, tools, and parameters for each operation
-  for (const sourceOp of sourceOperations) {
-    const cloneId = sourceToCloneMap.get(sourceOp.id)!;
-
-    // Clone steps
-    const steps = await trx
+  // 6. Clone steps, tools, and parameters (batch fetch + batch insert)
+  const [allSteps, allTools, allParams] = await Promise.all([
+    trx
       .selectFrom("jobOperationStep")
       .selectAll()
-      .where("operationId", "=", sourceOp.id)
-      .execute();
-
-    if (steps.length > 0) {
-      await trx
-        .insertInto("jobOperationStep")
-        .values(
-          steps.map(
-            ({
-              id: _id,
-              operationId: _opId,
-              createdAt: _ca,
-              updatedAt: _ua,
-              updatedBy: _ub,
-              ...step
-            }) => ({
-              ...step,
-              operationId: cloneId,
-              createdBy: userId,
-            })
-          )
-        )
-        .execute();
-    }
-
-    // Clone tools
-    const tools = await trx
+      .where("operationId", "in", operationPath)
+      .execute(),
+    trx
       .selectFrom("jobOperationTool")
       .selectAll()
-      .where("operationId", "=", sourceOp.id)
-      .execute();
-
-    if (tools.length > 0) {
-      await trx
-        .insertInto("jobOperationTool")
-        .values(
-          tools.map((tool) => ({
-            toolId: tool.toolId,
-            quantity: tool.quantity,
-            operationId: cloneId,
-            companyId,
-            createdBy: userId,
-          }))
-        )
-        .execute();
-    }
-
-    // Clone parameters
-    const params = await trx
+      .where("operationId", "in", operationPath)
+      .execute(),
+    trx
       .selectFrom("jobOperationParameter")
       .selectAll()
-      .where("operationId", "=", sourceOp.id)
-      .execute();
+      .where("operationId", "in", operationPath)
+      .execute(),
+  ]);
 
-    if (params.length > 0) {
-      await trx
-        .insertInto("jobOperationParameter")
-        .values(
-          params.map((param) => ({
-            key: param.key,
-            value: param.value,
-            operationId: cloneId,
-            companyId,
-            createdBy: userId,
-          }))
-        )
-        .execute();
-    }
-  }
+  const stepValues = allSteps.map(
+    ({
+      id: _id,
+      operationId,
+      createdAt: _ca,
+      updatedAt: _ua,
+      updatedBy: _ub,
+      ...step
+    }) => ({
+      ...step,
+      operationId: sourceToCloneMap.get(operationId)!,
+      createdBy: userId,
+    })
+  );
 
-  // 6. Wire the rework operations into the DAG
+  const toolValues = allTools.map((tool) => ({
+    toolId: tool.toolId,
+    quantity: tool.quantity,
+    operationId: sourceToCloneMap.get(tool.operationId)!,
+    companyId,
+    createdBy: userId,
+  }));
 
-  // 6a. First rework op depends on the trigger operation
-  await trx
-    .insertInto("jobOperationDependency")
-    .values({
-      operationId: clonedOperationIds[0],
-      dependsOnId: triggeredAtJobOperationId,
+  const paramValues = allParams.map((param) => ({
+    key: param.key,
+    value: param.value,
+    operationId: sourceToCloneMap.get(param.operationId)!,
+    companyId,
+    createdBy: userId,
+  }));
+
+  await Promise.all([
+    stepValues.length > 0
+      ? trx.insertInto("jobOperationStep").values(stepValues).execute()
+      : null,
+    toolValues.length > 0
+      ? trx.insertInto("jobOperationTool").values(toolValues).execute()
+      : null,
+    paramValues.length > 0
+      ? trx.insertInto("jobOperationParameter").values(paramValues).execute()
+      : null,
+  ]);
+
+  // 7. Wire the rework operations into the DAG
+  // First rework op has no dependencies — it's an independent parallel branch.
+  // Traceability is captured via the rework record, not DAG edges.
+  const dagEdges: Array<{
+    operationId: string;
+    dependsOnId: string;
+    jobId: string;
+    companyId: string;
+  }> = [];
+
+  // 7a. Each subsequent rework op depends on the previous
+  for (let i = 1; i < clonedOperationIds.length; i++) {
+    dagEdges.push({
+      operationId: clonedOperationIds[i],
+      dependsOnId: clonedOperationIds[i - 1],
       jobId,
       companyId,
-    })
-    .execute();
-
-  // 6b. Each subsequent rework op depends on the previous
-  for (let i = 1; i < clonedOperationIds.length; i++) {
-    await trx
-      .insertInto("jobOperationDependency")
-      .values({
-        operationId: clonedOperationIds[i],
-        dependsOnId: clonedOperationIds[i - 1],
-        jobId,
-        companyId,
-      })
-      .execute();
+    });
   }
 
-  // 6c. Rewire downstream operations
+  // 7b. Convergence: downstream ops that depended on triggeredAt also depend
+  //     on the last rework op so the DAG merges back.
   const downstreamDeps = await trx
     .selectFrom("jobOperationDependency")
-    .select(["operationId", "dependsOnId"])
+    .select(["operationId"])
     .where("dependsOnId", "=", triggeredAtJobOperationId)
     .where("operationId", "not in", clonedOperationIds)
     .execute();
@@ -301,26 +349,24 @@ async function triggerRework(
   const lastReworkOpId = clonedOperationIds[clonedOperationIds.length - 1];
 
   for (const dep of downstreamDeps) {
-    await trx
-      .deleteFrom("jobOperationDependency")
-      .where("operationId", "=", dep.operationId)
-      .where("dependsOnId", "=", triggeredAtJobOperationId)
-      .execute();
+    dagEdges.push({
+      operationId: dep.operationId,
+      dependsOnId: lastReworkOpId,
+      jobId,
+      companyId,
+    });
+  }
 
+  if (dagEdges.length > 0) {
     await trx
       .insertInto("jobOperationDependency")
-      .values({
-        operationId: dep.operationId,
-        dependsOnId: lastReworkOpId,
-        jobId,
-        companyId,
-      })
+      .values(dagEdges)
       .execute();
   }
 
   console.info(`🔗 DAG wired with ${downstreamDeps.length} downstream deps rewired`);
 
-  // 7. Record a productionQuantity entry for the rework
+  // 8. Record a productionQuantity entry for the rework
   await trx
     .insertInto("productionQuantity")
     .values({
@@ -346,7 +392,34 @@ serve(async (req) => {
   }
 
   try {
-    const body: TriggerReworkRequest = await req.json();
+    const raw = await req.json();
+    const parsed = z
+      .object({
+        jobId: z.string().min(1),
+        triggeredAtJobOperationId: z.string().min(1),
+        targetJobOperationId: z.string().min(1),
+        reason: z.string().min(1),
+        quantity: z.number().positive(),
+        trackedEntityIds: z.array(z.string()).optional(),
+        companyId: z.string().min(1),
+        userId: z.string().min(1),
+      })
+      .safeParse(raw);
+
+    if (!parsed.success) {
+      return new Response(
+        JSON.stringify({
+          success: false,
+          message: `Invalid request: ${parsed.error.issues.map((i) => i.message).join(", ")}`,
+        }),
+        {
+          status: 400,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        }
+      );
+    }
+
+    const body = parsed.data;
 
     console.info(
       `🔰 Starting rework for job ${body.jobId}: go back to ${body.targetJobOperationId} from ${body.triggeredAtJobOperationId}`

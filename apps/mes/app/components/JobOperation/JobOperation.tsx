@@ -601,9 +601,12 @@ export const JobOperation = ({
                   <ItemThumbnail thumbnailPath={thumbnailPath} size="xl" />
                 )}
                 <div className="flex flex-col flex-grow">
-                  <Heading size="h3" className="line-clamp-1">
-                    {operation.description}
-                  </Heading>
+                  <HStack spacing={2}>
+                    <Heading size="h3" className="line-clamp-1">
+                      {operation.description}
+                    </Heading>
+                    {operation.reworkId && <Badge variant="red">Rework</Badge>}
+                  </HStack>
                   <p className="text-muted-foreground line-clamp-1">
                     {operation.itemDescription}{" "}
                   </p>
@@ -2223,12 +2226,21 @@ export const JobOperation = ({
                     {operation.quantityComplete}/{operation.targetQuantity}
                   </span>
                   <BarProgress
-                    activeClassName={
-                      operation.operationStatus === "Paused" &&
-                      operation.quantityComplete < operation.targetQuantity
-                        ? "bg-yellow-500"
-                        : "bg-emerald-500"
-                    }
+                    segments={[
+                      {
+                        value: operation.quantityComplete,
+                        className: "bg-emerald-500"
+                      },
+                      {
+                        value: operation.quantityReworked ?? 0,
+                        className: "bg-yellow-500"
+                      },
+                      {
+                        value: operation.quantityScrapped ?? 0,
+                        className: "bg-red-500"
+                      }
+                    ]}
+                    max={operation.targetQuantity || 1}
                     progress={
                       (operation.quantityComplete / operation.targetQuantity) *
                       100
@@ -2333,6 +2345,9 @@ export const JobOperation = ({
           jobId={job.id!}
           isOpen={reworkModal.isOpen}
           onClose={reworkModal.onClose}
+          trackedEntities={trackedEntities}
+          parentIsSerial={parentIsSerial}
+          parentIsBatch={parentIsBatch}
         />
       )}
       {scrapModal.isOpen && (

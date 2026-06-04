@@ -21,7 +21,6 @@ type StorageUnitSelectProps = Omit<
   locationId?: string;
   /** Kept for API compat; the drill picker doesn't display per-item qty. */
   itemId?: string;
-  /** No-op in the drill picker — table inline preview no longer supported. */
   inline?: boolean;
   onChange?: (storageUnit: ListItem | null) => void;
   /**
@@ -38,6 +37,7 @@ const StorageUnit = forwardRef<HTMLDivElement, StorageUnitSelectProps>(
     const {
       name,
       label,
+      inline,
       locationId,
       isReadOnly,
       isOptional,
@@ -57,6 +57,7 @@ const StorageUnit = forwardRef<HTMLDivElement, StorageUnitSelectProps>(
       <StorageUnitDrillSelectField
         name={name}
         label={typeof label === "string" ? label : undefined}
+        inline={inline}
         helperText={
           typeof rest.helperText === "string" ? rest.helperText : undefined
         }

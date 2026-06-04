@@ -5,7 +5,7 @@ import {
   getCarbon,
   getMESUrl
 } from "@carbon/auth";
-import { setCompanyId } from "@carbon/auth/company.server";
+import { getCompanyId, setCompanyId } from "@carbon/auth/company.server";
 import {
   destroyAuthSession,
   requireAuthSession,
@@ -44,7 +44,8 @@ import { getOpenClockEntry } from "~/modules/people";
 import {
   getCompanies,
   getCompanyIntegrations,
-  getCompanySettings
+  getCompanySettings,
+  getEmployeeCompanies
 } from "~/modules/settings";
 import { getCustomFieldsSchemas } from "~/modules/shared/shared.server";
 import {
@@ -101,6 +102,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
   // Parallelize all requests
   const [
     companies,
+    employeeCompaniesResult,
     stripeCustomer,
     customFields,
     integrations,
@@ -114,6 +116,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
     modulePreferences
   ] = await Promise.all([
     getCompanies(client, userId),
+    getEmployeeCompanies(client, userId),
     getStripeCustomerByCompanyId(companyId, userId),
     getCustomFieldsSchemas(client, { companyId }),
     getCompanyIntegrations(client, companyId),
@@ -131,10 +134,35 @@ export async function loader({ request }: LoaderFunctionArgs) {
     throw await destroyAuthSession(request);
   }
 
+  const employeeCompanies = employeeCompaniesResult.data ?? [];
+  const hasMultipleCompanies = employeeCompanies.length > 1;
+
+  // Send multi-company users to the picker, preserving where they were headed.
+  const redirectToPicker = () => {
+    const url = new URL(request.url);
+    const dest = `${url.pathname}${url.search}`;
+    return redirect(
+      `${path.to.selectCompany}?redirectTo=${encodeURIComponent(dest)}`
+    );
+  };
+
+  // Multi-company users must actively choose a company. The companyId cookie is
+  // the "has chosen this session" marker — set only by the picker / company
+  // switch and cleared on logout. Until it's present, force the picker so we
+  // never silently serve the alphabetically-first company.
+  if (hasMultipleCompanies && !getCompanyId(request)) {
+    throw redirectToPicker();
+  }
+
   let company = companies.data?.find((c) => c.companyId === companyId);
 
   if (!company && companies.data?.length) {
-    company = companies.data[0];
+    // Session company is no longer valid (e.g. access revoked). Multi-company
+    // users re-pick; single-company users auto-enter their only company.
+    if (hasMultipleCompanies) {
+      throw redirectToPicker();
+    }
+    company = employeeCompanies[0] ?? companies.data[0];
     const sessionCookie = await updateCompanySession(
       request,
       company.id!,

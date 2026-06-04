@@ -165,6 +165,7 @@ export type Operation = z.infer<typeof jobOperationValidator> & {
   status: JobOperation["status"];
   tags: string[] | null;
   workInstruction: JSONContent | null;
+  reworkId: string | null;
 };
 
 type ItemWithData = Item & {
@@ -219,9 +220,12 @@ function makeItem(
     id: operation.id!,
     title: (
       <VStack spacing={0}>
-        <h3 className="font-semibold truncate cursor-pointer">
-          {operation.description}
-        </h3>
+        <HStack spacing={2}>
+          <h3 className="font-semibold truncate cursor-pointer">
+            {operation.description}
+          </h3>
+          {operation.reworkId && <Badge variant="red">Rework</Badge>}
+        </HStack>
         {operation.operationType === "Outside" && (
           <SupplierProcessPreview
             processId={operation.processId}
@@ -350,6 +354,7 @@ const initialOperation: Omit<
   overheadRate: 0,
   processId: "",
   procedureId: "",
+  reworkId: null,
   setupTime: 0,
   setupUnit: "Total Minutes",
   status: "Todo",
@@ -470,6 +475,7 @@ const JobBillOfProcess = ({
       operationsById.set("temporary", {
         ...pendingOperation,
         assignee: null,
+        reworkId: null,
         status: "Todo",
         workInstruction: {},
         jobOperationTool: [],

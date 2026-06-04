@@ -20,9 +20,16 @@ export async function action({ request }: ActionFunctionArgs) {
 
   const serviceRole = getCarbonServiceRole();
 
+  const { trackedEntityIds: trackedEntityIdsJson, ...reworkData } =
+    validation.data;
+  const trackedEntityIds = trackedEntityIdsJson
+    ? JSON.parse(trackedEntityIdsJson)
+    : undefined;
+
   const result = await serviceRole.functions.invoke("trigger-rework", {
     body: {
-      ...validation.data,
+      ...reworkData,
+      trackedEntityIds,
       companyId,
       userId
     }

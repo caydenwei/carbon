@@ -15,14 +15,24 @@ import {
   FormErrorMessage,
   FormHelperText,
   FormLabel,
+  HStack,
+  IconButton,
   Input,
   Popover,
   PopoverContent,
   PopoverTrigger,
-  useDisclosure
+  useDisclosure,
+  VStack
 } from "@carbon/react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { LuChevronDown, LuChevronRight, LuMapPin, LuX } from "react-icons/lu";
+import {
+  LuChevronDown,
+  LuChevronRight,
+  LuMapPin,
+  LuPlus,
+  LuSettings2,
+  LuX
+} from "react-icons/lu";
 import { useFetcher } from "react-router";
 import StorageUnitForm from "~/modules/inventory/ui/StorageUnits/StorageUnitForm";
 import { path } from "~/utils/path";
@@ -276,7 +286,7 @@ export function StorageUnitDrillSelect({
           />
 
           {/* List */}
-          <ul role="list" className="max-h-[260px] overflow-y-auto py-1">
+          <ul className="max-h-[260px] overflow-y-auto py-1">
             {searchResults ? (
               searchResults.length === 0 ? (
                 <li className="px-3 py-6 text-center text-xs text-muted-foreground">
@@ -411,6 +421,7 @@ export function useExcludedDescendantIds(rootId?: string): Set<string> {
 type StorageUnitDrillSelectFieldProps = {
   name: string;
   label?: string;
+  inline?: boolean;
   helperText?: string;
   locationId: string | null | undefined;
   isReadOnly?: boolean;
@@ -430,6 +441,7 @@ type StorageUnitDrillSelectFieldProps = {
 export function StorageUnitDrillSelectField({
   name,
   label,
+  inline = false,
   helperText,
   locationId,
   isReadOnly,
@@ -442,6 +454,35 @@ export function StorageUnitDrillSelectField({
 }: StorageUnitDrillSelectFieldProps) {
   const { error, getInputProps, isOptional: fieldIsOptional } = useField(name);
   const [value, setValue] = useControlField<string | undefined>(name);
+  const [inlineMode, setInlineMode] = useState(inline);
+  const rows = useStorageUnitsTree(locationId);
+  const displayName = rows.find((r) => r.id === value)?.name ?? "";
+
+  if (inlineMode) {
+    return (
+      <VStack spacing={0}>
+        {label && (
+          <span className="text-xs text-muted-foreground">{label}</span>
+        )}
+        <input type="hidden" name={name} value={value ?? ""} />
+        <HStack spacing={0} className="w-full justify-between">
+          {displayName && (
+            <span className="flex-grow text-sm line-clamp-1">
+              {displayName}
+            </span>
+          )}
+          <IconButton
+            icon={displayName ? <LuSettings2 /> : <LuPlus />}
+            aria-label={displayName ? "Edit" : "Add"}
+            size="sm"
+            variant="secondary"
+            isDisabled={isReadOnly}
+            onClick={() => setInlineMode(false)}
+          />
+        </HStack>
+      </VStack>
+    );
+  }
 
   return (
     <FormControl isInvalid={!!error}>
@@ -450,7 +491,6 @@ export function StorageUnitDrillSelectField({
           {label}
         </FormLabel>
       )}
-      {/* Hidden input so the form serialises the chosen id on submit. */}
       <input
         {...getInputProps({ id: name, type: "hidden" })}
         name={name}
@@ -462,6 +502,7 @@ export function StorageUnitDrillSelectField({
         onChange={(next, row) => {
           setValue(next || undefined);
           onChange?.(next ? (row ?? null) : null);
+          if (inline) setInlineMode(true);
         }}
         isReadOnly={isReadOnly}
         allowCreate={allowCreate}

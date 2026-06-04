@@ -3,6 +3,7 @@ import BillOfProcess from "./BillOfProcess";
 import BoMExplorer, { BoMActions } from "./BoMExplorer";
 import { FileBadge } from "./FileBadge";
 import ItemCostingForm from "./ItemCostingForm";
+import ItemDescription from "./ItemDescription";
 import ItemDocuments from "./ItemDocuments";
 import ItemForm from "./ItemForm";
 import ItemNotes from "./ItemNotes";
@@ -12,6 +13,7 @@ import ItemRiskRegister from "./ItemRiskRegister";
 import ItemSalePriceForm from "./ItemSalePriceForm";
 import MakeMethodTools from "./MakeMethodTools";
 import PickMethodForm from "./PickMethodForm";
+import { SelectedItemProperties } from "./SelectedItemProperties";
 import SupplierPartForm from "./SupplierPartForm";
 import SupplierParts from "./SupplierParts";
 
@@ -22,6 +24,7 @@ export {
   BoMExplorer,
   FileBadge,
   ItemCostingForm,
+  ItemDescription,
   ItemDocuments,
   ItemForm,
   ItemNotes,
@@ -31,6 +34,7 @@ export {
   ItemSalePriceForm,
   MakeMethodTools,
   PickMethodForm,
+  SelectedItemProperties,
   SupplierPartForm,
   SupplierParts
 };

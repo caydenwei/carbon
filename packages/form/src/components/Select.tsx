@@ -217,11 +217,17 @@ export const SelectBase = forwardRef<HTMLButtonElement, SelectBaseProps>(
             )}
           </SelectTrigger>
           <SelectContent>
-            {options.map((option) => (
-              <SelectItem key={option.value} value={option.value}>
-                {option.label}
-              </SelectItem>
-            ))}
+            {options.length === 0 ? (
+              <div className="py-6 text-center text-sm text-muted-foreground">
+                No options available
+              </div>
+            ) : (
+              options.map((option) => (
+                <SelectItem key={option.value} value={option.value}>
+                  {option.label}
+                </SelectItem>
+              ))
+            )}
           </SelectContent>
         </CarbonSelect>
         {isClearable && !isNonInteractive && value && (

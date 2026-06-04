@@ -8,6 +8,7 @@ type JobOperationNodeData = {
   status: string;
   quantityComplete: number;
   targetQuantity: number;
+  quantityReworked: number;
   quantityScrapped: number;
   direction: "LR" | "TB";
 };
@@ -49,10 +50,14 @@ function JobOperationNodeImpl({ data }: NodeProps) {
           {d.description}
         </div>
         <BarProgress
+          segments={[
+            { value: d.quantityComplete, className: "bg-emerald-500" },
+            { value: d.quantityReworked, className: "bg-yellow-500" },
+            { value: d.quantityScrapped, className: "bg-red-500" }
+          ]}
           progress={d.quantityComplete}
           max={d.targetQuantity || 1}
           value={`${d.quantityComplete}/${d.targetQuantity}`}
-          activeClassName={colors.bar}
           className="mt-1"
         />
         {d.quantityScrapped > 0 && (

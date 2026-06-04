@@ -89,6 +89,22 @@ async function migrate(): Promise<void> {
 
       console.log(`✅ 🐣 Starting migrations for ${workspace.id}`);
 
+      // TEMP backwards-compat shim — REMOVE once every workspace has deployed
+      // past this (then also delete the migration file). Migration `20260515`
+      // shipped with a non-standard 8-digit timestamp and was renamed to
+      // `20260515000000`. Workspaces that already recorded the old version hit a
+      // `db push` orphan gate ("Remote migration versions not found in local
+      // migrations directory") that blocks ALL their migrations. Marking the old
+      // version reverted touches the tracking table only (no SQL) and is a no-op
+      // on fresh workspaces that never had it; the renamed migration is
+      // idempotent (ADD COLUMN IF NOT EXISTS) so the push below re-applies it
+      // harmlessly.
+      const repairDbUrl =
+        connection_string && connection_string.startsWith("postgresql://")
+          ? ["--db-url", connection_string]
+          : [];
+      await $$`supabase migration repair --status reverted 20260515 ${repairDbUrl}`;
+
       if (connection_string && connection_string.startsWith("postgresql://")) {
         await $$`supabase db push --db-url ${connection_string} --include-all`;
       } else {

@@ -26,6 +26,7 @@ import {
   deleteMaterialGrade,
   deleteMaterialSubstance,
   deleteMethodMaterial,
+  deleteMethodOperation,
   assertMethodOperationIsDraft,
   deleteMethodOperationStep,
   deleteMethodOperationParameter,
@@ -445,6 +446,21 @@ export const registerItemsTools: RegisterTools = (server, ctx) => {
       const result = await assertMethodOperationIsDraft(ctx.client, params.operationId);
       return toMcpResult(result);
     }, "Failed: items_assertMethodOperationIsDraft"),
+  );
+
+  server.registerTool(
+    "items_deleteMethodOperation",
+    {
+      description: "delete method operation",
+      inputSchema: z.object({
+        methodOperationId: z.string(),
+      }),
+      annotations: DESTRUCTIVE_ANNOTATIONS,
+    },
+    withErrorHandling(async (params) => {
+      const result = await deleteMethodOperation(ctx.client, params.methodOperationId);
+      return toMcpResult(result);
+    }, "Failed: items_deleteMethodOperation"),
   );
 
   server.registerTool(

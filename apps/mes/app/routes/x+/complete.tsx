@@ -28,18 +28,11 @@ export async function action({ request }: ActionFunctionArgs) {
   const serviceRole = await getCarbonServiceRole();
 
   // Get current job operation and production quantities to check if operation will be finished
-  const [jobOperation, productionQuantities] = await Promise.all([
-    serviceRole
-      .from("jobOperation")
-      .select("*")
-      .eq("id", validation.data.jobOperationId)
-      .maybeSingle(),
-    serviceRole
-      .from("productionQuantity")
-      .select("*")
-      .eq("type", "Production")
-      .eq("jobOperationId", validation.data.jobOperationId)
-  ]);
+  const jobOperation = await serviceRole
+    .from("jobOperation")
+    .select("*")
+    .eq("id", validation.data.jobOperationId)
+    .maybeSingle();
 
   if (jobOperation.error || !jobOperation.data) {
     return data(
@@ -51,12 +44,14 @@ export async function action({ request }: ActionFunctionArgs) {
     );
   }
 
-  const currentQuantity =
-    productionQuantities.data?.reduce((acc, curr) => acc + curr.quantity, 0) ??
-    0;
+  const totalAccountedQuantity =
+    (jobOperation.data.quantityComplete ?? 0) +
+    (jobOperation.data.quantityReworked ?? 0) +
+    (jobOperation.data.quantityScrapped ?? 0) +
+    validation.data.quantity;
 
   const willBeFinished =
-    validation.data.quantity + currentQuantity >=
+    totalAccountedQuantity >=
     (jobOperation.data.targetQuantity ??
       jobOperation.data.operationQuantity ??
       0);
@@ -70,6 +65,16 @@ export async function action({ request }: ActionFunctionArgs) {
         userId
       }
     });
+
+    if (response.error) {
+      return data(
+        {},
+        await flash(request, {
+          ...error(response.error, "Failed to complete job operation"),
+          flash: "error"
+        })
+      );
+    }
 
     const trackedEntityId = response.data?.newTrackedEntityId;
 

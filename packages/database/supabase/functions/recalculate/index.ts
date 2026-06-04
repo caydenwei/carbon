@@ -279,6 +279,7 @@ const updateJobQuantities = async (
           operationQuantity: totalWithScrap,
         })
         .where("jobMakeMethodId", "=", tree.data.jobMaterialMakeMethodId)
+        .where("reworkId", "is", null)
         .execute(),
     ]);
 

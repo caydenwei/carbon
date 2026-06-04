@@ -98,6 +98,7 @@ function computeLayout(
         status: op.status ?? "Todo",
         quantityComplete: Number(op.quantityComplete ?? 0),
         targetQuantity: Number(op.targetQuantity ?? 0),
+        quantityReworked: Number(op.quantityReworked ?? 0),
         quantityScrapped: Number(op.quantityScrapped ?? 0),
         direction
       },

@@ -127,6 +127,9 @@ async function ensureLabel(name: string, color: string, description: string) {
       });
       return;
     }
+    if (isOctokitError(error, 403)) {
+      return;
+    }
     throw error;
   }
 }

@@ -83,7 +83,7 @@ msgid "Are you sure you want to end all production events? This will end all act
 msgstr "Möchten Sie wirklich alle Produktionsereignisse beenden? Dadurch werden alle aktiven Arbeitsgänge beendet, ohne sie abzuschließen."
 
 msgid "Are you sure you want to finish this operation? This will end all active production events for this operation."
-msgstr ""
+msgstr "Sind Sie sicher, dass Sie diesen Arbeitsgang beenden möchten? Dies beendet alle aktiven Produktionsereignisse für diesen Arbeitsgang."
 
 msgid "Are you sure you want to leave this page?"
 msgstr "Möchten Sie diese Seite wirklich verlassen?"
@@ -102,6 +102,9 @@ msgstr "Datei anhängen"
 
 msgid "Authentication Error"
 msgstr "Authentifizierungsfehler"
+
+msgid "Batch"
+msgstr "Charge"
 
 #. placeholder {0}: batch.readableId
 #. placeholder {1}: batch.quantity
@@ -218,7 +221,7 @@ msgid "Create Quality Issue"
 msgstr "Qualitätsproblem erstellen"
 
 msgid "Create Rework"
-msgstr ""
+msgstr "Rework erstellen"
 
 msgid "Customer"
 msgstr "Kunde"
@@ -249,7 +252,7 @@ msgid "Describe the problem..."
 msgstr "Beschreiben Sie das Problem..."
 
 msgid "Describe what needs to be reworked..."
-msgstr ""
+msgstr "Beschreiben Sie, was überarbeitet werden muss..."
 
 msgid "Description"
 msgstr "Beschreibung"
@@ -277,8 +280,8 @@ msgid "Dragging {0} cancelled."
 msgstr "Ziehen von {0} abgebrochen."
 
 #. placeholder {0}: formatRelativeTime( convertDateStringToIsoString( operation.operationDueDate ) )
-#. placeholder {0}: formatRelativeTime( convertDateStringToIsoString( operation.operationDueDate ) )
 #. placeholder {0}: formatRelativeTime( convertDateStringToIsoString(operation.jobDueDate) )
+#. placeholder {0}: formatRelativeTime( convertDateStringToIsoString(item.dueDate) )
 msgid "Due {0}"
 msgstr "Fällig {0}"
 
@@ -351,20 +354,20 @@ msgid "Filter"
 msgstr "Filter"
 
 msgid "Finish"
-msgstr ""
+msgstr "Fertig"
 
 #. placeholder {0}: operation.itemReadableId
 msgid "Finish {0}"
-msgstr ""
+msgstr "Beenden {0}"
 
 msgid "Finish Anyways"
-msgstr ""
+msgstr "Trotzdem beenden"
 
 msgid "Forgot to Clock Out?"
 msgstr "Vergessen auszustempeln?"
 
 msgid "Go back to operation"
-msgstr ""
+msgstr "Zurück zur Operation"
 
 msgid "Have a technical issue? Contact <0>Carbon Support.</0>"
 msgstr "Haben Sie ein technisches Problem? Kontaktieren Sie den <0>Carbon Support.</0>"
@@ -502,7 +505,7 @@ msgid "Model"
 msgstr "Modell"
 
 msgid "More Actions"
-msgstr ""
+msgstr "Weitere Aktionen"
 
 msgid "More options"
 msgstr "Weitere Optionen"
@@ -594,6 +597,9 @@ msgstr "Keine geplante Zeit"
 
 msgid "No serial numbers"
 msgstr "Keine Seriennummern"
+
+msgid "No serial numbers found"
+msgstr "Keine Seriennummern gefunden"
 
 msgid "No spare parts added yet"
 msgstr "Noch keine Ersatzteile hinzugefügt"
@@ -708,7 +714,7 @@ msgid "Quantity must be greater than 0"
 msgstr "Menge muss größer als 0 sein"
 
 msgid "Reason for rework"
-msgstr ""
+msgstr "Grund für Überarbeitung"
 
 msgid "Recent"
 msgstr "Zuletzt"
@@ -733,10 +739,10 @@ msgid "Remove part"
 msgstr "Teil entfernen"
 
 msgid "Rework"
-msgstr ""
+msgstr "Überarbeitung"
 
 msgid "Rework created successfully"
-msgstr ""
+msgstr "Überarbeitung erfolgreich erstellt"
 
 msgid "Sales Order"
 msgstr "Kundenauftrag"
@@ -750,11 +756,14 @@ msgstr "Scannen"
 msgid "Scan or enter serial number"
 msgstr "Seriennummer scannen oder eingeben"
 
+msgid "Scan or search serial number..."
+msgstr "Seriennummer scannen oder suchen..."
+
 msgid "Schedule"
 msgstr "Zeitplan"
 
 msgid "Scrap"
-msgstr ""
+msgstr "Ausschuss"
 
 msgid "Scrap Reason"
 msgstr "Ausschussgrund"
@@ -807,7 +816,7 @@ msgid "Select Serial Number"
 msgstr "Seriennummer auswählen"
 
 msgid "Select the operation to go back to. All operations from that point to the current operation will be redone."
-msgstr ""
+msgstr "Wählen Sie den Vorgang aus, zu dem Sie zurückkehren möchten. Alle Vorgänge von diesem Punkt bis zum aktuellen Vorgang werden wiederholt."
 
 msgid "Send"
 msgstr "Senden"
@@ -828,6 +837,9 @@ msgstr "Seriennummer ist nicht verfügbar"
 
 msgid "Serial number is required"
 msgstr "Seriennummer ist erforderlich"
+
+msgid "Serial numbers"
+msgstr "Seriennummern"
 
 msgid "Serial Numbers"
 msgstr "Seriennummern"

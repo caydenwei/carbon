@@ -7,6 +7,7 @@ type HeaderProps = {
   company: Company;
   title: string;
   documentId?: string | null;
+  documentSubId?: string | null;
   date?: string | null;
   currencyCode?: string | null;
   locale?: string;
@@ -36,7 +37,13 @@ const tw = createTw({
   }
 });
 
-const Header = ({ company, title, documentId, fixed }: HeaderProps) => {
+const Header = ({
+  company,
+  title,
+  documentId,
+  documentSubId,
+  fixed
+}: HeaderProps) => {
   const headerView = (
     <View style={tw("flex flex-row justify-between mb-1")}>
       <View style={tw("flex flex-row")}>
@@ -76,6 +83,11 @@ const Header = ({ company, title, documentId, fixed }: HeaderProps) => {
             style={tw("text-sm font-bold text-gray-600 tracking-tight -mt-4")}
           >
             {documentId}
+          </Text>
+        )}
+        {documentSubId && (
+          <Text style={tw("text-[8px] font-bold text-gray-600 tracking-tight")}>
+            {documentSubId}
           </Text>
         )}
       </View>

@@ -83,7 +83,7 @@ msgid "Are you sure you want to end all production events? This will end all act
 msgstr "Вы уверены, что хотите завершить все производственные события? Это прекратит все активные операции без их завершения."
 
 msgid "Are you sure you want to finish this operation? This will end all active production events for this operation."
-msgstr ""
+msgstr "Вы уверены, что хотите завершить эту операцию? Это завершит все активные производственные события для этой операции."
 
 msgid "Are you sure you want to leave this page?"
 msgstr "Вы уверены, что хотите покинуть эту страницу?"
@@ -102,6 +102,9 @@ msgstr "Прикрепить файл"
 
 msgid "Authentication Error"
 msgstr "Ошибка аутентификации"
+
+msgid "Batch"
+msgstr "Партия"
 
 #. placeholder {0}: batch.readableId
 #. placeholder {1}: batch.quantity
@@ -218,7 +221,7 @@ msgid "Create Quality Issue"
 msgstr "Создать проблему качества"
 
 msgid "Create Rework"
-msgstr ""
+msgstr "Создать переделку"
 
 msgid "Customer"
 msgstr "Заказчик"
@@ -249,7 +252,7 @@ msgid "Describe the problem..."
 msgstr "Опишите проблему..."
 
 msgid "Describe what needs to be reworked..."
-msgstr ""
+msgstr "Опишите, что нужно переделать..."
 
 msgid "Description"
 msgstr "Описание"
@@ -277,8 +280,8 @@ msgid "Dragging {0} cancelled."
 msgstr "Перетаскивание {0} отменено."
 
 #. placeholder {0}: formatRelativeTime( convertDateStringToIsoString( operation.operationDueDate ) )
-#. placeholder {0}: formatRelativeTime( convertDateStringToIsoString( operation.operationDueDate ) )
 #. placeholder {0}: formatRelativeTime( convertDateStringToIsoString(operation.jobDueDate) )
+#. placeholder {0}: formatRelativeTime( convertDateStringToIsoString(item.dueDate) )
 msgid "Due {0}"
 msgstr "Срок {0}"
 
@@ -351,20 +354,20 @@ msgid "Filter"
 msgstr "Фильтр"
 
 msgid "Finish"
-msgstr ""
+msgstr "Завершить"
 
 #. placeholder {0}: operation.itemReadableId
 msgid "Finish {0}"
-msgstr ""
+msgstr "Завершить {0}"
 
 msgid "Finish Anyways"
-msgstr ""
+msgstr "Завершить в любом случае"
 
 msgid "Forgot to Clock Out?"
 msgstr "Забыли отметить уход?"
 
 msgid "Go back to operation"
-msgstr ""
+msgstr "Вернуться к операции"
 
 msgid "Have a technical issue? Contact <0>Carbon Support.</0>"
 msgstr "Возникла техническая проблема? Обратитесь в <0>службу поддержки Carbon.</0>"
@@ -502,7 +505,7 @@ msgid "Model"
 msgstr "Модель"
 
 msgid "More Actions"
-msgstr ""
+msgstr "Дополнительные действия"
 
 msgid "More options"
 msgstr "Дополнительные действия"
@@ -594,6 +597,9 @@ msgstr "Нет запланированного времени"
 
 msgid "No serial numbers"
 msgstr "Нет серийных номеров"
+
+msgid "No serial numbers found"
+msgstr "Серийные номера не найдены"
 
 msgid "No spare parts added yet"
 msgstr "Запасные части ещё не добавлены"
@@ -708,7 +714,7 @@ msgid "Quantity must be greater than 0"
 msgstr "Количество должно быть больше 0"
 
 msgid "Reason for rework"
-msgstr ""
+msgstr "Причина переделки"
 
 msgid "Recent"
 msgstr "Недавние"
@@ -733,10 +739,10 @@ msgid "Remove part"
 msgstr "Удалить деталь"
 
 msgid "Rework"
-msgstr ""
+msgstr "Переделка"
 
 msgid "Rework created successfully"
-msgstr ""
+msgstr "Переработка успешно создана"
 
 msgid "Sales Order"
 msgstr "Заказ на продажу"
@@ -750,11 +756,14 @@ msgstr "Сканировать"
 msgid "Scan or enter serial number"
 msgstr "Сканируйте или введите серийный номер"
 
+msgid "Scan or search serial number..."
+msgstr "Сканируйте или ищите серийный номер..."
+
 msgid "Schedule"
 msgstr "Расписание"
 
 msgid "Scrap"
-msgstr ""
+msgstr "Брак"
 
 msgid "Scrap Reason"
 msgstr "Причина брака"
@@ -807,7 +816,7 @@ msgid "Select Serial Number"
 msgstr "Выберите серийный номер"
 
 msgid "Select the operation to go back to. All operations from that point to the current operation will be redone."
-msgstr ""
+msgstr "Выберите операцию, к которой нужно вернуться. Все операции от этой точки до текущей операции будут повторены."
 
 msgid "Send"
 msgstr "Отправить"
@@ -828,6 +837,9 @@ msgstr "Серийный номер недоступен"
 
 msgid "Serial number is required"
 msgstr "Серийный номер обязателен"
+
+msgid "Serial numbers"
+msgstr "Серийные номера"
 
 msgid "Serial Numbers"
 msgstr "Серийные номера"

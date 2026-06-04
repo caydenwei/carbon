@@ -283,14 +283,16 @@ const JobProperties = () => {
             }}
           </Await>
         </Suspense>
+      </VStack>
 
-        <span className="text-xs text-muted-foreground">
-          <Trans>Target</Trans>
-        </span>
-        {routeData?.job?.customerId &&
-        routeData?.job?.salesOrderId &&
-        routeData?.job?.salesOrderLineId ? (
-          <HStack className="group" spacing={1}>
+      {routeData?.job?.customerId &&
+      routeData?.job?.salesOrderId &&
+      routeData?.job?.salesOrderLineId ? (
+        <VStack spacing={0}>
+          <span className="text-xs text-muted-foreground">
+            <Trans>Target</Trans>
+          </span>
+          <HStack className="group w-full justify-between" spacing={0}>
             <Hyperlink
               to={path.to.salesOrderLine(
                 routeData.job.salesOrderId,
@@ -312,29 +314,29 @@ const JobProperties = () => {
               Unlink
             </Button>
           </HStack>
-        ) : (
-          <ValidatedForm
-            defaultValues={{
-              storageUnitId: routeData?.job?.storageUnitId ?? undefined
+        </VStack>
+      ) : (
+        <ValidatedForm
+          defaultValues={{
+            storageUnitId: routeData?.job?.storageUnitId ?? undefined
+          }}
+          validator={z.object({
+            storageUnitId: zfd.text(z.string().optional())
+          })}
+          className="w-full"
+        >
+          <StorageUnit
+            label={t`Target`}
+            name="storageUnitId"
+            inline
+            locationId={routeData?.job?.locationId ?? undefined}
+            isReadOnly={isDisabled}
+            onChange={(value) => {
+              onUpdate("storageUnitId", value?.id ?? null);
             }}
-            validator={z.object({
-              storageUnitId: zfd.text(z.string().optional())
-            })}
-            className="w-full"
-          >
-            <StorageUnit
-              label=""
-              name="storageUnitId"
-              inline
-              locationId={routeData?.job?.locationId ?? undefined}
-              isReadOnly={isDisabled}
-              onChange={(value) => {
-                onUpdate("storageUnitId", value?.id ?? null);
-              }}
-            />
-          </ValidatedForm>
-        )}
-      </VStack>
+          />
+        </ValidatedForm>
+      )}
 
       <Assignee
         id={jobId}

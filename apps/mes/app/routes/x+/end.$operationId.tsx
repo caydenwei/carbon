@@ -5,7 +5,7 @@ import { flash } from "@carbon/auth/session.server";
 import {
   evaluateLinesForSurface,
   isBlocked
-} from "@carbon/ee/custom-rules.server";
+} from "@carbon/ee/storage-rules.server";
 import type { LoaderFunctionArgs } from "react-router";
 import { redirect } from "react-router";
 import {
@@ -89,7 +89,12 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     0;
 
   const quantityToComplete = completeAll
-    ? Math.max(0, (jobOperation.data.operationQuantity ?? 0) - currentQuantity)
+    ? Math.max(
+        0,
+        (jobOperation.data.operationQuantity ?? 0) -
+          currentQuantity -
+          (jobOperation.data.quantityReworked ?? 0)
+      )
     : 1;
 
   const willBeFinished =

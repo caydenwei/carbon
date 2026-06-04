@@ -264,7 +264,9 @@ export async function loader({ context, request }: LoaderFunctionArgs) {
           thumbnailPath: op.thumbnailPath,
           quantity: op.operationQuantity,
           quantityCompleted: op.quantityComplete,
+          quantityReworked: op.quantityReworked,
           quantityScrapped: op.quantityScrapped,
+          reworkId: op.reworkId,
           setupDuration: operation.setupDuration,
           laborDuration: operation.laborDuration,
           machineDuration: operation.machineDuration

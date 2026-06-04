@@ -125,9 +125,10 @@ export async function getUpstreamOperations(
 
   return client
     .from("jobOperation")
-    .select("id, processId, description, order, status, reworkId")
+    .select(
+      "id, processId, description, order, status, reworkId, jobMakeMethod(item(name))"
+    )
     .in("id", Array.from(ancestors))
-    .is("reworkId", null)
     .order("order", { ascending: true });
 }
 

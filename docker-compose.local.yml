@@ -81,6 +81,53 @@ services:
       - |
         set -euo pipefail
         cd /repo/packages/database
+        node <<'NODE'
+        const { Client } = require("pg");
+
+        const deadline = Date.now() + 180_000;
+        const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+        async function storageReady() {
+          const client = new Client({
+            connectionString: process.env.SUPABASE_DB_URL
+          });
+          try {
+            await client.connect();
+            const result = await client.query(`
+              select
+                to_regclass('storage.buckets') is not null as buckets,
+                to_regclass('storage.objects') is not null as objects,
+                to_regprocedure('storage.foldername(text)') is not null as foldername,
+                to_regprocedure('storage.filename(text)') is not null as filename
+            `);
+            return Object.values(result.rows[0] ?? {}).every(Boolean);
+          } catch {
+            return false;
+          } finally {
+            await client.end().catch(() => {});
+          }
+        }
+
+        async function main() {
+          process.stdout.write("Waiting for Supabase storage schema");
+          while (Date.now() < deadline) {
+            if (await storageReady()) {
+              process.stdout.write(" ready\n");
+              return;
+            }
+            process.stdout.write(".");
+            await sleep(1000);
+          }
+
+          process.stderr.write("\nSupabase storage schema did not become ready within 180s\n");
+          process.exit(1);
+        }
+
+        main().catch((error) => {
+          console.error(error);
+          process.exit(1);
+        });
+        NODE
         pnpm exec supabase migration up --db-url postgresql://postgres:postgres@postgres:5432/postgres
         cd /repo
         pnpm --filter @carbon/database db:seed
